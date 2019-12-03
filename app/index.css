@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans|Raleway&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Julius+Sans+One|Montserrat&display=swap');
 
 :root {
-  --font1: 'Raleway', sans-serif;
-  --font2: 'Open Sans', sans-serif;
-  --purple: #7f53ac;
+  --font1: 'Julius Sans One', sans-serif;
+  --font2: 'Montserrat', sans-serif;
+  --purple: rgba(127, 83, 172, 1);
   --white: rgba(245, 245, 245, 1);
   --purple-gradient: linear-gradient(-135deg, #c850c0, #4158d0);
   --purple-fallback: rgba(183, 33, 255, 1);
@@ -24,7 +24,7 @@ body,
 
 body {
   background-color: var(--purple);
-  background: var(--purple-gradient);
+  /* background: var(--purple-gradient); */
   background-position: 400% 400%;
   background-attachment: fixed;
   margin: 0;
@@ -33,7 +33,7 @@ body {
   animation: animate 10s ease-in-out forwards infinite;
 }
 
-@-webkit-keyframes animate {
+/* @-webkit-keyframes animate {
   0%,
   100% {
     background-position: 0% 50%;
@@ -51,4 +51,4 @@ body {
   50% {
     background-position: 100% 50%;
   }
-}
+} */

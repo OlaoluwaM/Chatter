@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Login } from './components/Login';
+import { Auth } from './components/Auth';
 import './index.css';
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <Router>
       <div>
         <Switch>
-          <Route path="/" exact component={Login} />
+          <Route path="/" exact component={Auth} />
         </Switch>
       </div>
     </Router>
