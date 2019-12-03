@@ -1,14 +1,54 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Raleway&display=swap');
+
+:root {
+  --font1: 'Raleway', sans-serif;
+  --font2: 'Open Sans', sans-serif;
+  --purple: #7f53ac;
+  --white: rgba(245, 245, 245, 1);
+  --purple-gradient: linear-gradient(-135deg, #c850c0, #4158d0);
+  --purple-fallback: rgba(183, 33, 255, 1);
+}
+
 * {
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 html,
 body,
-#root {
+#root,
+#root > div {
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 
 body {
+  background-color: var(--purple);
+  background: var(--purple-gradient);
+  background-position: 400% 400%;
+  background-attachment: fixed;
   margin: 0;
   padding: 0;
+  -webkit-animation: animate 0.3s 0.2s linear both infinite;
+  animation: animate 10s ease-in-out forwards infinite;
+}
+
+@-webkit-keyframes animate {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes animate {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
