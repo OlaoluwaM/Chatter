@@ -23,14 +23,9 @@ body,
 }
 
 body {
-  background-color: var(--purple);
-  /* background: var(--purple-gradient); */
-  background-position: 400% 400%;
-  background-attachment: fixed;
+  background-color: var(--white);
   margin: 0;
   padding: 0;
-  -webkit-animation: animate 0.3s 0.2s linear both infinite;
-  animation: animate 10s ease-in-out forwards infinite;
 }
 
 /* @-webkit-keyframes animate {

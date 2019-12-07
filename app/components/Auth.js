@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useTransition, useSpring, animated } from 'react-spring';
+import { Button } from './UI-components';
+import { useSpring, animated, useTrail, config } from 'react-spring';
+
+// Styled Components Used on the Auth page, I don't want to abstract them because they are specific tot this page
 
 const AuthPage = styled.div.attrs({
   className: 'auth-page',
@@ -13,9 +16,12 @@ const AuthPage = styled.div.attrs({
   background: inherit;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 `;
 
-const SwitchArea = styled(animated.div)`
+const SwitchArea = styled(animated.div).attrs({
+  className: 'switch-area',
+})`
   flex-basis: 40%;
   width: 40%;
   background: inherit;
@@ -38,7 +44,9 @@ const SwitchArea = styled(animated.div)`
   }
 `;
 
-const FormContainer = styled(animated.form)`
+const FormContainer = styled(animated.form).attrs({
+  className: 'form-container',
+})`
   display: flex;
   color: #000;
   background: var(--white);
@@ -51,7 +59,7 @@ const FormContainer = styled(animated.form)`
   position: relative;
 `;
 
-const InputContainer = styled.div`
+const InputContainer = styled(animated.div)`
   width: 60%;
   color: inherit;
   height: 4.5%;
@@ -115,12 +123,12 @@ const Input = styled.input.attrs({
   }
 `;
 
-const FormTitle = styled.h1`
+const FormTitle = styled(animated.h1)`
   margin-bottom: 55px;
   font-family: var(--font1);
-  font-size: 3.8rem;
+  font-size: 3.5rem;
   letter-spacing: 0.2rem;
-  font-weight: 800;
+  font-weight: 1000;
 `;
 
 const InputLabel = styled.label.attrs({
@@ -137,95 +145,218 @@ const InputLabel = styled.label.attrs({
   transition: 0.2s ease all;
 `;
 
-const Button = styled.button`
-  border: 1.4px solid var(--white);
-  font-size: 1.1rem;
-  color: inherit;
-  padding: 20px 40px;
-  width: 270px;
-  text-transform: uppercase;
-  cursor: pointer;
-  font-family: var(--font2);
-  border-radius: 50px;
-  background: transparent;
-  outline: none;
-`;
-
 const SubmitButton = styled(Button)`
-  background: var(--purple);
+  background: var(--purple-gradient);
   border: none;
   color: var(--white);
 `;
 
-export function Auth() {
-  const [state, setState] = React.useState('login');
+function InputField({ name, required, type, label, style, ...rest }) {
+  return (
+    <InputContainer style={style}>
+      <Input {...rest} type={type} required={required} name={name} />
+      <Bar />
+      <InputLabel>{label}</InputLabel>
+    </InputContainer>
+  );
+}
+
+const AnimatedSubmitButton = animated(SubmitButton);
+
+// ----------------------------------------------------------------------------------------------------
+const loginComponents = [
+  {
+    component: FormTitle,
+    cProps: {},
+    innerText: 'Login',
+    id: 1243,
+  },
+  {
+    component: InputField,
+    cProps: {
+      name: 'email',
+      label: 'Email',
+    },
+    innerText: '',
+    id: 4234,
+  },
+  {
+    component: InputField,
+    cProps: {
+      name: 'passcode',
+      type: 'password',
+      label: 'Password',
+    },
+    innerText: '',
+    id: 2342,
+  },
+  {
+    component: AnimatedSubmitButton,
+    cProps: {
+      as: 'input',
+      type: 'submit',
+      name: 'btn',
+      value: 'Login',
+    },
+    innerText: '',
+    id: 3454,
+  },
+];
+
+const signUpComponents = [
+  {
+    component: FormTitle,
+    cProps: {},
+    innerText: 'Create an account',
+    id: 3423,
+  },
+  {
+    component: InputField,
+    cProps: {
+      name: 'email',
+      label: 'Email',
+    },
+    innerText: '',
+    id: 5567,
+  },
+  {
+    component: InputField,
+    cProps: {
+      name: 'passcode',
+      type: 'password',
+      label: 'Password',
+    },
+    innerText: '',
+    id: 7687,
+  },
+  {
+    component: InputField,
+    cProps: {
+      name: 'confirm-passcode',
+      type: 'password',
+      label: 'Confirm Password',
+    },
+    innerText: '',
+    id: 3204,
+  },
+  {
+    component: AnimatedSubmitButton,
+    cProps: {
+      as: 'input',
+      type: 'submit',
+      name: 'btn',
+      value: 'Sign Up',
+    },
+    innerText: '',
+    id: 2249,
+  },
+];
+
+// ---------------------------------------------------------------------------
+
+function Form({ type }) {
+  const [components, setComponents] = React.useState([]);
+
+  React.useEffect(() => {
+    setComponents(type === 'login' ? loginComponents : signUpComponents);
+    return () => setComponents([]);
+  }, [type]);
+
+  const trail = useTrail(components.length, {
+    from: { opacity: 0, transform: 'translate3d(0, 50px, 0)' },
+    to: { opacity: 1, transform: 'translate3d(0, 0px, 0)' },
+    reset: true,
+    config: config.gentle,
+    delay: 450,
+  });
+
+  return (
+    <React.Fragment>
+      {trail.map((props, index) => {
+        const obj = components[index];
+        const Component = obj.component;
+        return obj.innerText === '' ? (
+          <Component key={index} {...obj.cProps} style={props} />
+        ) : (
+          <Component key={index} {...obj.cProps} style={props}>
+            {obj.innerText}
+          </Component>
+        );
+      })}
+    </React.Fragment>
+  );
+}
+
+export default function Auth() {
+  const [isSwapped, setSwap] = React.useState(false);
+
+  const distanceMoveLeft = React.useRef(0);
+  const distanceMoveRight = React.useRef(0);
+
+  const slideLeftAnim = useSpring({
+    transform: isSwapped
+      ? `translateX(${distanceMoveLeft.current}px)`
+      : `translateX(0px)`,
+    config: config.stiff,
+  });
+
+  const slideRightAnim = useSpring({
+    transform: isSwapped
+      ? `translateX(${distanceMoveRight.current}px)`
+      : `translateX(0px)`,
+    config: config.stiff,
+  });
+
+  React.useEffect(() => {
+    const leftDist = document.querySelector('.form-container').offsetLeft;
+    const rightDist = document.querySelector('.form-container').offsetWidth;
+    distanceMoveLeft.current = leftDist * -1;
+    distanceMoveRight.current = rightDist - 0.5;
+  }, []);
 
   const handleSubmit = e => {
     e.preventDefault();
     e.reset();
   };
 
-  if (state === 'login') {
-    return (
-      <AuthPage>
-        <SwitchArea>
-          <h1>New Here ?</h1>
-          <Button>Sign Up</Button>
-        </SwitchArea>
-        <FormContainer onSubmit={handleSubmit} autoComplete="off">
-          <Login />
-        </FormContainer>
-      </AuthPage>
-    );
-  } else {
-    return (
-      <AuthPage>
-        <SwitchArea>
-          <h1>Welcome Back!</h1>
-          <Button>Login</Button>
-        </SwitchArea>
-        <FormContainer onSubmit={handleSubmit} autoComplete="off">
-          <SignUp />
-        </FormContainer>
-      </AuthPage>
-    );
-  }
-}
+  const buttonTransitions = useSpring({
+    from: { opacity: 0, transform: 'translateX(-570px)' },
+    to: [
+      { opacity: 0, transform: 'translateX(-570px)' },
+      { opacity: 1, transform: 'translateX(0px)' },
+    ],
+    reset: true,
+    config: config.gentle,
+  });
 
-function Login() {
-  return (
-    <React.Fragment>
-      <FormTitle>LOGIN</FormTitle>
-      <InputField name="email" label="Email" />
-      <InputField name="passcode" type="password" label="Password" />
-      <SubmitButton as="input" type="submit" name="btn" value="Login" />
-    </React.Fragment>
-  );
-}
+  const headerTransitions = useSpring({
+    from: { opacity: 0, transform: 'translateY(-40px)' },
+    to: [
+      { opacity: 0, transform: 'translateX(-40px)' },
+      { opacity: 1, transform: 'translateX(0px)' },
+    ],
+    reset: true,
+  });
 
-function SignUp() {
   return (
-    <React.Fragment>
-      <FormTitle style={{ fontSize: '3.5rem' }}>Create An Account</FormTitle>
-      <InputField name="email" label="Email" />
-      <InputField name="passcode" type="password" label="Password" />
-      <InputField
-        name="confirm-passcode"
-        type="password"
-        label="Confirm Password"
-      />
-      <SubmitButton as="input" type="submit" name="btn" value="Sign up" />
-    </React.Fragment>
-  );
-}
-
-function InputField({ name, required, type, label, ...rest }) {
-  return (
-    <InputContainer>
-      <Input {...rest} type={type} required={required} name={name} />
-      <Bar />
-      <InputLabel>{label}</InputLabel>
-    </InputContainer>
+    <AuthPage>
+      <SwitchArea style={slideRightAnim}>
+        <animated.h1 style={headerTransitions}>
+          {isSwapped ? 'Have an account ?' : 'New Here ?'}
+        </animated.h1>
+        <Button
+          style={buttonTransitions}
+          onClick={() => setSwap(swap => !swap)}>
+          {isSwapped ? 'Login' : 'Sign Up'}
+        </Button>
+      </SwitchArea>
+      <FormContainer
+        style={slideLeftAnim}
+        onSubmit={handleSubmit}
+        autoComplete="off">
+        <Form type={isSwapped ? 'sign-up' : 'login'} />
+      </FormContainer>
+    </AuthPage>
   );
 }
 
@@ -239,4 +370,8 @@ InputField.propTypes = {
   required: PropTypes.bool.isRequired,
   type: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+};
+
+Form.propTypes = {
+  type: PropTypes.string.isRequired,
 };
