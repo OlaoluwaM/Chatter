@@ -3,10 +3,8 @@
 :root {
   --font1: 'Julius Sans One', sans-serif;
   --font2: 'Montserrat', sans-serif;
-  --purple: rgba(127, 83, 172, 1);
-  --white: rgba(245, 245, 245, 1);
-  --purple-gradient: linear-gradient(-135deg, #c850c0, #4158d0);
-  --purple-fallback: rgba(183, 33, 255, 1);
+  --main: rgba(255, 255, 255, 1);
+  --sub: rgb(153, 102, 204);
 }
 
 * {
@@ -23,27 +21,10 @@ body,
 }
 
 body {
-  background-color: var(--white);
   margin: 0;
   padding: 0;
 }
 
-/* @-webkit-keyframes animate {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+li.active {
+  font-weight: bolder;
 }
-
-@keyframes animate {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-} */
