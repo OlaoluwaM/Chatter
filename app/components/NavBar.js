@@ -1,14 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Route, Link } from 'react-router-dom';
+import { AuthContext } from '../context/Context';
+import { Route, Link, __RouterContext } from 'react-router-dom';
 
 const NavContainer = styled.nav`
   position: relative;
   width: 100%;
   height: 6%;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  background: none;
+  background: var(--main);
+  padding: 0px 10px;
 
   ul {
     width: 18%;
@@ -31,16 +34,21 @@ const NavItem = styled.li`
   height: 100%;
   flex-basis: 100%;
   width: 100%;
-  margin-left: 25px;
   display: flex;
   padding: 10px;
   align-items: center;
   justify-content: center;
-
   a {
-    color: var(--sub);
+    color: rgba(64, 32, 96, 0.5);
     text-decoration: none;
     transition: inherit;
+    padding-top: 2px;
+  }
+
+  &.active > a,
+  &:hover > a {
+    border-top: 2px solid rgba(64, 32, 96, 1);
+    color: rgba(64, 32, 96, 1);
   }
 `;
 
@@ -50,7 +58,7 @@ function CustomLink({ to, exact, children }) {
   return (
     <Route
       exact={exact}
-      path={to}
+      path={typeof to === 'object' ? to.pathname : to}
       children={({ match }) => (
         <NavItem className={match ? 'active' : ''}>
           <Link to={to}>{children}</Link>
@@ -61,16 +69,43 @@ function CustomLink({ to, exact, children }) {
 }
 
 export default function Nav() {
-  const [toggle, setToggle] = React.useState(false);
+  // const [toggle, setToggle] = React.useState(false);
+  const { location } = React.useContext(__RouterContext);
+  const isAuthed = React.useContext(AuthContext);
 
   return (
     <NavContainer>
       <ul>
-        <CustomLink to="/" exact={true}>
+        <CustomLink to='/' exact={true}>
           Home
         </CustomLink>
-        <CustomLink to="/Chat">Chatroom</CustomLink>
+        {isAuthed && <CustomLink to='/Chat'>Chatroom</CustomLink>}
       </ul>
+      {location.pathname !== '/Auth' &&
+        location.pathname !== '/Chat' &&
+        !isAuthed && (
+          <ul style={{ width: '25%' }}>
+            <CustomLink
+              to={{
+                pathname: '/Auth',
+                state: {
+                  formType: 'login',
+                },
+              }}
+              exact={true}>
+              Login
+            </CustomLink>
+            <CustomLink
+              to={{
+                pathname: '/Auth',
+                state: {
+                  formType: 'sign-up',
+                },
+              }}>
+              Create an Account
+            </CustomLink>
+          </ul>
+        )}
     </NavContainer>
   );
 }

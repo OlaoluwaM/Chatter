@@ -1,209 +1,119 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button } from './UI-components';
-import { useSpring, animated, useTrail, config } from 'react-spring';
+import { Redirect } from 'react-router-dom';
+import { animated, useTrail, config } from 'react-spring';
+import { loginComponents, signUpComponents } from './Form-Components';
+import { AuthContext } from '../context/Context';
+import { extractFormData } from '../utils/helper';
 
-const InputContainer = styled(animated.div)`
-  width: 50%;
-  color: inherit;
-  height: 31px;
+
+const FormContainer = styled(animated.form).attrs({
+  className: 'form-container',
+})`
   display: flex;
+  color: var(--sub);
+  background: inherit;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  width: 85%;
+  flex-basis: 85%;
+  height: fit-content;
   position: relative;
-  margin-bottom: 65px;
-  background: transparent;
+  transition: 0.3s ease;
 `;
 
-const Bar = styled.span.attrs({
-  className: 'bar',
-})`
-  display: block;
-  position: relative;
-  width: 96.5%;
-  height: 3.5px;
-  border-radius: 50px;
-  background: rgba(153, 102, 204, 0.4);
+export default function Form({ setAuth, formType }) {
+  const [components, setComponents] = React.useState([]);
+  const [error, setError] = React.useState('');
+  const loadingRef = React.useRef();
+  const isAuthed = React.useContext(AuthContext);
 
-  ::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0px;
-    width: 0%;
-    height: 100%;
-    border-radius: 50px;
-    background: rgba(153, 102, 204, 1);
-    transition: 0.3s ease;
-  }
-`;
+  React.useEffect(() => {
+    setComponents(formType === 'login' ? loginComponents : signUpComponents);
+    return () => {
+      setComponents([]);
+      setError('');
+    };
+  }, [formType]);
 
-const Input = styled.input.attrs({
-  className: 'inputField',
-})`
-  flex-basis: 97%;
-  width: 97%;
-  color: inherit;
-  border: none;
-  transition: 0.7s ease;
-  outline: none;
-  background: transparent;
-  text-indent: 12px;
-  font-family: var(--font2);
-  font-size: 1rem;
-  padding-bottom: 7px;
+  const handleSignUp = data => {
+    const { username, passcode, confirmPasscode } = data;
+    if (passcode !== confirmPasscode) {
+      setError('Your passwords do not match');
+    } else {
+      loadingRef.current.style.opacity = 0.6;
+      setTimeout(() => {
+        localStorage.setItem(username, JSON.stringify(data));
+        setAuth(true);
+      }, 1000);
+    }
+  };
 
-  &:focus ~ label.inputLabel,
-  &:valid ~ label.inputLabel {
-    top: -25px;
-    font-size: 15px;
-    color: var(--sub);
-  }
+  const handleLogin = data => {
+    const { username, passcode } = data;
+    if (JSON.parse(localStorage.getItem(username)) === null) {
+      setError('User does not exist');
+    }
+    const { username: DBusername, passcode: DBpasscode } = JSON.parse(
+      localStorage.getItem(username)
+    );
+    if (username === DBusername && passcode === DBpasscode) {
+      loadingRef.current.style.opacity = 0.6;
+      setTimeout(() => {
+        setAuth(true);
+      }, 1000);
+    } else {
+      setError('Username or Password is incorrect');
+    }
+  };
 
-  &:focus ~ .bar:before {
-    width: 100%;
-  }
-`;
+  const handleSubmit = e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const extractedFormData = extractFormData(formData);
+    if (formType === 'login') {
+      handleLogin(extractedFormData);
+    } else {
+      handleSignUp(extractedFormData);
+    }
+  };
 
-const FormTitle = styled(animated.h1)`
-  margin-bottom: 65px;
-  font-family: var(--font1);
-  font-size: 3.8rem;
-  letter-spacing: 0.2rem;
-  font-weight: 1000;
-`;
+  const trail = useTrail(components.length, {
+    from: { opacity: 0, transform: 'translate3d(0, 50px, 0)' },
+    to: { opacity: 1, transform: 'translate3d(0, 0px, 0)' },
+    reset: true,
+    config: config.gentle,
+  });
 
-const InputLabel = styled.label.attrs({
-  className: 'inputLabel',
-})`
-  color: rgba(153, 102, 204, 0.4);
-  font-size: 1.1rem;
-  font-weight: normal;
-  position: absolute;
-  font-family: var(--font2);
-  pointer-events: none;
-  left: 15px;
-  top: 4px;
-  transition: 0.2s ease all;
-`;
+  const condition = components.length === 0;
 
-const SubmitButton = styled(Button)`
-  background: var(--sub);
-  border: none;
-  margin-bottom: 0px;
-  color: var(--main);
-`;
-
-const AnimatedSubmitButton = animated(SubmitButton);
-
-function InputField({ name, required, type, label, style, ...rest }) {
   return (
-    <InputContainer style={style}>
-      <Input {...rest} type={type} required={required} name={name} />
-      <Bar />
-      <InputLabel>{label}</InputLabel>
-    </InputContainer>
+    <FormContainer ref={loadingRef} onSubmit={handleSubmit} autoComplete='off'>
+      {isAuthed && <Redirect to='/' />}
+      {condition === false &&
+        !isAuthed &&
+        trail.map((props, index) => {
+          const obj = components[index];
+          const Component = obj.component;
+          return obj.innerText === '' ? (
+            <Component
+              key={index}
+              error={error}
+              {...obj.cProps}
+              style={props}
+            />
+          ) : (
+            <Component key={index} {...obj.cProps} style={props}>
+              {obj.innerText}
+            </Component>
+          );
+        })}
+    </FormContainer>
   );
 }
 
-InputField.defaultProps = {
-  required: true,
-  type: 'text',
+Form.propTypes = {
+  formType: PropTypes.string.isRequired,
 };
-
-InputField.propTypes = {
-  name: PropTypes.string.isRequired,
-  required: PropTypes.bool.isRequired,
-  type: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-};
-
-export const loginComponents = [
-  {
-    component: FormTitle,
-    cProps: {},
-    innerText: 'Login',
-    id: 1243,
-  },
-  {
-    component: InputField,
-    cProps: {
-      name: 'email',
-      label: 'Email',
-    },
-    innerText: '',
-    id: 4234,
-  },
-  {
-    component: InputField,
-    cProps: {
-      name: 'passcode',
-      type: 'password',
-      label: 'Password',
-    },
-    innerText: '',
-    id: 2342,
-  },
-  {
-    component: AnimatedSubmitButton,
-    cProps: {
-      as: 'input',
-      type: 'submit',
-      name: 'btn',
-      value: 'Login',
-    },
-    innerText: '',
-    id: 3454,
-  },
-];
-
-export const signUpComponents = [
-  {
-    component: FormTitle,
-    cProps: {},
-    innerText: 'Create an account',
-    id: 3423,
-  },
-  {
-    component: InputField,
-    cProps: {
-      name: 'email',
-      label: 'Email',
-    },
-    innerText: '',
-    id: 5567,
-  },
-  {
-    component: InputField,
-    cProps: {
-      name: 'passcode',
-      type: 'password',
-      label: 'Password',
-    },
-    innerText: '',
-    id: 7687,
-  },
-  {
-    component: InputField,
-    cProps: {
-      name: 'confirm-passcode',
-      type: 'password',
-      label: 'Confirm Password',
-    },
-    innerText: '',
-    id: 3204,
-  },
-  {
-    component: AnimatedSubmitButton,
-    cProps: {
-      as: 'input',
-      type: 'submit',
-      name: 'btn',
-      value: 'Sign Up',
-    },
-    innerText: '',
-    id: 2249,
-  },
-];

@@ -1,10 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useSpring, animated, useTrail, config } from 'react-spring';
-import { loginComponents, signUpComponents } from './Form';
-
-// Styled Components Used on the Auth page, I don't want to abstract them because they are specific tot this page
+import Form from './Form';
 
 const AuthPage = styled.div.attrs({
   className: 'auth-page',
@@ -20,21 +16,6 @@ const AuthPage = styled.div.attrs({
   overflow: hidden;
 `;
 
-const FormContainer = styled(animated.form).attrs({
-  className: 'form-container',
-})`
-  display: flex;
-  color: var(--sub);
-  background: inherit;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 75%;
-  flex-basis: 85%;
-  height: fit-content;
-  position: relative;
-`;
-
 const SwitchText = styled.p`
   color: var(--sub);
   text-transform: uppercase;
@@ -44,55 +25,17 @@ const SwitchText = styled.p`
   font-weight: bolder;
 `;
 
-function Form({ formType }) {
-  const [components, setComponents] = React.useState([]);
+export default function Auth({ location, setAuth }) {
+  const initialValue = location.state ? location.state.formType : 'login';
+  const [state, setState] = React.useState(initialValue);
 
   React.useEffect(() => {
-    setComponents(formType === 'login' ? loginComponents : signUpComponents);
-    return () => setComponents([]);
-  }, [formType]);
-
-  const trail = useTrail(components.length, {
-    from: { opacity: 0, transform: 'translate3d(0, 50px, 0)' },
-    to: { opacity: 1, transform: 'translate3d(0, 0px, 0)' },
-    reset: true,
-    config: config.gentle,
-  });
-
-  const condition = components.length === 0;
-
-  console.log({ condition, trail });
-  return (
-    <React.Fragment>
-      {condition === false &&
-        trail.map((props, index) => {
-          const obj = components[index];
-          const Component = obj.component;
-          return obj.innerText === '' ? (
-            <Component key={index} {...obj.cProps} style={props} />
-          ) : (
-            <Component key={index} {...obj.cProps} style={props}>
-              {obj.innerText}
-            </Component>
-          );
-        })}
-    </React.Fragment>
-  );
-}
-
-export default function Auth() {
-  const [state, setState] = React.useState('login');
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    e.reset();
-  };
+    if (location.state) setState(location.state.formType);
+  }, [location]);
 
   return (
     <AuthPage>
-      <FormContainer onSubmit={handleSubmit} autoComplete="off">
-        <Form formType={state} />
-      </FormContainer>
+      <Form setAuth={setAuth} formType={state} />
       <SwitchText
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>
         {state === 'login' ? ' Create an account' : ' Log into your account'}
@@ -100,7 +43,3 @@ export default function Auth() {
     </AuthPage>
   );
 }
-
-Form.propTypes = {
-  formType: PropTypes.string.isRequired,
-};
