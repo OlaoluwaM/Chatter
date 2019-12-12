@@ -22,6 +22,10 @@ module.exports = {
         test: /\.css$/,
         use: [{ loader: MiniCssExtractPlugin.loader }, 'css-loader'],
       },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: 'file-loader',
+      },
     ],
   },
   output: {
@@ -34,8 +38,6 @@ module.exports = {
     historyApiFallback: true,
     open: true,
     hotOnly: true,
-    contentBase: '/dist',
-    publicPath: '/',
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),

@@ -4,7 +4,7 @@
   --font1: 'Julius Sans One', sans-serif;
   --font2: 'Montserrat', sans-serif;
   --main: rgba(255, 255, 255, 1);
-  --sub: rgb(153, 102, 204);
+  --sub: rgba(153, 102, 204, 1);
 }
 
 * {
@@ -23,8 +23,4 @@ body,
 body {
   margin: 0;
   padding: 0;
-}
-
-li.active {
-  font-weight: bolder;
 }
