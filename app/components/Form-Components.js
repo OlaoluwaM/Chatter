@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Button } from './UI-components';
-import { useSpring, animated, useTrail, config } from 'react-spring';
+import { animated } from 'react-spring';
+import { FaCircle } from 'react-icons/fa';
+import { strongRegex, mediumRegex } from '../utils/helper';
+import Tooltip from './ToolTips';
 
 const InputContainer = styled(animated.div)`
   width: 50%;
@@ -110,6 +113,25 @@ const StyledErrorText = styled.p.attrs({
   margin-top: ${({ show }) => (show ? '15px' : '0')};
   margin-bottom: ${({ show }) => (show ? '40px' : '0')};
 `;
+const IndicatorIconWrapper = styled(animated.div)`
+  position: absolute;
+  right: 25px;
+  top: -5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  fill: ${({ strength }) =>
+    strength === 'weak' ? 'red' : strength === 'medium' ? 'orange' : 'green'};
+`;
+
+const IndicatorIconStyles = {
+  backgroundColor: 'inherit',
+  fill: 'inherit',
+  strokeColor: 'inherit',
+  zIndex: -10,
+};
 
 const AnimatedErrorText = animated(StyledErrorText);
 const AnimatedSubmitButton = animated(SubmitButton);
@@ -132,9 +154,38 @@ function ErrorText({ error, style }) {
 }
 
 function InputField({ name, required, type, label, style, ...rest }) {
+  const [passwordStrength, setPasswordStrength] = React.useState('weak');
+
+  const handleValidation = e => {
+    if (e.target.value.match(strongRegex)) {
+      setPasswordStrength('strong');
+    } else if (e.target.value.match(mediumRegex)) {
+      setPasswordStrength('medium');
+    } else setPasswordStrength('weak');
+  };
+
+  const { isValidated } = rest;
+
   return (
     <InputContainer style={style}>
-      <Input {...rest} type={type} required={required} name={name} />
+      {isValidated ? (
+        <Input
+          {...rest}
+          onChange={handleValidation}
+          type={type}
+          required={required}
+          name={name}
+        />
+      ) : (
+        <Input {...rest} type={type} required={required} name={name} />
+      )}
+      {isValidated && (
+        <Tooltip text={`${passwordStrength} password `}>
+          <IndicatorIconWrapper strength={passwordStrength}>
+            <FaCircle style={IndicatorIconStyles} />
+          </IndicatorIconWrapper>
+        </Tooltip>
+      )}
       <Bar />
       <InputLabel>{label}</InputLabel>
     </InputContainer>
@@ -226,6 +277,7 @@ export const signUpComponents = [
       name: 'passcode',
       type: 'password',
       label: 'Password',
+      isValidated: true,
     },
     innerText: '',
     id: 7687,

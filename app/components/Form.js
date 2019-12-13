@@ -7,7 +7,6 @@ import { loginComponents, signUpComponents } from './Form-Components';
 import { AuthContext } from '../context/Context';
 import { extractFormData } from '../utils/helper';
 
-
 const FormContainer = styled(animated.form).attrs({
   className: 'form-container',
 })`
@@ -43,7 +42,7 @@ export default function Form({ setAuth, formType }) {
     if (passcode !== confirmPasscode) {
       setError('Your passwords do not match');
     } else {
-      loadingRef.current.style.opacity = 0.6;
+      loadingRef.current.style.opacity = 0.4;
       setTimeout(() => {
         localStorage.setItem(username, JSON.stringify(data));
         setAuth(true);
@@ -60,7 +59,7 @@ export default function Form({ setAuth, formType }) {
       localStorage.getItem(username)
     );
     if (username === DBusername && passcode === DBpasscode) {
-      loadingRef.current.style.opacity = 0.6;
+      loadingRef.current.style.opacity = 0.4;
       setTimeout(() => {
         setAuth(true);
       }, 1000);
