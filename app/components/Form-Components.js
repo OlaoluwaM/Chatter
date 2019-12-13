@@ -220,7 +220,7 @@ export const loginComponents = [
   {
     component: InputField,
     cProps: {
-      name: 'username',
+      name: 'id',
       label: 'Username',
     },
     innerText: '',
@@ -265,7 +265,7 @@ export const signUpComponents = [
   {
     component: InputField,
     cProps: {
-      name: 'username',
+      name: 'id',
       label: 'Username',
     },
     innerText: '',

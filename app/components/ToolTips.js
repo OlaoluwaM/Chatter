@@ -11,7 +11,7 @@ const WrapperDiv = styled.div`
 
 const TooltipBox = styled(animated.div)`
   position: absolute;
-  right: -210px;
+  right: -200px;
   top: -25px;
   display: flex;
   width: max-content;

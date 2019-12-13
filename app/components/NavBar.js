@@ -52,15 +52,14 @@ const NavItem = styled.li`
   }
 `;
 
-function Icon() {}
 
-function CustomLink({ to, exact, children }) {
+function CustomLink({ to, exact, children, ...rest }) {
   return (
     <Route
       exact={exact}
       path={typeof to === 'object' ? to.pathname : to}
       children={({ match }) => (
-        <NavItem className={match ? 'active' : ''}>
+        <NavItem {...rest} className={match ? 'active' : ''}>
           <Link to={to}>{children}</Link>
         </NavItem>
       )}
@@ -68,10 +67,10 @@ function CustomLink({ to, exact, children }) {
   );
 }
 
-export default function Nav() {
+export default function Nav({ setAuth }) {
   // const [toggle, setToggle] = React.useState(false);
   const { location } = React.useContext(__RouterContext);
-  const isAuthed = React.useContext(AuthContext);
+  const { authed } = React.useContext(AuthContext);
 
   return (
     <NavContainer>
@@ -79,11 +78,11 @@ export default function Nav() {
         <CustomLink to='/' exact={true}>
           Home
         </CustomLink>
-        {isAuthed && <CustomLink to='/Chat'>Chatroom</CustomLink>}
+        {authed && <CustomLink to='/Chat'>Chatroom</CustomLink>}
       </ul>
       {location.pathname !== '/Auth' &&
         location.pathname !== '/Chat' &&
-        !isAuthed && (
+        !authed && (
           <ul style={{ width: '25%' }}>
             <CustomLink
               to={{
@@ -106,6 +105,11 @@ export default function Nav() {
             </CustomLink>
           </ul>
         )}
+      {authed && (
+        <CustomLink onClick={() => setAuth({ user: '', authed: false })} to='/'>
+          Logout
+        </CustomLink>
+      )}
     </NavContainer>
   );
 }

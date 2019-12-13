@@ -14,13 +14,13 @@ import { AuthProvider } from './context/Context';
 import './index.css';
 
 function App() {
-  const [isAuthed, setAuthed] = React.useState(false);
+  const [isAuthed, setAuthed] = React.useState({ user: '', authed: false });
 
   return (
     <AuthProvider value={isAuthed}>
       <div>
-        <Nav />
-        {!isAuthed && <Redirect to='/' />}
+        <Nav setAuth={setAuthed} />
+        {!isAuthed.authed && <Redirect to='/' />}
         <Switch>
           <Route exact path='/' component={Home} />
           <Route

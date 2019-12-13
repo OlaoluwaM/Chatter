@@ -4,6 +4,7 @@ import { randomColor, randomName } from '../utils/helper';
 import MessageArea from './Messages';
 import { OverHead } from './UI-components';
 import Input from './Input';
+import { AuthContext } from '../context/Context';
 
 const ChatAreaWrapper = styled.div`
   background: var(--main);
@@ -19,38 +20,52 @@ const ChatAreaWrapper = styled.div`
 
 export default function ChatArea() {
   const [state, setState] = React.useState({
-    messages: [
-      {
-        text: 'This is a test message!',
-        member: {
-          color: 'blue',
-          id: 'bluemoon',
-        },
-      },
-    ],
+    messages: [],
     member: {
       id: randomName(),
       color: randomColor(),
     },
   });
 
-  // React.useEffect(() => {
-  //   drone = new window.Scaledrone('QdpHluDuUEgfYxqm', {
-  //     data: state.member,
-  //   });
-  //   drone.on('open', error => {
-  //     if (error) {
-  //       return console.error(error);
-  //     }
-  //     const member = { ...state.member };
-  //     member.id = drone.clientId;
-  //     setState({ member });
-  //   });
-  // }, []);
+  const drone = React.useRef();
+  const { user } = React.useContext(AuthContext);
 
+  React.useEffect(() => {
+    const chatUser = { id: user, color: randomColor() };
+    drone.current = new window.Scaledrone('QdpHluDuUEgfYxqm', {
+      data: chatUser,
+    });
+
+    drone.current.on('open', error => {
+      if (error) {
+        return console.error(error);
+      }
+      const member = { ...chatUser };
+
+      member.id = drone.current.clientId;
+      setState(s => {
+        const { messages } = s;
+        return { messages, member };
+      });
+    });
+
+    const room = drone.current.subscribe('observable-room');
+    room.on('data', (data, member) => {
+      setState(s => {
+        const { messages, member: Cuser } = s;
+        messages.push({ text: data, member });
+        return { messages, member: Cuser };
+      });
+    });
+    return () => (drone.current = '');
+  }, []);
+
+  console.log(state);
   const onSendMessage = message => {
-    let newOne = [...state.messages, { text: message, member: state.member }];
-    setState(s => ({ messages: newOne, member: s.member }));
+    drone.current.publish({
+      room: 'observable-room',
+      message,
+    });
   };
 
   return (

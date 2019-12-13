@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import SideBar from './SideBar';
 import ChatArea from './ChatArea';
 
 const ChatRoomContainer = styled.div`
@@ -14,7 +13,6 @@ const ChatRoomContainer = styled.div`
 export function Chatroom() {
   return (
     <ChatRoomContainer>
-      <SideBar />
       <ChatArea />
     </ChatRoomContainer>
   );

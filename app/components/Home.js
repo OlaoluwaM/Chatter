@@ -20,7 +20,7 @@ const HomePage = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 60%;
+    width: 85%;
     height: 33%;
 
     h1 {
@@ -40,12 +40,13 @@ const iconStyles = {
 };
 
 export default function Home() {
-  const isAuthed = React.useContext(AuthContext);
+  const { user, authed } = React.useContext(AuthContext);
+
   return (
     <HomePage>
       <div>
-        <h1>Welcome to Chatter</h1>
-        <Link to={isAuthed ? '/Chat' : '/Auth'}>
+        <h1>{authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}</h1>
+        <Link to={authed ? '/Chat' : '/Auth'}>
           <Button style={{ background: 'var(--sub)', color: 'var(--main)' }}>
             <FaPaperPlane style={iconStyles} />
             Chat

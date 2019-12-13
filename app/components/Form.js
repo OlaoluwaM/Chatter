@@ -27,7 +27,7 @@ export default function Form({ setAuth, formType }) {
   const [components, setComponents] = React.useState([]);
   const [error, setError] = React.useState('');
   const loadingRef = React.useRef();
-  const isAuthed = React.useContext(AuthContext);
+  const { authed } = React.useContext(AuthContext);
 
   React.useEffect(() => {
     setComponents(formType === 'login' ? loginComponents : signUpComponents);
@@ -38,30 +38,34 @@ export default function Form({ setAuth, formType }) {
   }, [formType]);
 
   const handleSignUp = data => {
-    const { username, passcode, confirmPasscode } = data;
+    const users = JSON.parse(localStorage.getItem('Users')) || [];
+    const { id, passcode, confirmPasscode } = data;
     if (passcode !== confirmPasscode) {
       setError('Your passwords do not match');
     } else {
+      users.push(data);
       loadingRef.current.style.opacity = 0.4;
       setTimeout(() => {
-        localStorage.setItem(username, JSON.stringify(data));
-        setAuth(true);
+        localStorage.setItem('Users', JSON.stringify(users));
+        setAuth({ user: id, authed: true });
       }, 1000);
     }
   };
 
   const handleLogin = data => {
-    const { username, passcode } = data;
-    if (JSON.parse(localStorage.getItem(username)) === null) {
+    const { id: username, passcode } = data;
+    if (JSON.parse(localStorage.getItem('Users')) === null) {
       setError('User does not exist');
     }
-    const { username: DBusername, passcode: DBpasscode } = JSON.parse(
-      localStorage.getItem(username)
+    const users = JSON.parse(localStorage.getItem('Users'));
+    const userDataCorrect = users.some(
+      ({ id: DBusername, passcode: DBpasscode }) =>
+        username === DBusername && passcode === DBpasscode
     );
-    if (username === DBusername && passcode === DBpasscode) {
+    if (userDataCorrect) {
       loadingRef.current.style.opacity = 0.4;
       setTimeout(() => {
-        setAuth(true);
+        setAuth({ user: username, authed: true });
       }, 1000);
     } else {
       setError('Username or Password is incorrect');
@@ -90,9 +94,9 @@ export default function Form({ setAuth, formType }) {
 
   return (
     <FormContainer ref={loadingRef} onSubmit={handleSubmit} autoComplete='off'>
-      {isAuthed && <Redirect to='/' />}
+      {authed && <Redirect to='/' />}
       {condition === false &&
-        !isAuthed &&
+        !authed &&
         trail.map((props, index) => {
           const obj = components[index];
           const Component = obj.component;

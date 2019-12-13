@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { default as styled, css } from 'styled-components';
+import { animated, useSpring } from 'react-spring';
 
 const MessageAreaWrapper = styled.ul`
   width: 100%;
@@ -9,6 +10,7 @@ const MessageAreaWrapper = styled.ul`
   padding: 20px 0px;
   overflow-y: auto;
   background: #f5f5f5;
+  overflow-x: hidden;
 `;
 
 const Avatar = styled.span`
@@ -39,11 +41,11 @@ const MessageText = styled.div`
   display: inline-block;
 `;
 
-const MessageWrapper = styled.li`
+const MessageWrapper = styled(animated.li)`
   display: flex;
   margin-top: 30px;
-  ${({ myMessage }) =>
-    myMessage &&
+  ${({ mymessage }) =>
+    mymessage === 1 &&
     css`
       flex-direction: row-reverse;
       text-align: right;
@@ -58,15 +60,20 @@ const MessageWrapper = styled.li`
 
 function Message({ message, currentMember }) {
   const { member, text } = message;
-  // const isMyMessage = member.id === currentMember.id;
+
   const isMyMessage = member.id === currentMember.id;
-  // clientData;
-  // clientData;
+  const slideInDirection = isMyMessage ? 50 : -50;
+
+  const slideInAnim = useSpring({
+    from: { opacity: 0, transform: `translateX(${slideInDirection}px)` },
+    to: { opacity: 1, transform: `translateX(0px)` },
+  });
+
   return (
-    <MessageWrapper myMessage={isMyMessage}>
-      <Avatar bg={member.color} />
+    <MessageWrapper style={slideInAnim} mymessage={isMyMessage ? 1 : 0}>
+      <Avatar bg={member.clientData.color} />
       <MessageContent>
-        <Username>{member.id}</Username>
+        <Username>{member.clientData.id}</Username>
         <MessageText>{text}</MessageText>
       </MessageContent>
     </MessageWrapper>
@@ -75,7 +82,9 @@ function Message({ message, currentMember }) {
 
 export default function MessageArea({ messages, currentMember }) {
   const [messagesToRender, setMessages] = React.useState(messages);
-  React.useEffect(() => setMessages(messages), [messages]);
+  React.useEffect(() => {
+    setMessages(messages);
+  }, [messages]);
 
   return (
     <MessageAreaWrapper>
