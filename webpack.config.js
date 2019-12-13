@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   context: __dirname + '/app',
@@ -44,6 +45,7 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     new HtmlWebpackPlugin({ template: './index.html' }),
     new MiniCssExtractPlugin({ filename: 'bundle.css' }),
+    new CopyWebpackPlugin([{ from: '../_redirects' }]),
   ],
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 };
