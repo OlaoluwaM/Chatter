@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Form from './Form';
 
-const AuthPage = styled.div.attrs({
-  className: 'auth-page',
-})`
+const AuthPage = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;

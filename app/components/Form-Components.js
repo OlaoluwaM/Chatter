@@ -7,6 +7,14 @@ import { FaCircle } from 'react-icons/fa';
 import { strongRegex, mediumRegex } from '../utils/helper';
 import Tooltip from './ToolTips';
 
+const FormTitle = styled(animated.h1)`
+  margin-bottom: 25px;
+  font-family: var(--font1);
+  font-size: 3.8rem;
+  letter-spacing: 0.2rem;
+  font-weight: 1000;
+`;
+
 const InputContainer = styled(animated.div)`
   width: 50%;
   color: inherit;
@@ -20,9 +28,7 @@ const InputContainer = styled(animated.div)`
   background: transparent;
 `;
 
-const Bar = styled.span.attrs({
-  className: 'bar',
-})`
+const Bar = styled.span`
   display: block;
   position: relative;
   width: 96.5%;
@@ -43,9 +49,19 @@ const Bar = styled.span.attrs({
   }
 `;
 
-const Input = styled.input.attrs({
-  className: 'inputField',
-})`
+const InputLabel = styled.label`
+  color: rgba(153, 102, 204, 0.4);
+  font-size: 1.1rem;
+  font-weight: normal;
+  position: absolute;
+  font-family: var(--font2);
+  pointer-events: none;
+  left: 15px;
+  top: 4px;
+  transition: 0.2s ease all;
+`;
+
+const Input = styled.input`
   flex-basis: 97%;
   width: 97%;
   color: inherit;
@@ -58,38 +74,15 @@ const Input = styled.input.attrs({
   font-size: 1rem;
   padding-bottom: 7px;
 
-  &:focus ~ label.inputLabel,
-  &:valid ~ label.inputLabel {
+  &:focus ~ ${InputLabel}, &:valid ~ ${InputLabel} {
     top: -25px;
     font-size: 15px;
     color: var(--sub);
   }
 
-  &:focus ~ .bar:before {
+  &:focus ~ ${Bar}::before {
     width: 100%;
   }
-`;
-
-const FormTitle = styled(animated.h1)`
-  margin-bottom: 25px;
-  font-family: var(--font1);
-  font-size: 3.8rem;
-  letter-spacing: 0.2rem;
-  font-weight: 1000;
-`;
-
-const InputLabel = styled.label.attrs({
-  className: 'inputLabel',
-})`
-  color: rgba(153, 102, 204, 0.4);
-  font-size: 1.1rem;
-  font-weight: normal;
-  position: absolute;
-  font-family: var(--font2);
-  pointer-events: none;
-  left: 15px;
-  top: 4px;
-  transition: 0.2s ease all;
 `;
 
 const SubmitButton = styled(Button)`
@@ -99,9 +92,7 @@ const SubmitButton = styled(Button)`
   color: var(--main);
 `;
 
-const StyledErrorText = styled.p.attrs({
-  className: 'form-error-message',
-})`
+const StyledErrorText = styled.p`
   margin: 0;
   width: 50%;
   flex-basis: 5%;
@@ -113,6 +104,7 @@ const StyledErrorText = styled.p.attrs({
   margin-top: ${({ show }) => (show ? '15px' : '0')};
   margin-bottom: ${({ show }) => (show ? '40px' : '0')};
 `;
+
 const IndicatorIconWrapper = styled(animated.div)`
   position: absolute;
   right: 25px;
@@ -179,6 +171,7 @@ function InputField({ name, required, type, label, style, ...rest }) {
       ) : (
         <Input {...rest} type={type} required={required} name={name} />
       )}
+
       {isValidated && (
         <Tooltip text={`${passwordStrength} password `}>
           <IndicatorIconWrapper strength={passwordStrength}>

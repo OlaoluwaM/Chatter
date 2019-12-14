@@ -38,6 +38,7 @@ const NavItem = styled.li`
   padding: 10px;
   align-items: center;
   justify-content: center;
+
   a {
     color: rgba(64, 32, 96, 0.5);
     text-decoration: none;
@@ -51,7 +52,6 @@ const NavItem = styled.li`
     color: rgba(64, 32, 96, 1);
   }
 `;
-
 
 function CustomLink({ to, exact, children, ...rest }) {
   return (
@@ -67,8 +67,7 @@ function CustomLink({ to, exact, children, ...rest }) {
   );
 }
 
-export default function Nav({ setAuth }) {
-  // const [toggle, setToggle] = React.useState(false);
+export default function Nav() {
   const { location } = React.useContext(__RouterContext);
   const { authed } = React.useContext(AuthContext);
 
@@ -78,8 +77,10 @@ export default function Nav({ setAuth }) {
         <CustomLink to='/' exact={true}>
           Home
         </CustomLink>
+
         {authed && <CustomLink to='/Chat'>Chatroom</CustomLink>}
       </ul>
+
       {location.pathname !== '/Auth' &&
         location.pathname !== '/Chat' &&
         !authed && (
@@ -94,7 +95,9 @@ export default function Nav({ setAuth }) {
               exact={true}>
               Login
             </CustomLink>
+
             <CustomLink
+              exact={true}
               to={{
                 pathname: '/Auth',
                 state: {
@@ -105,11 +108,8 @@ export default function Nav({ setAuth }) {
             </CustomLink>
           </ul>
         )}
-      {authed && (
-        <CustomLink onClick={() => setAuth({ user: '', authed: false })} to='/'>
-          Logout
-        </CustomLink>
-      )}
+
+      {authed && <CustomLink to='/Logout'>Logout</CustomLink>}
     </NavContainer>
   );
 }

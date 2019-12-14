@@ -61,6 +61,7 @@ export default function Tooltip({ text, children }) {
 Tooltip.propTypes = {
   text: PropTypes.string.isRequired,
 };
+
 Tooltip.defaultProps = {
   text: 'message',
 };

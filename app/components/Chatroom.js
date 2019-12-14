@@ -10,7 +10,7 @@ const ChatRoomContainer = styled.div`
   overflow: hidden;
 `;
 
-export function Chatroom() {
+export default function Chatroom() {
   return (
     <ChatRoomContainer>
       <ChatArea />

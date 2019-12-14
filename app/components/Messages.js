@@ -59,8 +59,9 @@ const MessageWrapper = styled(animated.li)`
 `;
 
 function Message({ message, currentMember }) {
-  const { member, text } = message;
+  console.log(message, currentMember);
 
+  const { member, text } = message;
   const isMyMessage = member.id === currentMember.id;
   const slideInDirection = isMyMessage ? 50 : -50;
 
@@ -82,6 +83,8 @@ function Message({ message, currentMember }) {
 
 export default function MessageArea({ messages, currentMember }) {
   const [messagesToRender, setMessages] = React.useState(messages);
+  console.log(messages, currentMember);
+
   React.useEffect(() => {
     setMessages(messages);
   }, [messages]);

@@ -19,6 +19,9 @@ const ChatAreaWrapper = styled.div`
 `;
 
 export default function ChatArea() {
+  const { user } = React.useContext(AuthContext);
+  const chatUser = React.useRef({ id: user, color: randomColor() });
+
   const [state, setState] = React.useState({
     messages: [],
     member: {
@@ -27,29 +30,29 @@ export default function ChatArea() {
     },
   });
 
-  const drone = React.useRef();
-  const { user } = React.useContext(AuthContext);
+  const [drone, setDrone] = React.useState(() => {
+    return new window.Scaledrone('QdpHluDuUEgfYxqm', {
+      data: chatUser.current,
+    });
+  });
 
   React.useEffect(() => {
-    const chatUser = { id: user, color: randomColor() };
-    drone.current = new window.Scaledrone('QdpHluDuUEgfYxqm', {
-      data: chatUser,
-    });
-
-    drone.current.on('open', error => {
+    drone.on('open', error => {
       if (error) {
         return console.error(error);
       }
-      const member = { ...chatUser };
 
-      member.id = drone.current.clientId;
+      const member = { ...chatUser.current };
+      member.id = drone.clientId;
+
       setState(s => {
         const { messages } = s;
         return { messages, member };
       });
     });
 
-    const room = drone.current.subscribe('observable-room');
+    const room = drone.subscribe('observable-room');
+
     room.on('data', (data, member) => {
       setState(s => {
         const { messages, member: Cuser } = s;
@@ -57,12 +60,12 @@ export default function ChatArea() {
         return { messages, member: Cuser };
       });
     });
-    return () => (drone.current = '');
+
+    return () => setDrone(null);
   }, []);
 
-  console.log(state);
   const onSendMessage = message => {
-    drone.current.publish({
+    drone.publish({
       room: 'observable-room',
       message,
     });
@@ -71,8 +74,13 @@ export default function ChatArea() {
   return (
     <ChatAreaWrapper>
       <OverHead />
-      <MessageArea messages={state.messages} currentMember={state.member} />
-      <Input onSendMessage={onSendMessage} />
+      {drone === null || !drone ? (
+        <h1>Loading</h1>
+      ) : (
+        <MessageArea messages={state.messages} currentMember={state.member} />
+      )}
+
+      <Input isDisabled={drone === null} onSendMessage={onSendMessage} />
     </ChatAreaWrapper>
   );
 }

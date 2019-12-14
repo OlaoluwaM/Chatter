@@ -7,9 +7,7 @@ import { loginComponents, signUpComponents } from './Form-Components';
 import { AuthContext } from '../context/Context';
 import { extractFormData } from '../utils/helper';
 
-const FormContainer = styled(animated.form).attrs({
-  className: 'form-container',
-})`
+const FormContainer = styled(animated.form)`
   display: flex;
   color: var(--sub);
   background: inherit;
@@ -26,7 +24,7 @@ const FormContainer = styled(animated.form).attrs({
 export default function Form({ setAuth, formType }) {
   const [components, setComponents] = React.useState([]);
   const [error, setError] = React.useState('');
-  const loadingRef = React.useRef();
+  const formRef = React.useRef();
   const { authed } = React.useContext(AuthContext);
 
   React.useEffect(() => {
@@ -40,42 +38,57 @@ export default function Form({ setAuth, formType }) {
   const handleSignUp = data => {
     const users = JSON.parse(localStorage.getItem('Users')) || [];
     const { id, passcode, confirmPasscode } = data;
+
     if (passcode !== confirmPasscode) {
       setError('Your passwords do not match');
     } else {
+      data['loggedIn'] = true;
       users.push(data);
-      loadingRef.current.style.opacity = 0.4;
+      formRef.current.style.opacity = 0.4;
+
       setTimeout(() => {
         localStorage.setItem('Users', JSON.stringify(users));
         setAuth({ user: id, authed: true });
-      }, 1000);
+      }, 1500);
     }
   };
 
   const handleLogin = data => {
-    const { id: username, passcode } = data;
     if (JSON.parse(localStorage.getItem('Users')) === null) {
       setError('User does not exist');
     }
+
+    const { id: username, passcode } = data;
     const users = JSON.parse(localStorage.getItem('Users'));
-    const userDataCorrect = users.some(
+
+    const userData = users.find(
       ({ id: DBusername, passcode: DBpasscode }) =>
         username === DBusername && passcode === DBpasscode
     );
+    const userDataCorrect = userData !== undefined;
+
     if (userDataCorrect) {
-      loadingRef.current.style.opacity = 0.4;
+      formRef.current.style.opacity = 0.4;
+
       setTimeout(() => {
+        let index = users.indexOf(userData);
+        userData.loggedIn = true;
+        users.splice(index, 1, userData);
+        localStorage.setItem('Users', JSON.stringify(users));
+
         setAuth({ user: username, authed: true });
-      }, 1000);
+      }, 1500);
     } else {
       setError('Username or Password is incorrect');
     }
   };
 
   const handleSubmit = e => {
-    e.preventDefault();
+    setError('');
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
+
+    e.preventDefault();
     if (formType === 'login') {
       handleLogin(extractedFormData);
     } else {
@@ -93,13 +106,15 @@ export default function Form({ setAuth, formType }) {
   const condition = components.length === 0;
 
   return (
-    <FormContainer ref={loadingRef} onSubmit={handleSubmit} autoComplete='off'>
+    <FormContainer ref={formRef} onSubmit={handleSubmit} autoComplete='off'>
       {authed && <Redirect to='/' />}
+
       {condition === false &&
         !authed &&
         trail.map((props, index) => {
           const obj = components[index];
           const Component = obj.component;
+
           return obj.innerText === '' ? (
             <Component
               key={index}

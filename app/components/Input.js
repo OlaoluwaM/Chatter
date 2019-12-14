@@ -49,13 +49,13 @@ const SendButton = styled.button`
   font-weight: 400;
 `;
 
-export default function Input(props) {
+export default function Input({ isDisabled, onSendMessage }) {
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
     const { text } = message;
     e.preventDefault();
-    props.onSendMessage(text);
+    onSendMessage(text);
     setMessage({ text: '' });
   };
 
@@ -67,6 +67,7 @@ export default function Input(props) {
         value={message.text}
         placeholder='Enter a message'
         autoFocus={true}
+        disabled={isDisabled}
       />
       <SendButton as='input' type='submit' value='Send' />
     </InputContainer>
@@ -74,5 +75,6 @@ export default function Input(props) {
 }
 
 Input.propTypes = {
+  isDisabled: PropTypes.bool.isRequired,
   onSendMessage: PropTypes.func.isRequired,
 };

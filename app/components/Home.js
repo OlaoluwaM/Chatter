@@ -46,6 +46,7 @@ export default function Home() {
     <HomePage>
       <div>
         <h1>{authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}</h1>
+
         <Link to={authed ? '/Chat' : '/Auth'}>
           <Button style={{ background: 'var(--sub)', color: 'var(--main)' }}>
             <FaPaperPlane style={iconStyles} />
