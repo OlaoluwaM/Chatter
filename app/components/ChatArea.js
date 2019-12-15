@@ -10,47 +10,12 @@ const ChatAreaWrapper = styled.div`
   background: var(--main);
   height: 100%;
   flex-grow: 1;
-  width: 71%;
   margin-top: 15px;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
 `;
-
-function chatAreaReducer(state, action) {
-  switch (action.type) {
-    case 'Success':
-      return {
-        loading: false,
-        ready: true,
-        error: {
-          state: false,
-          text: '',
-        },
-      };
-    case 'Error':
-      return {
-        loading: false,
-        ready: false,
-        error: {
-          state: true,
-          text: action.error,
-        },
-      };
-    case 'Reset':
-      return {
-        loading: false,
-        ready: false,
-        error: {
-          state: false,
-          text: '',
-        },
-      };
-    default:
-      throw new Error('Action is not recognized');
-  }
-}
 
 export default function ChatArea() {
   const { user } = React.useContext(AuthContext);
@@ -60,11 +25,13 @@ export default function ChatArea() {
     messages: [],
     member: {},
   });
+
   const [drone, setDrone] = React.useState(() => {
     return new window.Scaledrone('QdpHluDuUEgfYxqm', {
       data: chatUser.current,
     });
   });
+
   const [chatErrorState, setChatErrorState] = React.useState({
     errorOccurred: false,
     text: '',
@@ -84,8 +51,8 @@ export default function ChatArea() {
       member.id = drone.clientId;
 
       setState(s => {
-        const { messages } = s;
-        return { messages, member };
+        const prevMessages = s.messages;
+        return { messages: prevMessages, member };
       });
     });
 
@@ -97,6 +64,10 @@ export default function ChatArea() {
         messages.push({ text: data, member });
         return { messages, member: Cuser };
       });
+
+      document
+        .querySelector('.message-area')
+        .scrollTo(0, document.querySelector('.message-area').scrollHeight);
     });
 
     return () => {

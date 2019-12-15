@@ -24,8 +24,9 @@ export const Wrapper = styled.div`
 
 export const OverHead = styled.div`
   width: 100%;
-  flex-basis: 12%;
-  height: 12%;
+  flex-basis: 12vh;
+  height: 12vh;
+  min-height: 12%;
   display: flex;
-  background: rgb(115, 57, 172);
+  background: rgba(0, 0, 0, 1);
 `;

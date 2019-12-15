@@ -4,8 +4,9 @@ import styled from 'styled-components';
 
 const InputContainer = styled.form`
   width: 100%;
-  height: 12%;
-  flex-basis: 12%;
+  height: 12vh;
+  flex-basis: 12vh;
+  min-height: 12vh;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
   display: flex;
   padding-left: 15px;
@@ -61,7 +62,9 @@ export default function Input({ conditions, onSendMessage }) {
   const handleSubmit = e => {
     const { text } = message;
     e.preventDefault();
-    onSendMessage(text);
+    if (text.length >= 1) {
+      onSendMessage(text);
+    }
     setMessage({ text: '' });
   };
 

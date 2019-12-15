@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { default as styled, css } from 'styled-components';
-import { animated, useSpring } from 'react-spring';
+import { animated, useSpring, config } from 'react-spring';
+import { AuthContext } from '../context/Context';
 
-const MessageAreaWrapper = styled.ul`
+const MessageAreaWrapper = styled.ul.attrs({
+  className: 'message-area',
+})`
   width: 100%;
   flex-grow: 1;
   margin: 0;
   position: relative;
-  padding: 20px 0px;
+  padding: 20px 17px;
   overflow-y: auto;
   background: #f5f5f5;
   overflow-x: hidden;
+  * {
+    overflow-anchor: none;
+  }
 `;
 
 const TextWrapper = styled(animated.div)`
@@ -32,7 +38,7 @@ const TextWrapper = styled(animated.div)`
     font-weight: 500;
     color: var(--sub);
     margin-top: -5px;
-    width: 30%;
+    width: 80%;
   }
 `;
 
@@ -59,7 +65,7 @@ const MessageText = styled.div`
   max-width: 400px;
   margin: 0;
   border-radius: 12px;
-  background-color: cornflowerblue;
+  background-color: rgb(191, 159, 223);
   color: white;
   display: inline-block;
 `;
@@ -76,26 +82,31 @@ const MessageWrapper = styled(animated.li)`
         align-items: center;
       }
       & ${MessageText} {
-        background: orangered;
+        background: rgb(140, 83, 198);
       }
     `}
+  &:last-of-type {
+    overflow-anchor: auto;
+  }
 `;
 
 function Message({ message, currentMember }) {
   const { member, text } = message;
   const isMyMessage = member.id === currentMember.id;
   const slideInDirection = isMyMessage ? 50 : -50;
+  const { user } = React.useContext(AuthContext);
 
   const slideInAnim = useSpring({
     from: { opacity: 0, transform: `translateX(${slideInDirection}px)` },
     to: { opacity: 1, transform: `translateX(0px)` },
+    config: config.wobbly,
   });
 
   return (
     <MessageWrapper style={slideInAnim} mymessage={isMyMessage ? 1 : 0}>
-      <Avatar bg={member.clientData.color} />
+      <Avatar bg={member.clientData ? member.clientData.color : '#000000'} />
       <MessageContent>
-        <Username>{member.clientData.id}</Username>
+        <Username>{member.clientData ? member.clientData.id : user}</Username>
         <MessageText>{text}</MessageText>
       </MessageContent>
     </MessageWrapper>
@@ -104,10 +115,6 @@ function Message({ message, currentMember }) {
 
 export default function MessageArea({ conditions, messages, currentMember }) {
   const [messagesToRender, setMessages] = React.useState(messages);
-
-  React.useEffect(() => {
-    setMessages(messages);
-  }, [messages]);
 
   const { success, loading, error } = conditions;
 
