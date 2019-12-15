@@ -34,6 +34,9 @@ const InputArea = styled.input`
   &:focus {
     border: 2px solid rgba(153, 102, 204, 1);
   }
+  &:disabled {
+    opacity: 0.3;
+  }
 `;
 const SendButton = styled.button`
   outline: none;
@@ -47,9 +50,12 @@ const SendButton = styled.button`
   border-radius: 30px;
   margin-left: 30px;
   font-weight: 400;
+  &:disabled {
+    opacity: 0.3;
+  }
 `;
 
-export default function Input({ isDisabled, onSendMessage }) {
+export default function Input({ conditions, onSendMessage }) {
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
@@ -59,22 +65,28 @@ export default function Input({ isDisabled, onSendMessage }) {
     setMessage({ text: '' });
   };
 
+  const { success } = conditions;
   return (
-    <InputContainer onSubmit={handleSubmit}>
+    <InputContainer disabled={!success} onSubmit={handleSubmit}>
       <InputArea
         onChange={e => setMessage({ text: e.target.value })}
         type='text'
         value={message.text}
         placeholder='Enter a message'
         autoFocus={true}
-        disabled={isDisabled}
+        disabled={success ? false : true}
       />
-      <SendButton as='input' type='submit' value='Send' />
+      <SendButton
+        as='input'
+        type='submit'
+        disabled={success ? false : true}
+        value='Send'
+      />
     </InputContainer>
   );
 }
 
 Input.propTypes = {
-  isDisabled: PropTypes.bool.isRequired,
+  conditions: PropTypes.object.isRequired,
   onSendMessage: PropTypes.func.isRequired,
 };

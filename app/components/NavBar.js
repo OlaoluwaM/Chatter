@@ -14,7 +14,8 @@ const NavContainer = styled.nav`
   padding: 0px 10px;
 
   ul {
-    width: 18%;
+    flex-basis: 35%;
+    width: 35%;
     height: 100%;
     display: flex;
     align-items: center;
@@ -36,6 +37,7 @@ const NavItem = styled.li`
   width: 100%;
   display: flex;
   padding: 10px;
+  text-align: center;
   align-items: center;
   justify-content: center;
 
@@ -84,7 +86,7 @@ export default function Nav() {
       {location.pathname !== '/Auth' &&
         location.pathname !== '/Chat' &&
         !authed && (
-          <ul style={{ width: '25%' }}>
+          <ul>
             <CustomLink
               to={{
                 pathname: '/Auth',
@@ -109,7 +111,12 @@ export default function Nav() {
           </ul>
         )}
 
-      {authed && <CustomLink to='/Logout'>Logout</CustomLink>}
+      {authed && (
+        <ul>
+          <CustomLink to='/Logout'>Logout</CustomLink>
+          <CustomLink to='/DeleteAccount'>Delete this account</CustomLink>
+        </ul>
+      )}
     </NavContainer>
   );
 }

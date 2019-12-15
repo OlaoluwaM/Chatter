@@ -17,6 +17,11 @@ export const Button = styled(animated.button)`
   outline: none;
 `;
 
+export const Wrapper = styled.div`
+  width: 100%;
+  height: 94%;
+`;
+
 export const OverHead = styled.div`
   width: 100%;
   flex-basis: 12%;

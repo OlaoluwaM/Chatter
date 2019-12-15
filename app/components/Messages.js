@@ -7,10 +7,33 @@ const MessageAreaWrapper = styled.ul`
   width: 100%;
   flex-grow: 1;
   margin: 0;
+  position: relative;
   padding: 20px 0px;
   overflow-y: auto;
   background: #f5f5f5;
   overflow-x: hidden;
+`;
+
+const TextWrapper = styled(animated.div)`
+  width: 70%;
+  height: 70%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  h1 {
+    font-family: var(--font2);
+    font-size: 3.5rem;
+    font-weight: 500;
+    color: var(--sub);
+    margin-top: -5px;
+    width: 30%;
+  }
 `;
 
 const Avatar = styled.span`
@@ -59,8 +82,6 @@ const MessageWrapper = styled(animated.li)`
 `;
 
 function Message({ message, currentMember }) {
-  console.log(message, currentMember);
-
   const { member, text } = message;
   const isMyMessage = member.id === currentMember.id;
   const slideInDirection = isMyMessage ? 50 : -50;
@@ -81,24 +102,49 @@ function Message({ message, currentMember }) {
   );
 }
 
-export default function MessageArea({ messages, currentMember }) {
+export default function MessageArea({ conditions, messages, currentMember }) {
   const [messagesToRender, setMessages] = React.useState(messages);
-  console.log(messages, currentMember);
 
   React.useEffect(() => {
     setMessages(messages);
   }, [messages]);
 
+  const { success, loading, error } = conditions;
+
+  const fadeInAnim = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+  });
+
   return (
     <MessageAreaWrapper>
-      {messagesToRender.map((message, ind) => (
-        <Message currentMember={currentMember} message={message} key={ind} />
-      ))}
+      {loading && (
+        <TextWrapper style={fadeInAnim}>
+          <h1>Setting up chat Environment</h1>
+        </TextWrapper>
+      )}
+      {error && (
+        <TextWrapper style={fadeInAnim}>
+          <h1>{chatState.error.text}</h1>
+        </TextWrapper>
+      )}
+      {success && (
+        <React.Fragment>
+          {messagesToRender.map((message, ind) => (
+            <Message
+              currentMember={currentMember}
+              message={message}
+              key={ind}
+            />
+          ))}
+        </React.Fragment>
+      )}
     </MessageAreaWrapper>
   );
 }
 
 MessageArea.propTypes = {
+  conditions: PropTypes.object.isRequired,
   messages: PropTypes.array.isRequired,
   currentMember: PropTypes.object.isRequired,
 };

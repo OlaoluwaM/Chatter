@@ -39,7 +39,9 @@ export default function Form({ setAuth, formType }) {
     const users = JSON.parse(localStorage.getItem('Users')) || [];
     const { id, passcode, confirmPasscode } = data;
 
-    if (passcode !== confirmPasscode) {
+    if (users.some(({ id: name }) => id === name)) {
+      setError('User Already Exists');
+    } else if (passcode !== confirmPasscode) {
       setError('Your passwords do not match');
     } else {
       data['loggedIn'] = true;
@@ -48,6 +50,7 @@ export default function Form({ setAuth, formType }) {
 
       setTimeout(() => {
         localStorage.setItem('Users', JSON.stringify(users));
+        sessionStorage.setItem('CurrentUser', JSON.stringify(data));
         setAuth({ user: id, authed: true });
       }, 1500);
     }
@@ -75,6 +78,7 @@ export default function Form({ setAuth, formType }) {
         userData.loggedIn = true;
         users.splice(index, 1, userData);
         localStorage.setItem('Users', JSON.stringify(users));
+        sessionStorage.setItem('CurrentUser', JSON.stringify(userData));
 
         setAuth({ user: username, authed: true });
       }, 1500);

@@ -11,16 +11,16 @@ import Home from './components/Home';
 import Nav from './components/NavBar';
 import Chatroom from './components/Chatroom';
 import Logout from './components/Logout';
+import DeleteAccount from './components/DeleteAccount';
 import { AuthProvider } from './context/Context';
 import './index.css';
 
 function App() {
-  const users = JSON.parse(localStorage.getItem('Users')) || [];
-  const loggedInUser = users.find(({ loggedIn }) => loggedIn === true);
+  const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser')) || '';
 
   const [isAuthed, setAuthed] = React.useState({
-    user: loggedInUser === undefined ? '' : loggedInUser.id,
-    authed: loggedInUser !== undefined,
+    user: currentUser ? currentUser.id : '',
+    authed: currentUser !== '',
   });
 
   return (
@@ -40,6 +40,10 @@ function App() {
           <Route
             path='/Logout'
             render={props => <Logout {...props} setAuth={setAuthed} />}
+          />
+          <Route
+            path='/DeleteAccount'
+            render={props => <DeleteAccount {...props} setAuth={setAuthed} />}
           />
         </Switch>
       </div>

@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPaperPlane } from 'react-icons/fa';
-import { Button } from './UI-components';
+import { Button, Wrapper } from './UI-components';
 import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
 
-const HomePage = styled.div`
+const HomePage = styled(Wrapper)`
   position: relative;
-  width: 100%;
-  height: 94%;
   background: var(--main);
   div {
     z-index: 10;

@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import Form from './Form';
+import { Wrapper } from './UI-components';
 
-const AuthPage = styled.div`
+const AuthPage = styled(Wrapper)`
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 94%;
   background: var(--main);
   align-items: center;
   justify-content: space-around;
