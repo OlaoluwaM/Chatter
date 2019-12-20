@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { capitalize } from '../utils/helper';
 import { useSpring, animated } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const WrapperDiv = styled.div`
+const WrapperDiv = styled(motion.div)`
   cursor: pointer;
   z-index: 30;
 `;
 
-const TooltipBox = styled(animated.div)`
+const TooltipBox = styled(motion.div)`
   position: absolute;
-  right: -200px;
-  top: -25px;
+  right: -210px;
+  top: -28px;
   display: flex;
   width: max-content;
   height: max-content;
@@ -40,19 +41,23 @@ function useHover() {
   return [hovering, attr];
 }
 
-export default function Tooltip({ text, children }) {
+export default function Tooltip({ text, children, MotionProps, style }) {
   const [hovering, attr] = useHover();
 
-  const showAnim = useSpring({
-    from: { opacity: 0, transform: 'translateX(10px)' },
-    to: hovering && { opacity: 1, transform: 'translateX(0px)' },
-    reset: true,
-    reverse: hovering === false ? true : false,
-  });
+  const tooltip = {
+    visible: { opacity: 1, x: 0 },
+    hidden: { opacity: 0, x: 90 },
+  };
 
   return (
-    <WrapperDiv {...attr}>
-      {hovering && <TooltipBox style={showAnim}>{capitalize(text)}</TooltipBox>}
+    <WrapperDiv {...attr} {...MotionProps} style={style}>
+      <AnimatePresence>
+        {hovering && (
+          <TooltipBox variants={tooltip} animate='visible' exit='hidden'>
+            {capitalize(text)}
+          </TooltipBox>
+        )}
+      </AnimatePresence>
       {children}
     </WrapperDiv>
   );
@@ -60,6 +65,8 @@ export default function Tooltip({ text, children }) {
 
 Tooltip.propTypes = {
   text: PropTypes.string.isRequired,
+  MotionProps: PropTypes.object,
+  style: PropTypes.object,
 };
 
 Tooltip.defaultProps = {

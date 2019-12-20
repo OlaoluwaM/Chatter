@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
-import { animated, useTrail, config } from 'react-spring';
-import { loginComponents, signUpComponents } from './Form-Components';
 import { AuthContext } from '../context/Context';
 import { extractFormData } from '../utils/helper';
+import { handleLogin, handleSignUp } from '../utils/authFunc';
+import { motion, AnimatePresence, useInvertedScale } from 'framer-motion';
+import { FormTitle, InputField, SubmitButton } from './Form-Components';
 
-const FormContainer = styled(animated.form)`
+const FormContainer = styled(motion.form)`
   display: flex;
   color: var(--sub);
   background: inherit;
@@ -22,116 +23,149 @@ const FormContainer = styled(animated.form)`
 `;
 
 export default function Form({ setAuth, formType }) {
-  const [components, setComponents] = React.useState([]);
-  const [error, setError] = React.useState('');
+  const [error, setError] = React.useState(null);
   const formRef = React.useRef();
   const { authed } = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    setComponents(formType === 'login' ? loginComponents : signUpComponents);
-    return () => {
-      setComponents([]);
-      setError('');
-    };
+    setError(null);
   }, [formType]);
 
-  const handleSignUp = data => {
-    const users = JSON.parse(localStorage.getItem('Users')) || [];
-    const { id, passcode, confirmPasscode } = data;
-
-    if (users.some(({ id: name }) => id === name)) {
-      setError('User Already Exists');
-    } else if (passcode !== confirmPasscode) {
-      setError('Your passwords do not match');
-    } else {
-      data['loggedIn'] = true;
-      users.push(data);
-      formRef.current.style.opacity = 0.4;
-
-      setTimeout(() => {
-        localStorage.setItem('Users', JSON.stringify(users));
-        sessionStorage.setItem('CurrentUser', JSON.stringify(data));
-        setAuth({ user: id, authed: true });
-      }, 1500);
-    }
-  };
-
-  const handleLogin = data => {
-    if (JSON.parse(localStorage.getItem('Users')) === null) {
-      setError('User does not exist');
-    }
-
-    const { id: username, passcode } = data;
-    const users = JSON.parse(localStorage.getItem('Users'));
-
-    const userData = users.find(
-      ({ id: DBusername, passcode: DBpasscode }) =>
-        username === DBusername && passcode === DBpasscode
-    );
-    const userDataCorrect = userData !== undefined;
-
-    if (userDataCorrect) {
-      formRef.current.style.opacity = 0.4;
-
-      setTimeout(() => {
-        let index = users.indexOf(userData);
-        userData.loggedIn = true;
-        users.splice(index, 1, userData);
-        localStorage.setItem('Users', JSON.stringify(users));
-        sessionStorage.setItem('CurrentUser', JSON.stringify(userData));
-
-        setAuth({ user: username, authed: true });
-      }, 1500);
-    } else {
-      setError('Username or Password is incorrect');
-    }
-  };
-
   const handleSubmit = e => {
-    setError('');
+    setError(null);
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
-
     e.preventDefault();
+
     if (formType === 'login') {
-      handleLogin(extractedFormData);
+      if (Object.keys(handleLogin(extractedFormData)).includes('error')) {
+        setError(handleLogin(extractedFormData));
+      }
+      formRef.current.style.opacity = 0.4;
+      setTimeout(() => setAuth(handleLogin(extractedFormData)), 1500);
     } else {
-      handleSignUp(extractedFormData);
+      if (Object.keys(handleSignUp(extractedFormData)).includes('error')) {
+        setError(handleSignUp(extractedFormData));
+      }
+      formRef.current.style.opacity = 0.4;
+      setTimeout(() => setAuth(handleSignUp(extractedFormData)), 1500);
     }
   };
 
-  const trail = useTrail(components.length, {
-    from: { opacity: 0, transform: 'translate3d(0, 50px, 0)' },
-    to: { opacity: 1, transform: 'translate3d(0, 0px, 0)' },
-    reset: true,
-    config: config.gentle,
-  });
+  const containerVariant = {
+    visible: {
+      opacity: 1,
+      transition: {
+        when: 'beforeChildren',
+        staggerChildren: 0.2,
+        dealyChildren: 0.1,
+      },
+    },
 
-  const condition = components.length === 0;
+    hidden: {
+      opacity: 0,
+      transition: {
+        when: 'afterChildren',
+      },
+    },
+  };
 
+  const itemVariant = {
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: 'spring',
+        mass: 1,
+        tension: 180,
+        friction: 12,
+      },
+    },
+    hidden: {
+      opacity: 0,
+      x: 100,
+    },
+  };
+
+  const spring = {
+    type: 'spring',
+    damping: 20,
+    stiffness: 300,
+  };
+
+  // const { scaleX, scaleY } = useInvertedScale();
   return (
-    <FormContainer ref={formRef} onSubmit={handleSubmit} autoComplete='off'>
+    <FormContainer
+      variants={containerVariant}
+      initial='hidden'
+      animate='visible'
+      ref={formRef}
+      onSubmit={handleSubmit}
+      autoComplete='off'>
       {authed && <Redirect to='/' />}
 
-      {condition === false &&
-        !authed &&
-        trail.map((props, index) => {
-          const obj = components[index];
-          const Component = obj.component;
+      {!authed && (
+        <AnimatePresence>
+          <FormTitle
+            key='form-title'
+            variants={itemVariant}
+            exit='hidden'
+            positionTransition={spring}>
+            {formType === 'login' ? 'Login' : 'Create An Account'}
+          </FormTitle>
 
-          return obj.innerText === '' ? (
-            <Component
-              key={index}
+          <InputField
+            key='id-field'
+            MotionProps={{
+              variants: itemVariant,
+              exit: 'hidden',
+              layoutTransition: spring,
+            }}
+            error={error}
+            name='id'
+            label='Username'
+          />
+
+          <InputField
+            key='password-field'
+            MotionProps={{
+              variants: itemVariant,
+              layoutTransition: spring,
+              exit: 'hidden',
+            }}
+            error={error}
+            name='password'
+            type='password'
+            label='Password'
+            validate={formType !== 'login' ? true : false}
+          />
+
+          {formType !== 'login' && (
+            <InputField
+              key='confirmPassword-field'
+              MotionProps={{
+                variants: itemVariant,
+                layoutTransition: spring,
+                exit: 'hidden',
+              }}
               error={error}
-              {...obj.cProps}
-              style={props}
+              name='confirmPassword'
+              type='password'
+              label='Confirm Password'
             />
-          ) : (
-            <Component key={index} {...obj.cProps} style={props}>
-              {obj.innerText}
-            </Component>
-          );
-        })}
+          )}
+
+          <SubmitButton
+            key='submit-button'
+            exit='hidden'
+            variants={itemVariant}
+            type='submit'
+            name='btn'
+            layoutTransition={spring}
+            value={formType === 'login' ? 'Login' : 'Sign Up'}
+          />
+        </AnimatePresence>
+      )}
     </FormContainer>
   );
 }

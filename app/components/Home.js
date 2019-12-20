@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPaperPlane } from 'react-icons/fa';
-import { Button, Wrapper } from './UI-components';
+import { Wrapper } from './UI-components';
 import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
 
@@ -46,10 +46,12 @@ export default function Home() {
         <h1>{authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}</h1>
 
         <Link to={authed ? '/Chat' : '/Auth'}>
-          <Button style={{ background: 'var(--sub)', color: 'var(--main)' }}>
+          <button
+            className='button'
+            style={{ background: 'var(--sub)', color: 'var(--main)' }}>
             <FaPaperPlane style={iconStyles} />
             Chat
-          </Button>
+          </button>
         </Link>
       </div>
     </HomePage>

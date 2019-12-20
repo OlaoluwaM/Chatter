@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
-import { Button, Wrapper } from './UI-components';
-import { Redirect, Prompt } from 'react-router-dom';
+import { Wrapper } from './UI-components';
+import { Redirect } from 'react-router-dom';
 
 const DeleteAccPage = styled(Wrapper)`
   display: flex;
@@ -18,7 +18,7 @@ const DeleteAccPage = styled(Wrapper)`
   }
 `;
 
-const DeleteBtn = styled(Button)`
+const DeleteBtn = styled.button`
   text-transform: uppercase;
   font-weight: bolder;
   background: red;
@@ -60,6 +60,7 @@ export default function DeleteAccount({ setAuth }) {
         <DeleteAccPage>
           <h1>Warning, Danger Zone</h1>
           <DeleteBtn
+            className='button'
             disabled={delBtnHasBeenClicked}
             onClick={() => setButtonClickState(true)}>
             {delBtnHasBeenClicked ? 'Deleting Account' : 'Delete my account'}
