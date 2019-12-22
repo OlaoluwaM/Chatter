@@ -161,3 +161,10 @@ export const strongRegex = new RegExp(
 export const mediumRegex = new RegExp(
   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
 );
+
+export const debounce = (func, ms = 0) => {
+  let timeoutId;
+  return function(...args) {
+    timeoutId = setTimeout(() => func.apply(this, args), ms);
+  };
+};
