@@ -123,14 +123,6 @@ const MotionInputInfo = styled(motion.p)`
   transition: 0.3s color ease;
 `;
 
-const IndicatorIcon = styled(motion.div)`
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: ${({ strength }) =>
-    strength === 'weak' ? 'red' : strength === 'medium' ? 'orange' : 'green'};
-`;
-
 export function InputInfo({ error, color, MotionProps }) {
   return (
     <MotionInputInfo color={color} {...MotionProps}>
