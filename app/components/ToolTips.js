@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { capitalize } from '../utils/helper';
-import { useSpring, animated } from 'react-spring';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WrapperDiv = styled(motion.div)`
