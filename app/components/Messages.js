@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { default as styled, css } from 'styled-components';
-import { animated, useSpring, config } from 'react-spring';
 import { AuthContext } from '../context/Context';
+import { motion, AnimatePresence } from 'framer-motion';
+import { spring2 } from '../utils/motionObj';
 
 const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
@@ -20,7 +21,7 @@ const MessageAreaWrapper = styled.ul.attrs({
   }
 `;
 
-const TextWrapper = styled(animated.div)`
+const TextWrapper = styled(motion.div)`
   width: 70%;
   height: 70%;
   position: absolute;
@@ -70,7 +71,7 @@ const MessageText = styled.div`
   display: inline-block;
 `;
 
-const MessageWrapper = styled(animated.li)`
+const MessageWrapper = styled(motion.li)`
   display: flex;
   margin-top: 30px;
   ${({ mymessage }) =>
@@ -90,20 +91,32 @@ const MessageWrapper = styled(animated.li)`
   }
 `;
 
-function Message({ message, currentMember }) {
+function Message({ message, currentMember, exit }) {
   const { member, text } = message;
   const isMyMessage = member.id === currentMember.id;
-  const slideInDirection = isMyMessage ? 50 : -50;
   const { user } = React.useContext(AuthContext);
 
-  const slideInAnim = useSpring({
-    from: { opacity: 0, transform: `translateX(${slideInDirection}px)` },
-    to: { opacity: 1, transform: `translateX(0px)` },
-    config: config.wobbly,
-  });
+  const messageVariant = {
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { ...spring2 },
+    },
+    hidden: isMyMessage => ({
+      opacity: 0,
+      x: isMyMessage ? 50 : -50,
+      transition: { ...spring2 },
+    }),
+  };
 
   return (
-    <MessageWrapper style={slideInAnim} mymessage={isMyMessage ? 1 : 0}>
+    <MessageWrapper
+      variants={messageVariant}
+      initial='hidden'
+      animate='visible'
+      mymessage={isMyMessage ? 1 : 0}
+      custom={isMyMessage}
+      exit={exit}>
       <Avatar bg={member.clientData ? member.clientData.color : '#000000'} />
       <MessageContent>
         <Username>{member.clientData ? member.clientData.id : user}</Username>
@@ -118,34 +131,40 @@ export default function MessageArea({ conditions, messages, currentMember }) {
 
   const { success, loading, error } = conditions;
 
-  const fadeInAnim = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-  });
-
   return (
     <MessageAreaWrapper>
-      {loading && (
-        <TextWrapper style={fadeInAnim}>
-          <h1>Setting up chat Environment</h1>
-        </TextWrapper>
-      )}
-      {error && (
-        <TextWrapper style={fadeInAnim}>
-          <h1>{chatState.error.text}</h1>
-        </TextWrapper>
-      )}
-      {success && (
-        <React.Fragment>
-          {messagesToRender.map((message, ind) => (
-            <Message
-              currentMember={currentMember}
-              message={message}
-              key={ind}
-            />
-          ))}
-        </React.Fragment>
-      )}
+      <AnimatePresence>
+        {loading && (
+          <TextWrapper
+            key='loading-text'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+            <h1>Setting up chat Environment</h1>
+          </TextWrapper>
+        )}
+        {error && (
+          <TextWrapper
+            key='error-text'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+            <h1>{chatState.error.text}</h1>
+          </TextWrapper>
+        )}
+        {success && (
+          <>
+            {messagesToRender.map((message, ind) => (
+              <Message
+                currentMember={currentMember}
+                message={message}
+                key={ind}
+                exit={{ opacity: 0 }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
     </MessageAreaWrapper>
   );
 }

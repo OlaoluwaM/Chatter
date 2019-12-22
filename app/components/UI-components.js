@@ -1,14 +1,14 @@
 import styled from 'styled-components';
-// import { animated } from 'react-spring';
 import { motion } from 'framer-motion';
+
 // For Components I use in multiple files
 
-export const Wrapper = styled.div`
+export const Wrapper = styled(motion.div)`
   width: 100%;
   height: 94%;
 `;
 
-export const OverHead = styled.div`
+export const OverHead = styled(motion.div)`
   width: 100%;
   flex-basis: 12vh;
   height: 12vh;
