@@ -14,7 +14,7 @@ const MessageAreaWrapper = styled.ul.attrs({
   position: relative;
   padding: 20px 17px;
   overflow-y: auto;
-  background: #f5f5f5;
+  background-image: linear-gradient(135deg, #ce9ffc 10%, #7367f0 100%);
   overflow-x: hidden;
   * {
     overflow-anchor: none;
@@ -22,7 +22,7 @@ const MessageAreaWrapper = styled.ul.attrs({
 `;
 
 const TextWrapper = styled(motion.div)`
-  width: 70%;
+  width: 100%;
   height: 70%;
   position: absolute;
   left: 50%;
@@ -36,10 +36,10 @@ const TextWrapper = styled(motion.div)`
   h1 {
     font-family: var(--font2);
     font-size: 3.5rem;
-    font-weight: 500;
-    color: var(--sub);
-    margin-top: -5px;
-    width: 80%;
+    font-weight: 100;
+    color: var(--main);
+    width: 100%;
+    text-align: center;
   }
 `;
 
@@ -49,29 +49,35 @@ const Avatar = styled.span`
   border-radius: 50%;
   display: inline-block;
   margin: 0 10px -10px;
+  border: 1.5px double var(--main);
   background: ${({ bg }) => bg};
 `;
 
 const MessageContent = styled.div`
   display: inline-block;
+  font-weight: 300;
 `;
+
 const Username = styled.div`
   display: block;
-  color: grey;
-  font-size: 14px;
-  padding-bottom: 4px;
+  color: var(--main);
+  font-size: 15px;
+  padding-bottom: 5px;
+  font-weight: 100;
 `;
+
 const MessageText = styled.div`
   padding: 10px;
   max-width: 400px;
   margin: 0;
   border-radius: 12px;
-  background-color: rgb(191, 159, 223);
-  color: white;
+  background-color: var(--main);
+  color: var(--sub);
   display: inline-block;
 `;
 
 const MessageWrapper = styled(motion.li)`
+  font-family: var(--font2);
   display: flex;
   margin-top: 30px;
   ${({ mymessage }) =>
@@ -83,7 +89,8 @@ const MessageWrapper = styled(motion.li)`
         align-items: center;
       }
       & ${MessageText} {
-        background: rgb(140, 83, 198);
+        background: rgb(115, 57, 172);
+        color: white;
       }
     `}
   &:last-of-type {
@@ -92,9 +99,12 @@ const MessageWrapper = styled(motion.li)`
 `;
 
 function Message({ message, currentMember, exit }) {
-  const { member, text } = message;
-  const isMyMessage = member.id === currentMember.id;
   const { user } = React.useContext(AuthContext);
+  const { member, text } = message;
+  const isMyMessage =
+    member.id === currentMember.id ||
+    member.id === user ||
+    member.clientData.id === user;
 
   const messageVariant = {
     visible: {
@@ -128,9 +138,9 @@ function Message({ message, currentMember, exit }) {
 
 export default function MessageArea({ conditions, messages, currentMember }) {
   const [messagesToRender, setMessages] = React.useState(messages);
-
   const { success, loading, error } = conditions;
 
+  console.log(messages, currentMember);
   return (
     <MessageAreaWrapper>
       <AnimatePresence>
@@ -140,7 +150,7 @@ export default function MessageArea({ conditions, messages, currentMember }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}>
-            <h1>Setting up chat Environment</h1>
+            <h1>Setting up chat environment</h1>
           </TextWrapper>
         )}
         {error && (

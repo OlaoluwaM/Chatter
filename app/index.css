@@ -1,8 +1,8 @@
-/* @import url('https://fonts.googleapis.com/css?family=Julius+Sans+One|Montserrat&display=swap'); */
+@import url('https://fonts.googleapis.com/css?family=Raleway|Roboto+Slab&display=swap');
 
 :root {
-  --font1: 'Julius Sans One', sans-serif;
-  --font2: 'Montserrat', sans-serif;
+  --font1: Raleway, sans-serif;
+  --font2: 'Roboto Slab', sans-serif;
   --main: rgba(255, 255, 255, 1);
   --sub: rgba(153, 102, 204, 1);
 }
@@ -46,4 +46,8 @@ body {
   border-radius: 50px;
   background: transparent;
   outline: none;
+}
+
+div.twitter-picker {
+  transform: scale(0.85);
 }

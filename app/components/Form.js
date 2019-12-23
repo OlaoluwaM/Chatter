@@ -7,8 +7,8 @@ import { extractFormData } from '../utils/helper';
 import { handleLogin, handleSignUp } from '../utils/authFunc';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
-import { validateUserDataIntegrity } from '../utils/authFunc';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
+import ColorPicker from './CustomColorPicker';
 
 const FormContainer = styled(motion.form)`
   display: flex;
@@ -95,18 +95,36 @@ export default function Form({ setAuth, formType }) {
           />
 
           {formType !== 'login' && (
-            <InputField
-              key='confirmPassword-field'
-              MotionProps={{
-                variants: itemVariant,
-                layoutTransition: spring,
-                exit: 'hidden',
-              }}
-              formState={{ formType, setInputFieldError }}
-              name='confirmPassword'
-              type='password'
-              label='Confirm Password'
-            />
+            <>
+              <InputField
+                key='confirmPassword-field'
+                MotionProps={{
+                  variants: itemVariant,
+                  layoutTransition: spring,
+                  exit: 'hidden',
+                }}
+                formState={{ formType, setInputFieldError }}
+                name='confirmPassword'
+                type='password'
+                label='Confirm Password'
+              />
+              <ColorPicker
+                key='colorInput'
+                MotionProps={{
+                  variants: itemVariant,
+                  layoutTransition: spring,
+                  exit: 'hidden',
+                }}
+              />
+              {/* <ColorPicker
+                label='Pick a color'
+                MotionProps={{
+                  variants: itemVariant,
+                  layoutTransition: spring,
+                  exit: 'hidden',
+                }}
+              /> */}
+            </>
           )}
 
           <SubmitButton

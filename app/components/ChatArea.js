@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { randomColor, randomName } from '../utils/helper';
+import { randomColor } from '../utils/helper';
 import MessageArea from './Messages';
-import { OverHead } from './UI-components';
 import Input from './Input';
 import { AuthContext } from '../context/Context';
 
@@ -18,12 +17,12 @@ const ChatAreaWrapper = styled.div`
 `;
 
 export default function ChatArea() {
-  const { user } = React.useContext(AuthContext);
+  const { user, authed } = React.useContext(AuthContext);
   const chatUser = React.useRef({ id: user, color: randomColor() });
 
   const [state, setState] = React.useState({
-    messages: [],
-    member: {},
+    messages: JSON.parse(localStorage.getItem(`${user}M`)) || [],
+    member: chatUser,
   });
 
   const [drone, setDrone] = React.useState(() => {
@@ -59,6 +58,12 @@ export default function ChatArea() {
     const room = drone.subscribe('observable-room');
 
     room.on('data', (data, member) => {
+      const userMessages = JSON.parse(localStorage.getItem(`${user}M`)) || [];
+      if (member.id === user || user === member.clientData.id) {
+        userMessages.push({ text: data, member: { ...member.clientData } });
+        localStorage.setItem(`${user}M`, JSON.stringify(userMessages));
+      }
+
       setState(s => {
         const { messages, member: Cuser } = s;
         messages.push({ text: data, member });
@@ -71,11 +76,14 @@ export default function ChatArea() {
     });
 
     return () => {
-      setDrone(null);
-      setChatErrorState({ errorOccurred: false, text: '' });
+      if (!authed && user === '') {
+        setDrone(null);
+        setChatErrorState({ errorOccurred: false, text: '' });
+      }
     };
   }, []);
 
+  console.log(state.member);
   const onSendMessage = message => {
     drone.publish({
       room: 'observable-room',
@@ -94,7 +102,6 @@ export default function ChatArea() {
 
   return (
     <ChatAreaWrapper>
-      <OverHead />
       <MessageArea
         conditions={conditions}
         messages={state.messages}

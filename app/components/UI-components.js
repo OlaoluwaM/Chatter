@@ -5,14 +5,5 @@ import { motion } from 'framer-motion';
 
 export const Wrapper = styled(motion.div)`
   width: 100%;
-  height: 94%;
-`;
-
-export const OverHead = styled(motion.div)`
-  width: 100%;
-  flex-basis: 12vh;
-  height: 12vh;
-  min-height: 12%;
-  display: flex;
-  background: rgba(0, 0, 0, 1);
+  height: calc(100% - 7%);
 `;

@@ -11,6 +11,11 @@ export const spring = {
   stiffness: 300,
 };
 
+export const tween = {
+  type: 'tween',
+  duration: 0.2,
+  ease: 'easeIn',
+};
 // For Form.js -----------------------------------------------------------------------------------
 
 export const containerVariant = {
@@ -55,5 +60,18 @@ export const InputInfoVariant = {
     opacity: 0,
     x: 50,
     transition: { ...spring2 },
+  },
+};
+
+export const colorPickerVariant = {
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { ...spring },
+  },
+  hidden: {
+    opacity: 0,
+    x: 100,
+    transition: { ...spring },
   },
 };

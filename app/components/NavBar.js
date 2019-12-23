@@ -2,56 +2,59 @@ import React from 'react';
 import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
 import { Route, Link, __RouterContext } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const NavContainer = styled.nav`
   position: relative;
   width: 100%;
-  height: 6%;
+  height: 7%;
+  padding: 0px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--main);
-  padding: 0px 10px;
-
-  ul {
-    flex-basis: 35%;
-    width: 35%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin: 0;
-    padding: 0;
-    padding-top: 8px;
-  }
 `;
 
-const NavItem = styled.li`
+const NavItem = styled(motion.li)`
   list-style-type: none;
-  font-family: var(--font2);
-  font-weight: 300;
+  font-family: var(--font1);
+  font-weight: 700;
   font-size: 1.1rem;
-  transition: 0.3s ease;
+  transition: 0.5s ease;
   height: 100%;
-  flex-basis: 100%;
-  width: 100%;
   display: flex;
-  padding: 10px;
   text-align: center;
   align-items: center;
   justify-content: center;
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.1rem;
 
   a {
-    color: rgba(64, 32, 96, 0.5);
+    color: inherit;
     text-decoration: none;
     transition: inherit;
     padding-top: 2px;
   }
 
-  &.active > a,
-  &:hover > a {
-    border-top: 2px solid rgba(64, 32, 96, 1);
-    color: rgba(64, 32, 96, 1);
+  &.active,
+  &:hover {
+    color: rgba(140, 83, 198, 1);
+  }
+`;
+
+const NavUl = styled.ul`
+  flex-basis: 25%;
+  width: 25%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+
+  & > ${NavItem} {
+    width: ${({ children }) => `calc(100%/ ${children.length})`};
+    flex-basis: ${({ children }) => `calc(100%/ ${children.length})`};
   }
 `;
 
@@ -75,18 +78,18 @@ export default function Nav() {
 
   return (
     <NavContainer>
-      <ul>
+      <NavUl>
         <CustomLink to='/' exact={true}>
           Home
         </CustomLink>
 
         {authed && <CustomLink to='/Chat'>Chatroom</CustomLink>}
-      </ul>
+      </NavUl>
 
       {location.pathname !== '/Auth' &&
         location.pathname !== '/Chat' &&
         !authed && (
-          <ul>
+          <NavUl>
             <CustomLink
               to={{
                 pathname: '/Auth',
@@ -106,16 +109,16 @@ export default function Nav() {
                   formType: 'sign-up',
                 },
               }}>
-              Create an Account
+              Sign Up
             </CustomLink>
-          </ul>
+          </NavUl>
         )}
 
       {authed && (
-        <ul>
+        <NavUl>
           <CustomLink to='/Logout'>Logout</CustomLink>
-          <CustomLink to='/DeleteAccount'>Delete this account</CustomLink>
-        </ul>
+          <CustomLink to='/DeleteAccount'>Delete account</CustomLink>
+        </NavUl>
       )}
     </NavContainer>
   );

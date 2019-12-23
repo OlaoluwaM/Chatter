@@ -23,11 +23,14 @@ const HomePage = styled(Wrapper)`
 
     h1 {
       text-align: center;
-      font-size: 3.7rem;
+      font-size: 4rem;
       font-family: var(--font1);
       color: var(--sub);
-      font-weight: 100;
+      font-weight: lighter;
       margin-bottom: 0;
+      margin-top: 18px;
+      letter-spacing: 0.1rem;
+      word-spacing: 0.2rem;
     }
   }
 `;
@@ -35,6 +38,15 @@ const HomePage = styled(Wrapper)`
 const iconStyles = {
   fill: 'var(--main)',
   marginRight: '15px',
+};
+
+const buttonStyles = {
+  fontFamily: 'var(--font1)',
+  fontWeight: 100,
+  background: 'var(--sub)',
+  color: 'var(--main)',
+  textTransform: 'uppercase',
+  fontSize: '1.3rem',
 };
 
 export default function Home() {
@@ -46,9 +58,7 @@ export default function Home() {
         <h1>{authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}</h1>
 
         <Link to={authed ? '/Chat' : '/Auth'}>
-          <button
-            className='button'
-            style={{ background: 'var(--sub)', color: 'var(--main)' }}>
+          <button className='button' style={buttonStyles}>
             <FaPaperPlane style={iconStyles} />
             Chat
           </button>

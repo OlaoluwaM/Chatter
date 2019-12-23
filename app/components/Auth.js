@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import Form from './Form';
 import { Wrapper } from './UI-components';
+import { motion } from 'framer-motion';
+import { spring, spring2 } from '../utils/motionObj';
 
 const AuthPage = styled(Wrapper)`
   position: relative;
@@ -13,13 +15,16 @@ const AuthPage = styled(Wrapper)`
   overflow: hidden;
 `;
 
-const SwitchText = styled.p`
+const SwitchText = styled(motion.p)`
   color: var(--sub);
   text-transform: uppercase;
   font-family: var(--font1);
   font-size: 1.2rem;
   cursor: pointer;
+  letter-spacing: 0.2rem;
+  word-spacing: 0.2rem;
   font-weight: bolder;
+  margin-bottom: 5px;
 `;
 
 export default function Auth({ location, setAuth }) {
@@ -34,6 +39,10 @@ export default function Auth({ location, setAuth }) {
     <AuthPage>
       <Form setAuth={setAuth} formType={state} />
       <SwitchText
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...spring, delay: 1.9 }}
+        layoutTransition={spring2}
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>
         {state === 'login' ? ' Create an account' : ' Log into your account'}
       </SwitchText>

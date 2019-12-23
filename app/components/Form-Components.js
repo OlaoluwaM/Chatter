@@ -10,32 +10,14 @@ export const FormTitle = styled(motion.h1)`
   margin: 0;
   flex-basis: 23%;
   text-align: center;
-  font-family: var(--font1);
-  font-size: 3.8rem;
+  font-family: var(--font2);
+  font-size: 4.1rem;
   letter-spacing: 0.2rem;
-  font-weight: bolder;
-  margin-top: 25px;
+  font-weight: 800;
+  margin-top: 20px;
 `;
 
-const InputContainer = styled(motion.div)`
-  width: 50%;
-  color: inherit;
-  height: 17%;
-  flex-basis: 17%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  margin-bottom: 10px;
-  background: transparent;
-
-  &:not(:last-of-type) {
-    margin-bottom: 18px;
-  }
-`;
-
-const Bar = styled.span`
+export const Bar = styled.span`
   display: block;
   position: relative;
   width: 100%;
@@ -57,12 +39,12 @@ const Bar = styled.span`
   }
 `;
 
-const InputLabel = styled.label`
+export const InputLabel = styled.label`
   color: rgba(153, 102, 204, 0.4);
   font-size: 1.1rem;
-  font-weight: normal;
+  font-weight: 700;
   position: absolute;
-  font-family: var(--font2);
+  font-family: var(--font1);
   pointer-events: none;
   left: 15px;
   top: 6px;
@@ -78,17 +60,38 @@ const Input = styled.input`
   outline: none;
   background: transparent;
   text-indent: 15px;
-  font-family: var(--font2);
-  font-size: 1rem;
+  font-family: var(--font1);
+  font-size: 1.1rem;
+  font-weight: 100;
   padding-bottom: -3px;
+`;
 
-  &:focus ~ ${InputLabel}, &:valid ~ ${InputLabel} {
+export const InputContainer = styled(motion.div)`
+  width: 50%;
+  color: inherit;
+  height: 17%;
+  flex-basis: 17%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  margin-bottom: 0px;
+  background: transparent;
+
+  /* div > input {
+    background: red;
+    input:valid & + ${InputLabel} {
+      color: red;
+    }
+  } */
+  &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
     top: -20px;
     font-size: 15px;
     color: var(--sub);
   }
 
-  &:focus ~ ${Bar}::before {
+  &:focus-within ${Bar}::before {
     width: 100%;
   }
 `;
@@ -99,9 +102,14 @@ export const SubmitButton = styled(motion.input).attrs({
   background: var(--sub);
   border: none;
   margin-bottom: 0px;
-  margin-top: 0px;
+  margin-top: 5px;
   color: var(--main);
   flex-basis: 11.5%;
+  font-family: var(--font1);
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: 0.1rem;
+  text-transform: lowercase;
 
   &:disabled {
     background: rgba(153, 102, 204, 0.4);

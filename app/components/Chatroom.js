@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import ChatArea from './ChatArea';
+import { Wrapper } from './UI-components';
 
-const ChatRoomContainer = styled.div`
-  width: 100%;
-  height: 94%;
+const ChatRoomContainer = styled(Wrapper)`
   display: flex;
   align-items: center;
   overflow: hidden;
