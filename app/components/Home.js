@@ -1,13 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPaperPlane } from 'react-icons/fa';
-import { Wrapper } from './UI-components';
+import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
+import { headerVariant, buttonVariant } from '../utils/motionObj';
 
-const HomePage = styled(Wrapper)`
+const HomePage = styled.div.attrs({
+  className: 'wrapper',
+})`
   position: relative;
   background: var(--main);
+
   div {
     z-index: 10;
     position: absolute;
@@ -55,13 +59,20 @@ export default function Home() {
   return (
     <HomePage>
       <div>
-        <h1>{authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}</h1>
+        <motion.h1 variants={headerVariant} initial='hidden' animate='visible'>
+          {authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}
+        </motion.h1>
 
         <Link to={authed ? '/Chat' : '/Auth'}>
-          <button className='button' style={buttonStyles}>
+          <motion.button
+            variants={buttonVariant}
+            initial='hidden'
+            animate='visible'
+            className='button'
+            style={buttonStyles}>
             <FaPaperPlane style={iconStyles} />
             Chat
-          </button>
+          </motion.button>
         </Link>
       </div>
     </HomePage>

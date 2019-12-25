@@ -8,15 +8,15 @@ import { strongRegex } from './helper';
 
 export function handleSignUp(data) {
   const users = JSON.parse(localStorage.getItem('Users')) || [];
-  const { id, password } = data;
+  const { id, password, color } = data;
 
   data['loggedIn'] = true;
   const { loggedIn } = data;
-  users.push({ id, password, loggedIn });
+  users.push({ id, password, color, loggedIn });
 
   localStorage.setItem('Users', JSON.stringify(users));
   sessionStorage.setItem('CurrentUser', JSON.stringify(data));
-  return { user: id, authed: true };
+  return { user: id, color, authed: true };
 }
 
 /**s
@@ -27,8 +27,8 @@ export function handleSignUp(data) {
  */
 
 export function handleLogin(data) {
-  const { id, password } = data;
   const users = JSON.parse(localStorage.getItem('Users'));
+  const { id, password, color } = data;
 
   const userData = users.find(
     ({ id: DBusername, password: DBpassword }) =>
@@ -36,12 +36,15 @@ export function handleLogin(data) {
   );
 
   let index = users.indexOf(userData);
+  userData.color = color;
+  updateUserMessageAvatar(id, color);
+
   userData.loggedIn = true;
   users.splice(index, 1, userData);
   localStorage.setItem('Users', JSON.stringify(users));
   sessionStorage.setItem('CurrentUser', JSON.stringify(userData));
 
-  return { user: id, authed: true };
+  return { user: id, color, authed: true };
 }
 
 // Validation Functions -------------------------------------
@@ -88,7 +91,7 @@ function passwordEqualityValidation(value) {
 function passwordStrengthValidation(value) {
   if (value.match(strongRegex)) {
     return { text: 'Strength 100% 🙌', color: 'green' };
-  } else return { text: 'Password is not strong enough', color: 'red' };
+  } else return { text: 'Weak 😒', color: 'red' };
 }
 
 /**
@@ -130,7 +133,6 @@ export function validateUserPasswordIntegrity(value) {
     return { text: 'Correct 👍', color: 'green' };
   } else return { text: 'Incorrect', color: 'red' };
 }
-// ----------------------------------------------------------------------------
 
 /**
  *
@@ -153,5 +155,42 @@ export function inputValidation(name, inputValue, isLoginForm) {
         : validateUserPasswordIntegrity(inputValue);
     case 'confirmPassword':
       return !isLoginForm && passwordEqualityValidation(inputValue);
+  }
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+ *
+ * @param {string} user - User's name
+ * @param {string} newColor - User's new avatar color
+ */
+
+function updateUserMessageAvatar(user, newColor) {
+  if (!JSON.parse(localStorage.getItem(`${user}M`))) return;
+  const messages = JSON.parse(localStorage.getItem(`${user}M`));
+
+  const updatedMessages = messages.map(obj => {
+    obj.color = newColor;
+    return obj;
+  });
+
+  localStorage.setItem(`${user}M`, JSON.stringify(updatedMessages));
+}
+
+/**
+ *
+ * @param {{}} data
+ * @param {string} avatarColor
+ * @returns {string}
+ */
+
+export function setAvatarColor(data, avatarColor) {
+  const users = JSON.parse(localStorage.getItem('Users')) || [];
+  if (users.length > 0) {
+    const { color } = users.find(({ id }) => id === data.id);
+    return avatarColor === '#7339ac' ? color : avatarColor;
+  } else {
+    return avatarColor;
   }
 }

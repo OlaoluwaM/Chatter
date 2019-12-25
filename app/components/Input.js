@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
 
-const InputContainer = styled.form`
+const InputContainer = styled(motion.form)`
   width: 100%;
   height: 12vh;
   flex-basis: 12vh;
@@ -15,7 +17,7 @@ const InputContainer = styled.form`
   background: var(--main);
 `;
 
-const InputArea = styled.input`
+const InputArea = styled(motion.input)`
   position: relative;
   flex-basis: 60%;
   width: 60%;
@@ -28,18 +30,19 @@ const InputArea = styled.input`
   border: 2px solid rgba(153, 102, 204, 0.4);
   justify-self: center;
   outline: none;
-  transition: 0.3s ease;
   background: var(--main);
+
+  &:disabled {
+    opacity: 0.5;
+  }
 
   &:hover,
   &:focus {
     border: 2px solid rgba(153, 102, 204, 1);
   }
-  &:disabled {
-    opacity: 0.3;
-  }
 `;
-const SendButton = styled.button`
+
+const SendButton = styled(motion.input)`
   outline: none;
   border: none;
   background: var(--sub);
@@ -51,8 +54,9 @@ const SendButton = styled.button`
   border-radius: 30px;
   margin-left: 30px;
   font-weight: 400;
+
   &:disabled {
-    opacity: 0.3;
+    opacity: 0.5;
   }
 `;
 
@@ -70,8 +74,14 @@ export default function Input({ conditions, onSendMessage }) {
 
   const { success } = conditions;
   return (
-    <InputContainer disabled={!success} onSubmit={handleSubmit}>
+    <InputContainer
+      variants={inputContainerVariant}
+      initial='hidden'
+      animate='visible'
+      disabled={!success}
+      onSubmit={handleSubmit}>
       <InputArea
+        variants={inputItemVariant}
         onChange={e => setMessage({ text: e.target.value })}
         type='text'
         value={message.text}
@@ -80,7 +90,7 @@ export default function Input({ conditions, onSendMessage }) {
         disabled={success ? false : true}
       />
       <SendButton
-        as='input'
+        variants={inputItemVariant}
         type='submit'
         disabled={success ? false : true}
         value='Send'

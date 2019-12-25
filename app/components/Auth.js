@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import Form from './Form';
-import { Wrapper } from './UI-components';
 import { motion } from 'framer-motion';
 import { spring, spring2 } from '../utils/motionObj';
 
-const AuthPage = styled(Wrapper)`
+const AuthPage = styled.div.attrs({
+  className: 'wrapper',
+})`
   position: relative;
   display: flex;
   flex-direction: column;

@@ -1,8 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
-import { randomColor } from '../utils/helper';
-import MessageArea from './Messages';
 import Input from './Input';
+import styled from 'styled-components';
+import MessageArea from './Messages';
 import { AuthContext } from '../context/Context';
 
 const ChatAreaWrapper = styled.div`
@@ -17,8 +16,8 @@ const ChatAreaWrapper = styled.div`
 `;
 
 export default function ChatArea() {
-  const { user, authed } = React.useContext(AuthContext);
-  const chatUser = React.useRef({ id: user, color: randomColor() });
+  const { user, authed, color } = React.useContext(AuthContext);
+  const chatUser = React.useRef({ id: user, color });
 
   const [state, setState] = React.useState({
     messages: JSON.parse(localStorage.getItem(`${user}M`)) || [],
@@ -39,10 +38,9 @@ export default function ChatArea() {
   React.useEffect(() => {
     drone.on('open', error => {
       if (error) {
-        console.error(error);
         setChatErrorState({
           errorOccurred: true,
-          text: 'Something went wrong, reload the page to try again',
+          text: 'Something went wrong, try reloading',
         });
       }
 
@@ -56,12 +54,22 @@ export default function ChatArea() {
     });
 
     const room = drone.subscribe('observable-room');
+    console.log(room);
 
     room.on('data', (data, member) => {
       const userMessages = JSON.parse(localStorage.getItem(`${user}M`)) || [];
-      if (member.id === user || user === member.clientData.id) {
-        userMessages.push({ text: data, member: { ...member.clientData } });
-        localStorage.setItem(`${user}M`, JSON.stringify(userMessages));
+      console.log(member, data);
+      try {
+        if (member.id === user || user === member.clientData.id) {
+          userMessages.push({ text: data, member: { ...member.clientData } });
+          localStorage.setItem(`${user}M`, JSON.stringify(userMessages));
+        }
+      } catch (error) {
+        console.error(error);
+        setChatErrorState({
+          errorOccurred: true,
+          text: 'Something went wrong, try reloading',
+        });
       }
 
       setState(s => {
@@ -76,11 +84,11 @@ export default function ChatArea() {
     });
 
     return () => {
-      if (!authed && user === '') {
-        setDrone(null);
-        setChatErrorState({ errorOccurred: false, text: '' });
-      }
+      setDrone(null);
+      setChatErrorState({ errorOccurred: false, text: '' });
     };
+    //   if (!authed && user === '') {
+    // };
   }, []);
 
   console.log(state.member);
@@ -92,12 +100,9 @@ export default function ChatArea() {
   };
 
   const conditions = {
-    success:
-      Object.keys(state.member).length > 0 && !chatErrorState.errorOccurred,
-    loading:
-      Object.keys(state.member).length <= 0 && !chatErrorState.errorOccurred,
-    error:
-      Object.keys(state.member).length <= 0 && chatErrorState.errorOccurred,
+    success: drone && !chatErrorState.errorOccurred,
+    loading: !drone && !chatErrorState.errorOccurred,
+    error: chatErrorState.errorOccurred,
   };
 
   return (
@@ -106,6 +111,7 @@ export default function ChatArea() {
         conditions={conditions}
         messages={state.messages}
         currentMember={state.member}
+        chatErrorState={chatErrorState}
       />
       <Input conditions={conditions} onSendMessage={onSendMessage} />
     </ChatAreaWrapper>

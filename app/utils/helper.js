@@ -1,144 +1,4 @@
-export function randomName() {
-  const adjectives = [
-    'autumn',
-    'hidden',
-    'bitter',
-    'misty',
-    'silent',
-    'empty',
-    'dry',
-    'dark',
-    'summer',
-    'icy',
-    'delicate',
-    'quiet',
-    'white',
-    'cool',
-    'spring',
-    'winter',
-    'patient',
-    'twilight',
-    'dawn',
-    'crimson',
-    'wispy',
-    'weathered',
-    'blue',
-    'billowing',
-    'broken',
-    'cold',
-    'damp',
-    'falling',
-    'frosty',
-    'green',
-    'long',
-    'late',
-    'lingering',
-    'bold',
-    'little',
-    'morning',
-    'muddy',
-    'old',
-    'red',
-    'rough',
-    'still',
-    'small',
-    'sparkling',
-    'throbbing',
-    'shy',
-    'wandering',
-    'withered',
-    'wild',
-    'black',
-    'young',
-    'holy',
-    'solitary',
-    'fragrant',
-    'aged',
-    'snowy',
-    'proud',
-    'floral',
-    'restless',
-    'divine',
-    'polished',
-    'ancient',
-    'purple',
-    'lively',
-    'nameless',
-  ];
-  const nouns = [
-    'waterfall',
-    'river',
-    'breeze',
-    'moon',
-    'rain',
-    'wind',
-    'sea',
-    'morning',
-    'snow',
-    'lake',
-    'sunset',
-    'pine',
-    'shadow',
-    'leaf',
-    'dawn',
-    'glitter',
-    'forest',
-    'hill',
-    'cloud',
-    'meadow',
-    'sun',
-    'glade',
-    'bird',
-    'brook',
-    'butterfly',
-    'bush',
-    'dew',
-    'dust',
-    'field',
-    'fire',
-    'flower',
-    'firefly',
-    'feather',
-    'grass',
-    'haze',
-    'mountain',
-    'night',
-    'pond',
-    'darkness',
-    'snowflake',
-    'silence',
-    'sound',
-    'sky',
-    'shape',
-    'surf',
-    'thunder',
-    'violet',
-    'water',
-    'wildflower',
-    'wave',
-    'water',
-    'resonance',
-    'sun',
-    'wood',
-    'dream',
-    'cherry',
-    'tree',
-    'fog',
-    'frost',
-    'voice',
-    'paper',
-    'frog',
-    'smoke',
-    'star',
-  ];
-  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  return adjective + noun;
-}
-
-export function randomColor() {
-  return '#' + Math.floor(Math.random() * 0xffffff).toString(16);
-}
+'use strict';
 
 export function extractFormData(data) {
   const FormDataObj = Array.from(data).reduce((total, curr) => {
@@ -158,9 +18,9 @@ export const strongRegex = new RegExp(
   '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})'
 );
 
-export const mediumRegex = new RegExp(
-  '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
-);
+// export const mediumRegex = new RegExp(
+//   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
+// );
 
 export const debounce = (func, ms = 0) => {
   let timeoutId;
@@ -168,3 +28,29 @@ export const debounce = (func, ms = 0) => {
     timeoutId = setTimeout(() => func.apply(this, args), ms);
   };
 };
+
+export function getContrast(hexcolor) {
+  if (hexcolor.slice(0, 1) === '#') {
+    hexcolor = hexcolor.slice(1);
+  }
+
+  if (hexcolor.length === 3) {
+    hexcolor = hexcolor
+      .split('')
+      .map(function(hex) {
+        return hex + hex;
+      })
+      .join('');
+  }
+
+  // Convert to RGB value
+  var r = parseInt(hexcolor.substr(0, 2), 16);
+  var g = parseInt(hexcolor.substr(2, 2), 16);
+  var b = parseInt(hexcolor.substr(4, 2), 16);
+
+  // Get YIQ ratio
+  var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+  // Check contrast
+  return yiq >= 128 ? 'black' : 'white';
+}

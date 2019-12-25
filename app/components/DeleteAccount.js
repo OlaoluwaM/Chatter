@@ -1,14 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AuthContext } from '../context/Context';
-import { Wrapper } from './UI-components';
 import { Redirect } from 'react-router-dom';
+import { AuthContext } from '../context/Context';
+import { spring } from '../utils/motionObj';
+import { motion, AnimatePresence } from 'framer-motion';
+import { headerVariant, buttonVariant } from '../utils/motionObj';
 
-const DeleteAccPage = styled(Wrapper)`
+const DeleteAccPage = styled.div.attrs({
+  className: 'wrapper',
+})`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   h1 {
     color: red;
     font-size: 4rem;
@@ -18,7 +23,7 @@ const DeleteAccPage = styled(Wrapper)`
   }
 `;
 
-const DeleteBtn = styled.button`
+const DeleteBtn = styled(motion.button)`
   text-transform: uppercase;
   font-weight: bolder;
   background: red;
@@ -31,8 +36,6 @@ const DeleteBtn = styled.button`
 export default function DeleteAccount({ setAuth }) {
   const [delBtnHasBeenClicked, setButtonClickState] = React.useState(false);
   const { user, authed } = React.useContext(AuthContext);
-  const warningMessage =
-    'Warning, this action is irreversible do you want to proceed with it';
 
   React.useEffect(() => {
     if (delBtnHasBeenClicked) {
@@ -46,27 +49,41 @@ export default function DeleteAccount({ setAuth }) {
 
       localStorage.setItem('Users', JSON.stringify(updatedUsersArray));
       sessionStorage.removeItem('CurrentUser');
+      localStorage.removeItem(`${user}M`);
       setTimeout(() => {
-        setAuth({ user: '', authed: false });
+        setAuth({ user: '', color: '#7339ac', authed: false });
       }, 2000);
     }
   }, [delBtnHasBeenClicked]);
 
   return (
-    <React.Fragment>
+    <>
       {!authed ? (
         <Redirect to='/' />
       ) : (
         <DeleteAccPage>
-          <h1>Warning, Danger Zone</h1>
-          <DeleteBtn
-            className='button'
-            disabled={delBtnHasBeenClicked}
-            onClick={() => setButtonClickState(true)}>
-            {delBtnHasBeenClicked ? 'Deleting Account' : 'Delete my account'}
-          </DeleteBtn>
+          <motion.h1
+            variants={headerVariant}
+            initial='hidden'
+            animate='visible'>
+            Warning, Danger Zone
+          </motion.h1>
+          <AnimatePresence>
+            <DeleteBtn
+              key='delete-button'
+              exit='hidden'
+              layoutTransition={spring}
+              variants={buttonVariant}
+              initial='hidden'
+              animate='visible'
+              className='button'
+              disabled={delBtnHasBeenClicked}
+              onClick={() => setButtonClickState(true)}>
+              {delBtnHasBeenClicked ? 'Deleting Account' : 'Delete my account'}
+            </DeleteBtn>
+          </AnimatePresence>
         </DeleteAccPage>
       )}
-    </React.Fragment>
+    </>
   );
 }

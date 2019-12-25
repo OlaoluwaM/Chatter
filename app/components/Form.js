@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import ColorPicker from './CustomColorPicker';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
 import { extractFormData } from '../utils/helper';
-import { handleLogin, handleSignUp } from '../utils/authFunc';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
-import ColorPicker from './CustomColorPicker';
+import { handleLogin, handleSignUp, setAvatarColor } from '../utils/authFunc';
 
 const FormContainer = styled(motion.form)`
   display: flex;
@@ -27,19 +27,19 @@ const FormContainer = styled(motion.form)`
 export default function Form({ setAuth, formType }) {
   const [inputFieldError, setInputFieldError] = React.useState(false);
   const formRef = React.useRef();
-  const { authed } = React.useContext(AuthContext);
+  const { authed, color } = React.useContext(AuthContext);
 
   React.useEffect(() => {
     return () => setInputFieldError(false);
   }, [formType]);
 
   const handleSubmit = e => {
+    e.preventDefault();
     if (inputFieldError) return;
 
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
-    e.preventDefault();
-
+    extractedFormData['color'] = setAvatarColor(extractedFormData, color);
     if (formType === 'login') {
       formRef.current.style.opacity = 0.4;
       setTimeout(() => setAuth(handleLogin(extractedFormData)), 1500);
@@ -95,37 +95,32 @@ export default function Form({ setAuth, formType }) {
           />
 
           {formType !== 'login' && (
-            <>
-              <InputField
-                key='confirmPassword-field'
-                MotionProps={{
-                  variants: itemVariant,
-                  layoutTransition: spring,
-                  exit: 'hidden',
-                }}
-                formState={{ formType, setInputFieldError }}
-                name='confirmPassword'
-                type='password'
-                label='Confirm Password'
-              />
-              <ColorPicker
-                key='colorInput'
-                MotionProps={{
-                  variants: itemVariant,
-                  layoutTransition: spring,
-                  exit: 'hidden',
-                }}
-              />
-              {/* <ColorPicker
-                label='Pick a color'
-                MotionProps={{
-                  variants: itemVariant,
-                  layoutTransition: spring,
-                  exit: 'hidden',
-                }}
-              /> */}
-            </>
+            <InputField
+              key='confirmPassword-field'
+              MotionProps={{
+                variants: itemVariant,
+                layoutTransition: spring,
+                exit: 'hidden',
+              }}
+              formState={{ formType, setInputFieldError }}
+              name='confirmPassword'
+              type='password'
+              label='Confirm Password'
+            />
           )}
+
+          <ColorPicker
+            key='colorInput'
+            setAuthColor={setAuth}
+            btnText={
+              formType === 'login' ? 'Change avatar Color' : 'pick a color'
+            }
+            MotionProps={{
+              variants: itemVariant,
+              layoutTransition: spring,
+              exit: 'hidden',
+            }}
+          />
 
           <SubmitButton
             key='submit-button'

@@ -24,7 +24,6 @@ export const containerVariant = {
     transition: {
       when: 'beforeChildren',
       staggerChildren: 0.2,
-      dealyChildren: 0.1,
     },
   },
 
@@ -73,5 +72,69 @@ export const colorPickerVariant = {
     opacity: 0,
     x: 100,
     transition: { ...spring },
+  },
+};
+
+export const regularTexVariant = {
+  visible: {
+    opacity: 1,
+    y: 0,
+  },
+  hidden: {
+    opacity: 0,
+    y: 50,
+  },
+};
+
+export const headerVariant = {
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { ...spring },
+  },
+  hidden: {
+    opacity: 0,
+    y: -50,
+  },
+};
+
+export const buttonVariant = {
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { ...spring },
+  },
+  hidden: {
+    opacity: 0,
+    y: 50,
+  },
+};
+
+export const inputContainerVariant = {
+  visible: {
+    opacity: 1,
+    transition: {
+      when: 'beforeChildren',
+      staggerChildren: 0.2,
+    },
+  },
+
+  hidden: {
+    opacity: 0,
+    transition: {
+      when: 'afterChildren',
+    },
+  },
+};
+
+export const inputItemVariant = {
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { ...spring2 },
+  },
+  hidden: {
+    opacity: 0,
+    x: -100,
   },
 };

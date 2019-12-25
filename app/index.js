@@ -20,6 +20,7 @@ function App() {
 
   const [isAuthed, setAuthed] = React.useState({
     user: currentUser ? currentUser.id : '',
+    color: currentUser ? currentUser.color : '#7339ac',
     authed: currentUser !== '',
   });
 

@@ -1,19 +1,24 @@
 import React from 'react';
-import { AuthContext } from '../context/Context';
-import { Redirect } from 'react-router-dom';
-import { Wrapper } from './UI-components';
 import styled from 'styled-components';
+import { Redirect } from 'react-router-dom';
+import { AuthContext } from '../context/Context';
+import { regularTexVariant } from '../utils/motionObj';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const LogoutPage = styled(Wrapper)`
+const LogoutPage = styled.div.attrs({
+  className: 'wrapper',
+})`
+  width: 100%;
+  height: calc(100% - 7%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
   h1 {
-    font-family: var(--font1);
+    font-family: var(--font2);
     font-size: 3.8rem;
-    font-weight: 100;
+    font-weight: 300;
     text-transform: capitalize;
   }
 `;
@@ -34,14 +39,23 @@ export default function Logout({ setAuth }) {
   sessionStorage.removeItem('CurrentUser');
 
   setTimeout(() => {
-    setAuth({ user: '', authed: false });
+    setAuth({ user: '', color: '#7339ac', authed: false });
   }, 2000);
 
   return !authed ? (
     <Redirect to='/' />
   ) : (
     <LogoutPage>
-      <h1>{`Logging ${user} out`}</h1>
+      <AnimatePresence>
+        <motion.h1
+          key='Logout-text'
+          initial='hidden'
+          animate='visible'
+          exit='hidden'
+          variants={regularTexVariant}>
+          Logging out
+        </motion.h1>
+      </AnimatePresence>
     </LogoutPage>
   );
 }

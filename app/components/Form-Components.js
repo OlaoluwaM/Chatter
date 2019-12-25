@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
-import { inputValidation } from '../utils/authFunc';
 import { debounce } from '../utils/helper';
+import { inputValidation } from '../utils/authFunc';
 import { InputInfoVariant } from '../utils/motionObj';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
@@ -79,12 +79,6 @@ export const InputContainer = styled(motion.div)`
   margin-bottom: 0px;
   background: transparent;
 
-  /* div > input {
-    background: red;
-    input:valid & + ${InputLabel} {
-      color: red;
-    }
-  } */
   &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
     top: -20px;
     font-size: 15px;

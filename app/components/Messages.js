@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { default as styled, css } from 'styled-components';
-import { AuthContext } from '../context/Context';
-import { motion, AnimatePresence } from 'framer-motion';
 import { spring2 } from '../utils/motionObj';
+import { AuthContext } from '../context/Context';
+import { default as styled, css } from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
@@ -69,6 +69,7 @@ const Username = styled.div`
 const MessageText = styled.div`
   padding: 10px;
   max-width: 400px;
+  overflow-wrap: break-word;
   margin: 0;
   border-radius: 12px;
   background-color: var(--main);
@@ -99,7 +100,7 @@ const MessageWrapper = styled(motion.li)`
 `;
 
 function Message({ message, currentMember, exit }) {
-  const { user } = React.useContext(AuthContext);
+  const { user, color } = React.useContext(AuthContext);
   const { member, text } = message;
   const isMyMessage =
     member.id === currentMember.id ||
@@ -127,7 +128,7 @@ function Message({ message, currentMember, exit }) {
       mymessage={isMyMessage ? 1 : 0}
       custom={isMyMessage}
       exit={exit}>
-      <Avatar bg={member.clientData ? member.clientData.color : '#000000'} />
+      <Avatar bg={member.clientData ? member.clientData.color : color} />
       <MessageContent>
         <Username>{member.clientData ? member.clientData.id : user}</Username>
         <MessageText>{text}</MessageText>
@@ -136,11 +137,10 @@ function Message({ message, currentMember, exit }) {
   );
 }
 
-export default function MessageArea({ conditions, messages, currentMember }) {
-  const [messagesToRender, setMessages] = React.useState(messages);
+export default function MessageArea(props) {
+  const { conditions, messages, currentMember, chatErrorState } = props;
   const { success, loading, error } = conditions;
 
-  console.log(messages, currentMember);
   return (
     <MessageAreaWrapper>
       <AnimatePresence>
@@ -159,12 +159,12 @@ export default function MessageArea({ conditions, messages, currentMember }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}>
-            <h1>{chatState.error.text}</h1>
+            <h1>{chatErrorState.text}</h1>
           </TextWrapper>
         )}
         {success && (
           <>
-            {messagesToRender.map((message, ind) => (
+            {messages.map((message, ind) => (
               <Message
                 currentMember={currentMember}
                 message={message}

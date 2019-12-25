@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import { InputContainer } from './Form-Components';
 import { TwitterPicker } from 'react-color';
 import { motion, AnimatePresence } from 'framer-motion';
-import { colorPickerVariant, spring } from '../utils/motionObj';
+import { colorPickerVariant, tween } from '../utils/motionObj';
+import { getContrast } from '../utils/helper';
+import { AuthContext } from '../context/Context';
 
 const popOver = {
   position: 'relative',
@@ -20,11 +22,11 @@ const containerStyles = {
 
 const RevealButton = styled(motion.input)`
   cursor: pointer;
-  color: var(--main);
-  background: var(--sub);
-  border: 5px double var(--main);
-  flex-basis: 31%;
-  width: 31%;
+  color: ${({ color }) => getContrast(color)};
+  background: ${({ color }) => color};
+  border: 5px double ${({ color }) => getContrast(color)};
+  flex-basis: auto;
+  width: auto;
   height: auto;
   padding: 10px;
   font-family: var(--font1);
@@ -37,20 +39,33 @@ const RevealButton = styled(motion.input)`
   text-transform: lowercase;
 `;
 
-export default function ColorPicker({ MotionProps }) {
+export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
+  const { color } = React.useContext(AuthContext);
   const [displayColorPicker, setDisplay] = React.useState(false);
+  const [inputValue, setValue] = React.useState(color);
 
   const handleClick = () => setDisplay(dcp => !dcp);
+
+  const handleColorChange = color => {
+    setValue(color.hex);
+    console.log(color);
+    setAuthColor(auth => {
+      const { user, authed } = auth;
+      return { user, color: color.hex, authed };
+    });
+  };
 
   return (
     <InputContainer {...MotionProps} style={containerStyles}>
       <AnimatePresence>
         <RevealButton
+          name='colorPicker'
           key='revealButtn'
-          layoutTransition={spring}
+          positionTransition={tween}
           exit={{ opacity: 0 }}
           type='button'
-          value='Pick Color'
+          value={btnText}
+          color={inputValue}
           onClick={handleClick}
         />
         {displayColorPicker && (
@@ -60,7 +75,11 @@ export default function ColorPicker({ MotionProps }) {
             animate={displayColorPicker ? 'visible' : 'hidden'}
             exit='hidden'
             style={popOver}>
-            <TwitterPicker triangle='hide' />
+            <TwitterPicker
+              color={inputValue}
+              triangle='hide'
+              onChangeComplete={handleColorChange}
+            />
           </motion.div>
         )}
       </AnimatePresence>
