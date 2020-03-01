@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { debounce } from '../utils/helper';
+import { debounce, hexToRgb } from '../utils/helper';
 import { inputValidation } from '../utils/authFunc';
 import { InputInfoVariant } from '../utils/motionObj';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
-  flex-basis: 23%;
+  color: ${({ theme }) => theme.black};
   text-align: center;
   font-family: var(--font2);
   font-size: 4.1rem;
@@ -24,7 +24,7 @@ export const Bar = styled.span`
   height: 3.2%;
   flex-basis: 3.2%;
   border-radius: 50px;
-  background: rgba(153, 102, 204, 0.4);
+  background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
 
   ::before {
     content: '';
@@ -34,25 +34,24 @@ export const Bar = styled.span`
     width: 0%;
     height: 100%;
     border-radius: 50px;
-    background: rgba(153, 102, 204, 1);
+    background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
     transition: 0.3s ease;
   }
 `;
 
 export const InputLabel = styled.label`
-  color: rgba(153, 102, 204, 0.4);
+  color: ${({ theme }) => hexToRgb(theme.black, 0.4)};
   font-size: 1.1rem;
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
   pointer-events: none;
   left: 15px;
-  top: 6px;
+  top: 40%;
   transition: 0.2s ease all;
 `;
 
 const Input = styled.input`
-  flex-basis: 28%;
   width: 100%;
   color: inherit;
   border: none;
@@ -63,41 +62,45 @@ const Input = styled.input`
   font-family: var(--font1);
   font-size: 1.1rem;
   font-weight: 100;
-  padding-bottom: -3px;
+
+  &:not([type='button']) {
+    top: 0;
+    flex-basis: 80%;
+  }
 `;
 
 export const InputContainer = styled(motion.div)`
-  width: 50%;
+  width: 70%;
   color: inherit;
-  height: 17%;
-  flex-basis: 17%;
+  flex-basis: auto;
+  margin-bottom: 0px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  position: relative;
-  margin-bottom: 0px;
-  background: transparent;
 
-  &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: -20px;
-    font-size: 15px;
-    color: var(--sub);
+  &:not(:last-of-type) {
+    flex-grow: 0.15;
   }
 
-  &:focus-within ${Bar}::before {
-    width: 100%;
+  &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
+    top: -25px;
+    font-size: 17px;
+    color: ${({ theme }) => theme.main};
   }
 `;
 
 export const SubmitButton = styled(motion.input).attrs({
   className: 'button',
 })`
-  background: var(--sub);
+  border-radius: 50px;
+  background: ${({ theme }) => theme.main};
+  box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
   border: none;
   margin-bottom: 0px;
   margin-top: 5px;
-  color: var(--main);
+  color: ${({ theme }) => theme.sub};
   flex-basis: 11.5%;
   font-family: var(--font1);
   font-size: 1.3rem;
@@ -106,7 +109,7 @@ export const SubmitButton = styled(motion.input).attrs({
   text-transform: lowercase;
 
   &:disabled {
-    background: rgba(153, 102, 204, 0.4);
+    background: ${({ theme }) => hexToRgb(theme.main, 0.3)};
   }
 `;
 

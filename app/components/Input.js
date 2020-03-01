@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/Context';
 import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
 
 const InputContainer = styled(motion.form)`
@@ -60,46 +61,36 @@ const SendButton = styled(motion.input)`
   }
 `;
 
-export default function Input({ conditions, onSendMessage }) {
+export default function Input({ onSendMessage }) {
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
     const { text } = message;
     e.preventDefault();
-    if (text.length >= 1) {
       onSendMessage(text);
-    }
     setMessage({ text: '' });
   };
 
-  const { success } = conditions;
   return (
     <InputContainer
       variants={inputContainerVariant}
       initial='hidden'
       animate='visible'
-      disabled={!success}
       onSubmit={handleSubmit}>
       <InputArea
         variants={inputItemVariant}
         onChange={e => setMessage({ text: e.target.value })}
         type='text'
         value={message.text}
-        placeholder='Enter a message'
+        placeholder='Say Hi!'
         autoFocus={true}
-        disabled={success ? false : true}
       />
-      <SendButton
-        variants={inputItemVariant}
-        type='submit'
-        disabled={success ? false : true}
-        value='Send'
-      />
+
+      <SendButton variants={inputItemVariant} type='submit' value='Send' />
     </InputContainer>
   );
 }
 
 Input.propTypes = {
-  conditions: PropTypes.object.isRequired,
   onSendMessage: PropTypes.func.isRequired,
 };

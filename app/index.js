@@ -13,20 +13,22 @@ import Chatroom from './components/Chatroom';
 import Logout from './components/Logout';
 import DeleteAccount from './components/DeleteAccount';
 import { AuthProvider } from './context/Context';
-import './index.css';
+import { ThemeProvider } from 'styled-components';
+import { themeObj } from './context/Context';
+import './index.scss';
 
 function App() {
   const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser')) || '';
 
   const [isAuthed, setAuthed] = React.useState({
-    user: currentUser ? currentUser.id : '',
-    color: currentUser ? currentUser.color : '#7339ac',
+    user: currentUser ? currentUser.name : '',
+    color: currentUser ? currentUser.color : themeObj.sub,
     authed: currentUser !== '',
   });
 
   return (
-    <AuthProvider value={isAuthed}>
-      <div>
+    <ThemeProvider theme={themeObj}>
+      <AuthProvider value={isAuthed}>
         <Nav />
 
         {!isAuthed.authed && <Redirect to='/' />}
@@ -47,8 +49,8 @@ function App() {
             render={props => <DeleteAccount {...props} setAuth={setAuthed} />}
           />
         </Switch>
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -10,14 +10,14 @@ const AuthPage = styled.div.attrs({
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--main);
+  background: ${({ theme }) => theme.main};
   align-items: center;
   justify-content: space-around;
   overflow: hidden;
 `;
 
 const SwitchText = styled(motion.p)`
-  color: var(--sub);
+  color: ${({ theme }) => theme.sub};
   text-transform: uppercase;
   font-family: var(--font1);
   font-size: 1.2rem;

@@ -4,24 +4,29 @@ import styled from 'styled-components';
 import ColorPicker from './CustomColorPicker';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
-import { extractFormData } from '../utils/helper';
+import { extractFormData, hexToRgb } from '../utils/helper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 import { handleLogin, handleSignUp, setAvatarColor } from '../utils/authFunc';
 
+
 const FormContainer = styled(motion.form)`
   display: flex;
-  color: var(--sub);
   background: inherit;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 85%;
+  justify-content: space-around;
+  width: 50%;
   flex-basis: 85%;
   height: fit-content;
   position: relative;
-  transition: 0.3s ease;
+  overflow: hidden;
+  border-radius: 40px;
+  background: ${({ theme }) => theme.main};
+  margin-top: 25px;
+  border-radius: 50px;
+  box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
 `;
 
 export default function Form({ setAuth, formType }) {
@@ -70,13 +75,13 @@ export default function Form({ setAuth, formType }) {
           </FormTitle>
 
           <InputField
-            key='id-field'
+            key='name-field'
             MotionProps={{
               variants: itemVariant,
               layoutTransition: spring,
               exit: 'hidden',
             }}
-            name='id'
+            name='name'
             label='Username'
             formState={{ formType, setInputFieldError }}
           />

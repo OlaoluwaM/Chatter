@@ -20,8 +20,15 @@ module.exports = {
         use: ['babel-loader'],
       },
       {
-        test: /\.css$/,
-        use: [{ loader: MiniCssExtractPlugin.loader }, 'css-loader'],
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          'css-loader',
+          'postcss-loader',
+          'sass-loader',
+        ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,

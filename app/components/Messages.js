@@ -37,7 +37,7 @@ const TextWrapper = styled(motion.div)`
     font-family: var(--font2);
     font-size: 3.5rem;
     font-weight: 100;
-    color: var(--main);
+    color: ${({ theme }) => theme.main};
     width: 100%;
     text-align: center;
   }
@@ -49,7 +49,7 @@ const Avatar = styled.span`
   border-radius: 50%;
   display: inline-block;
   margin: 0 10px -10px;
-  border: 1.5px double var(--main);
+  border: 1.5px double ${({ theme }) => theme.main};
   background: ${({ bg }) => bg};
 `;
 
@@ -60,7 +60,7 @@ const MessageContent = styled.div`
 
 const Username = styled.div`
   display: block;
-  color: var(--main);
+  color: ${({ theme }) => theme.main};
   font-size: 15px;
   padding-bottom: 5px;
   font-weight: 100;
@@ -72,7 +72,7 @@ const MessageText = styled.div`
   overflow-wrap: break-word;
   margin: 0;
   border-radius: 12px;
-  background-color: var(--main);
+  background-color: ${({ theme }) => theme.main};
   color: var(--sub);
   display: inline-block;
 `;
@@ -101,11 +101,10 @@ const MessageWrapper = styled(motion.li)`
 
 function Message({ message, currentMember, exit }) {
   const { user, color } = React.useContext(AuthContext);
-  const { member, text } = message;
-  const isMyMessage =
-    member.id === currentMember.id ||
-    member.id === user ||
-    member.clientData.id === user;
+  const { metaData, userId } = currentMember;
+  const { avatar_color } = metaData;
+
+  const isMyMessage = userId === user;
 
   const messageVariant = {
     visible: {
@@ -128,64 +127,39 @@ function Message({ message, currentMember, exit }) {
       mymessage={isMyMessage ? 1 : 0}
       custom={isMyMessage}
       exit={exit}>
-      <Avatar bg={member.clientData ? member.clientData.color : color} />
+      <Avatar bg={avatar_color ? avatar_color : color} />
       <MessageContent>
-        <Username>{member.clientData ? member.clientData.id : user}</Username>
-        <MessageText>{text}</MessageText>
+        <Username>{userId ? userId : user}</Username>
+        <MessageText>{message}</MessageText>
       </MessageContent>
     </MessageWrapper>
   );
 }
 
 export default function MessageArea(props) {
-  const { conditions, messages, currentMember, chatErrorState } = props;
-  const { success, loading, error } = conditions;
+  const { messages } = props;
 
   return (
     <MessageAreaWrapper>
       <AnimatePresence>
-        {loading && (
-          <TextWrapper
-            key='loading-text'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}>
-            <h1>Setting up chat environment</h1>
-          </TextWrapper>
-        )}
-        {error && (
-          <TextWrapper
-            key='error-text'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}>
-            <h1>{chatErrorState.text}</h1>
-          </TextWrapper>
-        )}
-        {success && (
-          <>
-            {messages.map((message, ind) => (
-              <Message
-                currentMember={currentMember}
-                message={message}
-                key={ind}
-                exit={{ opacity: 0 }}
-              />
-            ))}
-          </>
-        )}
+        {messages.map(({ messageId, sender, text }) => (
+          <Message
+            currentMember={sender}
+            message={text}
+            key={messageId}
+            exit={{ opacity: 0 }}
+          />
+        ))}
       </AnimatePresence>
     </MessageAreaWrapper>
   );
 }
 
 MessageArea.propTypes = {
-  conditions: PropTypes.object.isRequired,
   messages: PropTypes.array.isRequired,
-  currentMember: PropTypes.object.isRequired,
 };
 
 Message.propTypes = {
-  message: PropTypes.object.isRequired,
+  message: PropTypes.string.isRequired,
   currentMember: PropTypes.object.isRequired,
 };
