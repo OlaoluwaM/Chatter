@@ -85,16 +85,16 @@ export default function Sidebar({ inviteUser }) {
       });
     });
 
-    // applicationUserListQuery.next(function(users, error) {
-    //   if (error) dispatch({ type: 'Error', error: error.message });
+    applicationUserListQuery.next(function(users, error) {
+      if (error) dispatch({ type: 'Error', error: error.message });
 
-    //   setOnlineUsers(
-    //     users.filter(
-    //       ({ userId, connectionStatus }) =>
-    //         connectionStatus === 'online' && userId !== currentUser
-    //     )
-    //   );
-    // });
+      setUsers(
+        users.filter(
+          ({ userId, connectionStatus }) =>
+            connectionStatus === 'online' && userId !== currentUser
+        )
+      );
+    });
   }, []);
 
   const currentUserDisplayVariants = {
