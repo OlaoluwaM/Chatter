@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
 import { headerVariant, buttonVariant, spring2 } from '../utils/motionObj';
-import { SVGBackground } from './SVGIcons';
 
 const HomePage = styled.div.attrs({
   className: 'wrapper',
@@ -82,8 +81,12 @@ export default function Home() {
             initial='hidden'
             animate='visible'
             whileTap='tap'>
-            <IoIosChatbubbles />
-            Chat
+            {authed && (
+              <>
+                <IoIosChatbubbles /> Chat
+              </>
+            )}
+            {!authed && 'Sign In'}
           </ChatButton>
         </Link>
       </div>

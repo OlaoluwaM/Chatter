@@ -1,8 +1,8 @@
 import React from 'react';
-import * as SendBird from 'sendbird';
 import styled from 'styled-components';
 import ChatArea from './ChatArea';
 import Sidebar from './Sidebar';
+import * as SendBird from 'sendbird';
 import { filterObject } from '../utils/helper';
 import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
@@ -10,8 +10,8 @@ import {
   createUserMetaData,
   createGroupParamEntries,
   chatManagerReducer,
+  extractNeededMessageData,
 } from '../utils/chatFunctions';
-import { addMessage } from '../utils/chatFunctions';
 
 const ChatRoomContainer = styled.div.attrs({
   className: 'wrapper',
@@ -19,21 +19,20 @@ const ChatRoomContainer = styled.div.attrs({
   display: flex;
   align-items: center;
   overflow: hidden;
+  background: ${({ theme }) => theme.darkMain};
 `;
 
 export default function Chatroom() {
   const { user: userId, color } = React.useContext(AuthContext);
 
-  const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
-  const [gCParams] = React.useState(() => new sb.GroupChannelParams());
-
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
+  const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
   React.useEffect(() => {
     try {
       sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
-
+        console.log(color);
         createUserMetaData(user, { avatarColor: color });
 
         const filteredUserObj = filterObject(user, [
@@ -56,13 +55,18 @@ export default function Chatroom() {
     }
 
     return () => {
-      sb.disconnect();
       dispatch({ type: 'Reset' });
+      sb.disconnect();
     };
   }, []);
 
   const createOneToOneChannel = users => {
     const { '0': currentUser, '1': invitee } = users;
+    const { userChannel } = chatManager;
+
+    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) return;
+
+    const gCParams = new sb.GroupChannelParams();
 
     gCParams.addUserId(invitee);
     const obj = Object.fromEntries(createGroupParamEntries(currentUser));
@@ -77,8 +81,7 @@ export default function Chatroom() {
       prevMessages.load((messages, error) => {
         if (error) dispatch({ type: 'Error', error: error.message });
 
-        const filteredMessages = messages.map(addMessage);
-        console.log(filteredMessages);
+        const filteredMessages = messages.map(extractNeededMessageData);
 
         dispatch({
           type: 'New channel and message',
@@ -88,7 +91,7 @@ export default function Chatroom() {
       });
     });
   };
-
+  console.log(chatManager);
   const chatManagerIsSetup =
     chatManager !== null ? Object.keys(chatManager).length > 0 : false;
 
@@ -99,7 +102,6 @@ export default function Chatroom() {
   };
 
   const { success, loading, error } = conditions;
-  console.log(chatManager);
 
   const chatContextObj = {
     sb,

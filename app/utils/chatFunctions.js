@@ -8,9 +8,12 @@ import { filterObject } from './helper';
  */
 
 export function createUserMetaData(user, desiredData) {
+  const { metaData } = user;
   Object.keys(desiredData).forEach(key => {
-    if (user.metaData.hasOwnProperty(key)) return;
-    user.createMetaData({ [key]: data[key] });
+    if (!metaData.hasOwnProperty(key) || metaData[key] !== desiredData[key]) {
+      // user.createMetaData({ [key]: desiredData[key] });
+      user.updateMetaData({ [key]: desiredData[key] });
+    } else return;
   });
 }
 
@@ -29,7 +32,13 @@ export function createGroupParamEntries(user) {
   ];
 }
 
-export function addMessage(messageObj) {
+/**
+ *
+ * @param {{}} messageObj
+ * @returns {{}}
+ */
+
+export function extractNeededMessageData(messageObj) {
   return filterObject(messageObj, [
     'channelUrl',
     'messageId',

@@ -8,46 +8,53 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
-  color: ${({ theme }) => theme.black};
-  text-align: center;
+  color: ${({ theme }) => theme.sub};
+  text-align: left;
+  padding-left: 12px;
   font-family: var(--font2);
-  font-size: 4.1rem;
+  font-size: 5rem;
   letter-spacing: 0.2rem;
   font-weight: 800;
-  margin-top: 20px;
+  margin-top: -30px;
 `;
 
 export const Bar = styled.span`
   display: block;
   position: relative;
   width: 100%;
-  height: 3.2%;
-  flex-basis: 3.2%;
+  margin-left: 3.5%;
+  height: 4px;
+  flex-basis: 4px;
   border-radius: 50px;
-  background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
+  background: ${({ theme, color }) =>
+    color ? color.color : hexToRgb(theme.sub, 0.2)};
+  transition: 0.5s ease-out;
 
   ::before {
+    transition: inherit;
     content: '';
     position: absolute;
+    transform-origin: left;
     top: 0;
-    left: 0px;
-    width: 0%;
+
+    width: inherit;
+    transform: scaleX(0);
     height: 100%;
     border-radius: 50px;
-    background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
-    transition: 0.3s ease;
+    background: ${({ theme, color }) => (color ? color.color : theme.sub)};
   }
 `;
 
 export const InputLabel = styled.label`
-  color: ${({ theme }) => hexToRgb(theme.black, 0.4)};
-  font-size: 1.1rem;
+  color: ${({ theme }) => hexToRgb(theme.sub, 0.4)};
+  font-size: 1rem;
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
   pointer-events: none;
-  left: 15px;
-  top: 40%;
+  left: 2%;
+  top: 50%;
+  transform: translateY(-60%);
   transition: 0.2s ease all;
 `;
 
@@ -55,24 +62,21 @@ const Input = styled.input`
   width: 100%;
   color: inherit;
   border: none;
-  transition: 0.7s ease;
   outline: none;
   background: transparent;
-  text-indent: 15px;
+  text-indent: 2%;
   font-family: var(--font1);
   font-size: 1.1rem;
   font-weight: 100;
 
   &:not([type='button']) {
     top: 0;
-    flex-basis: 80%;
+    flex-basis: 30%;
   }
 `;
 
 export const InputContainer = styled(motion.div)`
-  width: 70%;
-  color: inherit;
-  flex-basis: auto;
+  color: ${({ theme }) => theme.sub};
   margin-bottom: 0px;
   position: relative;
   display: flex;
@@ -81,13 +85,17 @@ export const InputContainer = styled(motion.div)`
   justify-content: flex-start;
 
   &:not(:last-of-type) {
-    flex-grow: 0.15;
+    justify-content: center;
   }
 
   &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: -25px;
+    top: 9%;
     font-size: 17px;
-    color: ${({ theme }) => theme.main};
+    color: ${({ theme }) => theme.sub};
+  }
+
+  &:focus-within ${Bar}::before, input:valid ~ ${Bar} {
+    transform: scaleX(1);
   }
 `;
 
@@ -95,21 +103,20 @@ export const SubmitButton = styled(motion.input).attrs({
   className: 'button',
 })`
   border-radius: 50px;
-  background: ${({ theme }) => theme.main};
-  box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
+  background: ${({ theme }) => theme.sub};
   border: none;
   margin-bottom: 0px;
-  margin-top: 5px;
-  color: ${({ theme }) => theme.sub};
-  flex-basis: 11.5%;
+  margin-top: 10px;
+  color: ${({ theme }) => theme.main};
   font-family: var(--font1);
   font-size: 1.3rem;
   font-weight: 500;
   letter-spacing: 0.1rem;
+  place-self: flex-end center;
   text-transform: lowercase;
 
   &:disabled {
-    background: ${({ theme }) => hexToRgb(theme.main, 0.3)};
+    background: ${({ theme }) => hexToRgb(theme.sub, 0.3)};
   }
 `;
 
@@ -117,15 +124,13 @@ const MotionInputInfo = styled(motion.p)`
   margin: 0;
   color: ${({ color }) => color};
   font-family: var(--font2);
-  font-size: 0.9rem;
+  font-size: 0.89rem;
   font-weight: 300;
   text-align: left;
   width: 100%;
-  height: fit-content;
-  padding: 6px;
-  position: relative;
-  padding-left: 15px;
-  transition: 0.3s color ease;
+  position: absolute;
+  bottom: 0px;
+  padding-left: 2%;
 `;
 
 export function InputInfo({ error, color, MotionProps }) {
@@ -166,7 +171,7 @@ export function InputField(props) {
     setError(inputValidation(name, inputValue, LoginForm));
 
   return (
-    <InputContainer {...MotionProps}>
+    <InputContainer {...MotionProps} color={error}>
       <Input
         onKeyUp={handleDebouncedInputValidation}
         onFocus={handleInputValidation}
@@ -175,11 +180,12 @@ export function InputField(props) {
         type={type}
         required={required}
         name={name}
+        color={error}
         {...rest}
       />
 
-      <Bar />
-      <InputLabel>{label}</InputLabel>
+      <Bar color={error} />
+      <InputLabel color={error}>{label}</InputLabel>
       <AnimatePresence>
         {error && (
           <InputInfo

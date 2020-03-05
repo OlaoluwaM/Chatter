@@ -2,60 +2,72 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
+import { FaPaperPlane } from 'react-icons/fa';
 import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
 
 const InputContainer = styled(motion.form)`
-  width: 100%;
-  height: 12vh;
-  flex-basis: 12vh;
-  min-height: 12vh;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
+  width: 91%;
+  flex-basis: 7vh;
+  height: 7vh;
   display: flex;
-  padding-left: 15px;
-  justify-content: flex-start;
+  justify-content: space-between;
+  padding: 10px;
   align-items: center;
-  background: var(--main);
+  background: ${({ theme }) => theme.main};
+  opacity: 0.7;
+  border-radius: 15px;
+  align-self: center;
 `;
 
 const InputArea = styled(motion.input)`
   position: relative;
-  flex-basis: 60%;
-  width: 60%;
-  border-radius: 5px;
+  width: 62%;
+  flex-basis: 62%;
+  border-radius: 3px;
   text-indent: 14px;
   font-family: var(--font2);
-  font-size: 1.1rem;
-  color: #000;
-  height: 50%;
-  border: 2px solid rgba(153, 102, 204, 0.4);
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.black};
+  height: 5vh;
+  border: none;
   justify-self: center;
   outline: none;
-  background: var(--main);
+  background: transparent;
+  margin-left: 80px;
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 
   &:hover,
   &:focus {
-    border: 2px solid rgba(153, 102, 204, 1);
+    opacity: 1;
+    /* border: 2px solid #bfbfbf; */
   }
 `;
 
-const SendButton = styled(motion.input)`
+const SendButton = styled(motion.button)`
   outline: none;
   border: none;
-  background: var(--sub);
-  color: var(--main);
-  font-size: 1.1rem;
-  font-family: var(--font2);
-  padding: 10px;
-  width: 100px;
-  border-radius: 30px;
-  margin-left: 30px;
-  font-weight: 400;
+  background: transparent;
+  fill: ${({ theme }) => theme.darkMain};
+  font-size: 1.3rem;
+  margin-left: 40px;
+  margin-right: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 
+  & > svg {
+    transition: 0.3s linear;
+    fill: inherit;
+  }
+  & > svg:hover {
+    fill: ${({ theme }) => theme.sub};
+  }
   &:disabled {
     opacity: 0.5;
   }
@@ -67,7 +79,7 @@ export default function Input({ onSendMessage }) {
   const handleSubmit = e => {
     const { text } = message;
     e.preventDefault();
-      onSendMessage(text);
+    onSendMessage(text);
     setMessage({ text: '' });
   };
 
@@ -86,7 +98,9 @@ export default function Input({ onSendMessage }) {
         autoFocus={true}
       />
 
-      <SendButton variants={inputItemVariant} type='submit' value='Send' />
+      <SendButton variants={inputItemVariant} type='submit'>
+        <FaPaperPlane />
+      </SendButton>
     </InputContainer>
   );
 }

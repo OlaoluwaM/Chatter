@@ -1,20 +1,30 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AuthContext } from '../context/Context';
-import { Route, Link, __RouterContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { hexToRgb } from '../utils/helper';
+import { AuthContext } from '../context/Context';
 import { navUlVariant, navItemVariant } from '../utils/motionObj';
+import { Route, Link, __RouterContext } from 'react-router-dom';
 
 const NavContainer = styled.nav`
   position: relative;
   width: 100%;
   height: 7%;
   overflow: hidden;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  display: grid;
   background: ${({ theme }) => theme.main};
+`;
+
+const NavUl = styled(motion.ul)`
+  width: auto;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 180px));
+  grid-auto-flow: column;
+  gap: 10px;
+  justify-content: end;
+  margin: 0;
+  padding: 0;
 `;
 
 const NavItem = styled(motion.li)`
@@ -25,7 +35,7 @@ const NavItem = styled(motion.li)`
   height: 100%;
   display: flex;
   text-align: center;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   color: ${({ theme }) => hexToRgb(theme.black, 0.5)};
   letter-spacing: 0.1rem;
@@ -35,17 +45,6 @@ const NavItem = styled(motion.li)`
     text-decoration: none;
     padding-top: 2px;
   }
-`;
-
-const NavUl = styled(motion.ul).attrs({
-  className: 'nav-ul',
-})`
-  flex-basis: ${({ children }) => `${children.length * 10 + 5}%`};
-  width: 25%;
-  height: 100%;
-  display: grid;
-  margin: 0;
-  padding: 0;
 `;
 
 function CustomLink({ to, exact, children, ...rest }) {

@@ -3,7 +3,7 @@
 $font1: Raleway, sans-serif;
 $font2: 'Roboto Slab', sans-serif;
 $main: #ffffff;
-$whiteShade2: #dfe4eb;
+$dark-main: #eeefef;
 $sub: #5e0bdc;
 $dark-sub: #4909aa;
 $black: #222222;
@@ -73,7 +73,30 @@ li.active {
   color: $dark-sub;
 }
 
-.nav-ul {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  grid-auto-flow: column;
+.color-display {
+  font-family: $font1;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: capitalize;
+  transition: 0.2s ease;
+}
+
+.burger .burger-lines,
+.burger .burger-lines:after,
+.burger .burger-lines:before {
+  background-color: $sub;
+}
+
+.pulse {
+  box-shadow: 0 0 0 0 $dark-sub;
+  animation: pulse 1.5s infinite backwards;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0px lighten($sub, 40%);
+  }
+  70% {
+    box-shadow: 0 0 0 15px lighten($sub, 40%);
+  }
 }

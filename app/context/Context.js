@@ -10,7 +10,7 @@ export const ChatProvider = ChatContext.Provider;
 
 export const themeObj = {
   main: '#ffffff',
-  whiteShade2: '#DFE4EB',
+  darkMain: '#EEEFEF',
   sub: '#5e0bdc',
   darkSub: '#4909aa',
   black: '#222222',

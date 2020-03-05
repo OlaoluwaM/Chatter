@@ -9,13 +9,15 @@ const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
 })`
   width: 100%;
-  flex-grow: 1;
   margin: 0;
   position: relative;
   padding: 20px 17px;
   overflow-y: auto;
-  background-image: linear-gradient(135deg, #ce9ffc 10%, #7367f0 100%);
+  background: inherit;
   overflow-x: hidden;
+  flex-grow: 1;
+  padding-bottom: 12px;
+
   * {
     overflow-anchor: none;
   }
@@ -82,18 +84,24 @@ const MessageWrapper = styled(motion.li)`
   display: flex;
   margin-top: 30px;
   ${({ mymessage }) =>
-    mymessage === 1 &&
-    css`
-      flex-direction: row-reverse;
-      text-align: right;
-      & > ${MessageContent} {
-        align-items: center;
-      }
-      & ${MessageText} {
-        background: rgb(115, 57, 172);
-        color: white;
-      }
-    `}
+    mymessage === 1
+      ? css`
+          flex-direction: row-reverse;
+          text-align: right;
+          & > ${MessageContent} {
+            align-items: center;
+          }
+          & ${MessageText} {
+            background: ${({ theme }) => theme.sub};
+            color: ${({ theme }) => theme.main};
+          }
+        `
+      : css`
+          & ${MessageText} {
+            background: ${({ theme }) => theme.main};
+            color: ${({ theme }) => theme.black};
+          }
+        `}
   &:last-of-type {
     overflow-anchor: auto;
   }
@@ -102,7 +110,8 @@ const MessageWrapper = styled(motion.li)`
 function Message({ message, currentMember, exit }) {
   const { user, color } = React.useContext(AuthContext);
   const { metaData, userId } = currentMember;
-  const { avatar_color } = metaData;
+  const { avatarColor } = metaData;
+  console.log(avatarColor);
 
   const isMyMessage = userId === user;
 
@@ -127,7 +136,7 @@ function Message({ message, currentMember, exit }) {
       mymessage={isMyMessage ? 1 : 0}
       custom={isMyMessage}
       exit={exit}>
-      <Avatar bg={avatar_color ? avatar_color : color} />
+      <Avatar bg={isMyMessage ? color : avatarColor} />
       <MessageContent>
         <Username>{userId ? userId : user}</Username>
         <MessageText>{message}</MessageText>

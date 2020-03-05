@@ -71,9 +71,9 @@ export function hexToRgb(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export function percentageOf(value1, value2) {
-  return (value1 / value2) * 100;
-}
+// export function percentageOf(value1, value2) {
+//   return (value1 / value2) * 100;
+// }
 
 export function randomID() {
   return `_${Math.random()

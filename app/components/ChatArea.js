@@ -2,55 +2,69 @@ import React from 'react';
 import Input from './Input';
 import styled from 'styled-components';
 import MessageArea from './Messages';
-import { AuthContext, ChatContext } from '../context/Context';
 import { randomID } from '../utils/helper';
-import { addMessage } from '../utils/chatFunctions';
+import { ChatContext } from '../context/Context';
+import { extractNeededMessageData } from '../utils/chatFunctions';
 
 const ChatAreaWrapper = styled.div`
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.darkMain};
   height: 100%;
   flex-grow: 1;
-  margin-top: 15px;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
+  padding-bottom: 8px;
 `;
 
 export default function ChatArea() {
   const { sb, chatManager, dispatch } = React.useContext(ChatContext);
 
-  const [channelHandler] = React.useState(() => new sb.ChannelHandler());
-
   React.useEffect(() => {
-    const HANDLER_ID = randomID();
+    const channelHandler = new sb.ChannelHandler();
+    const connectionHandler = new sb.ConnectionHandler();
+
+    const HANDLER_ID1 = randomID();
+    const HANDLER_ID2 = randomID();
 
     try {
       channelHandler.onMessageReceived = (channel, message) => {
-        console.log(addMessage(message));
         if (chatManager !== null && chatManager.hasOwnProperty('userChannel')) {
-          console.log(111);
-          dispatch({ type: 'New message', messages: [addMessage(message)] });
+          dispatch({
+            type: 'New message',
+            messages: [extractNeededMessageData(message)],
+          });
         } else {
-          console.log(222);
           dispatch({
             type: 'New channel and message',
             channel,
-            messages: [addMessage(message)],
+            messages: [extractNeededMessageData(message)],
           });
         }
       };
 
-      sb.addChannelHandler(HANDLER_ID, channelHandler);
+      connectionHandler.onReconnectStarted = function() {
+        console.log('reconnecting');
+      };
+      connectionHandler.onReconnectSucceeded = function() {
+        console.log('reconnected');
+      };
+      connectionHandler.onReconnectFailed = function() {
+        console.log('reload');
+      };
+
+      sb.addChannelHandler(HANDLER_ID1, channelHandler);
+      sb.addConnectionHandler(HANDLER_ID2, connectionHandler);
     } catch (error) {
       console.error(error);
       dispatch({ type: 'Error', error });
     }
 
     return () => {
-      sb.removeChannelHandler(HANDLER_ID);
+      sb.removeChannelHandler(HANDLER_ID1);
+      sb.removeConnectionHandler(HANDLER_ID2);
     };
-  });
+  }, []);
 
   const onSendMessage = message => {
     const { userChannel } = chatManager;
@@ -62,7 +76,10 @@ export default function ChatArea() {
       groupChannel.sendUserMessage(message, '', '', (message, error) => {
         if (error) dispatch({ type: 'Error', error: error.message });
 
-        dispatch({ type: 'New message', messages: [addMessage(message)] });
+        dispatch({
+          type: 'New message',
+          messages: [extractNeededMessageData(message)],
+        });
       });
     });
   };

@@ -167,6 +167,7 @@ export const navUlVariant = {
     },
   },
 };
+
 export const navItemVariant = {
   visible: {
     opacity: 1,
@@ -180,5 +181,48 @@ export const navItemVariant = {
   hover: {
     color: themeObj.darkSub,
     transition: { type: 'tween', ease: 'linear' },
+  },
+};
+
+export const sideBarVariant = {
+  visible: {
+    flexBasis: '30%',
+    width: '100%',
+    transition: {
+      when: 'beforeChildren',
+      staggerChildren: 0.2,
+    },
+  },
+  hidden: {
+    flexBasis: 0,
+    width: '0%',
+  },
+};
+
+export const menuVariants = {
+  visible: {
+    opacity: 1,
+    transition: {
+      when: 'beforeChildren',
+      staggerChildren: 0.1,
+      delayChildren: 0.5,
+    },
+  },
+  hidden: {
+    opacity: 0,
+  },
+};
+
+export const menuItemVariant = {
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      ...spring2,
+    },
+  },
+  hidden: {
+    opacity: 0,
+    x: '-100%',
   },
 };
