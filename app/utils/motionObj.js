@@ -124,7 +124,9 @@ export const inputContainerVariant = {
     opacity: 1,
     transition: {
       when: 'beforeChildren',
-      staggerChildren: 0.2,
+      staggerChildren: 0.1,
+      delayChildren: 1,
+      staggerDirection: -1,
     },
   },
 
@@ -139,12 +141,12 @@ export const inputContainerVariant = {
 export const inputItemVariant = {
   visible: {
     opacity: 1,
-    y: 0,
-    transition: { ...spring2 },
+    x: 0,
+    transition: { type: 'tween' },
   },
   hidden: {
     opacity: 0,
-    y: 100,
+    x: 30,
   },
 };
 
@@ -155,7 +157,7 @@ export const navUlVariant = {
     opacity: 1,
     transition: {
       when: 'beforeChildren',
-      delayChildren: 1,
+      delayChildren: 0.5,
       staggerChildren: 0.1,
     },
   },
@@ -205,7 +207,6 @@ export const menuVariants = {
     transition: {
       when: 'beforeChildren',
       staggerChildren: 0.1,
-      delayChildren: 0.5,
     },
   },
   hidden: {

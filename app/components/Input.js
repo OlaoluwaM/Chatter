@@ -19,6 +19,7 @@ const InputContainer = styled(motion.form)`
   opacity: 0.7;
   border-radius: 15px;
   align-self: center;
+  overflow: hidden;
 `;
 
 const InputArea = styled(motion.input)`
@@ -33,6 +34,7 @@ const InputArea = styled(motion.input)`
   height: 5vh;
   border: none;
   justify-self: center;
+  align-self: flex-start;
   outline: none;
   background: transparent;
   margin-left: 80px;
@@ -52,7 +54,7 @@ const SendButton = styled(motion.button)`
   outline: none;
   border: none;
   background: transparent;
-  fill: ${({ theme }) => theme.darkMain};
+  fill: ${({ fill }) => fill};
   font-size: 1.3rem;
   margin-left: 40px;
   margin-right: 30px;
@@ -74,6 +76,7 @@ const SendButton = styled(motion.button)`
 `;
 
 export default function Input({ onSendMessage }) {
+  const { color } = React.useContext(AuthContext);
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
@@ -98,7 +101,7 @@ export default function Input({ onSendMessage }) {
         autoFocus={true}
       />
 
-      <SendButton variants={inputItemVariant} type='submit'>
+      <SendButton fill={color} variants={inputItemVariant} type='submit'>
         <FaPaperPlane />
       </SendButton>
     </InputContainer>

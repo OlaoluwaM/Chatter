@@ -23,11 +23,24 @@ const AvatarColorHolder = styled.div`
   align-items: center;
 
   div {
+    position: relative;
     background: ${({ color }) => color};
     width: 50px;
     height: 50px;
     border-radius: 50%;
     border: 1.5px solid ${({ theme }) => theme.main};
+
+    &:after {
+      content: '';
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      border: 2px solid ${({ color }) => color};
+      position: absolute;
+      bottom: 0px;
+      right: 4px;
+      background: lightgreen;
+    }
   }
 `;
 
@@ -73,7 +86,7 @@ export default function UserDisplay(props) {
   );
 }
 
-UserDisplay.PropTypes = {
+UserDisplay.propTypes = {
   avatarColor: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
   subData: PropTypes.string,

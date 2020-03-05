@@ -1,8 +1,8 @@
 import React from 'react';
-import { AuthContext, ChatContext } from '../context/Context';
-import { default as styled, ThemeContext } from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import styled from 'styled-components';
 import UserDisplay from './UserDisplay';
+import { motion } from 'framer-motion';
+import { AuthContext, ChatContext } from '../context/Context';
 import {
   sideBarVariant,
   menuVariants,
@@ -58,26 +58,49 @@ const CurrentUserDisplay = styled(MenuItem)`
 `;
 
 export default function Sidebar({ inviteUser }) {
-  const themeObj = React.useContext(ThemeContext);
   const { user: currentUser, color } = React.useContext(AuthContext);
 
-  const [onlineUsers, setOnlineUsers] = React.useState([]);
+  const [users, setUsers] = React.useState([]);
   const { sb, dispatch } = React.useContext(ChatContext);
 
   React.useEffect(() => {
-    const ApplicationUserListQuery = sb.createApplicationUserListQuery();
+    const applicationUserListQuery = sb.createApplicationUserListQuery();
+    const groupChannelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
+    const openChannelListQuery = sb.OpenChannel.createOpenChannelListQuery();
 
-    ApplicationUserListQuery.next(function(users, error) {
-      if (error) dispatch({ type: 'Error', error: error.message });
-
-      setOnlineUsers(
-        users.filter(
-          ({ userId, connectionStatus }) =>
-            connectionStatus === 'online' && userId !== currentUser
-        )
-      );
+    console.log({
+      applicationUserListQuery,
+      groupChannelListQuery,
+      openChannelListQuery,
     });
+
+    [
+      applicationUserListQuery,
+      groupChannelListQuery,
+      openChannelListQuery,
+    ].forEach(o => {
+      o.next((value, error) => {
+        if (error) dispatch({ type: 'Error', error: error.message });
+        console.log(value);
+      });
+    });
+
+    // applicationUserListQuery.next(function(users, error) {
+    //   if (error) dispatch({ type: 'Error', error: error.message });
+
+    //   setOnlineUsers(
+    //     users.filter(
+    //       ({ userId, connectionStatus }) =>
+    //         connectionStatus === 'online' && userId !== currentUser
+    //     )
+    //   );
+    // });
   }, []);
+
+  const currentUserDisplayVariants = {
+    hidden: { opacity: 0, y: -50 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   return (
     <SidebarContainer
@@ -86,15 +109,15 @@ export default function Sidebar({ inviteUser }) {
       animate='visible'
       style={{ flexBasis: '0%', width: '0%' }}>
       <CurrentUserDisplay
-        variants={{
-          hidden: { opacity: 0, y: -30 },
-          visible: { opacity: 1, y: 0 },
-        }}>
+        variants={currentUserDisplayVariants}
+        initial='hidden'
+        animate='visible'>
         <UserDisplay avatarColor={color} userName={currentUser} />
       </CurrentUserDisplay>
+
       <MenuContainer variants={menuVariants}>
-        {onlineUsers.length > 0 &&
-          onlineUsers.map(({ userId }, ind) => (
+        {users.length > 0 &&
+          users.map(({ userId }, ind) => (
             <MenuItem
               key={userId}
               onTap={() => inviteUser([currentUser, userId])}>

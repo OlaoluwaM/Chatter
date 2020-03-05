@@ -99,6 +99,7 @@ const MessageWrapper = styled(motion.li)`
       : css`
           & ${MessageText} {
             background: ${({ theme }) => theme.main};
+            filter: brightness(40%);
             color: ${({ theme }) => theme.black};
           }
         `}
