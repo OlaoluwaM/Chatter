@@ -85,11 +85,11 @@ export default function Sidebar({ inviteUser }) {
       });
     });
 
-    applicationUserListQuery.next(function(users, error) {
+    applicationUserListQuery.next(function(user, error) {
       if (error) dispatch({ type: 'Error', error: error.message });
 
       setUsers(
-        users.filter(
+        user.filter(
           ({ userId, connectionStatus }) =>
             connectionStatus === 'online' && userId !== currentUser
         )
