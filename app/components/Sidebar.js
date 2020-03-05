@@ -60,7 +60,7 @@ const CurrentUserDisplay = styled(MenuItem)`
 export default function Sidebar({ inviteUser }) {
   const { user: currentUser, color } = React.useContext(AuthContext);
 
-  const [users, setUsers] = React.useState([]);
+  const [onlineUsers, setOnlineUsers] = React.useState([]);
   const { sb, dispatch } = React.useContext(ChatContext);
 
   React.useEffect(() => {
@@ -68,28 +68,28 @@ export default function Sidebar({ inviteUser }) {
     const groupChannelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
     const openChannelListQuery = sb.OpenChannel.createOpenChannelListQuery();
 
-    console.log({
-      applicationUserListQuery,
-      groupChannelListQuery,
-      openChannelListQuery,
-    });
+    // console.log({
+    //   applicationUserListQuery,
+    //   groupChannelListQuery,
+    //   openChannelListQuery,
+    // });
 
-    [
-      applicationUserListQuery,
-      groupChannelListQuery,
-      openChannelListQuery,
-    ].forEach(o => {
-      o.next((value, error) => {
-        if (error) dispatch({ type: 'Error', error: error.message });
-        console.log(value);
-      });
-    });
+    // [
+    //   applicationUserListQuery,
+    //   groupChannelListQuery,
+    //   openChannelListQuery,
+    // ].forEach(o => {
+    //   o.next((value, error) => {
+    //     if (error) dispatch({ type: 'Error', error: error.message });
+    //     console.log(value);
+    //   });
+    // });
 
-    applicationUserListQuery.next(function(user, error) {
+    applicationUserListQuery.next(function(users, error) {
       if (error) dispatch({ type: 'Error', error: error.message });
 
-      setUsers(
-        user.filter(
+      setOnlineUsers(
+        users.filter(
           ({ userId, connectionStatus }) =>
             connectionStatus === 'online' && userId !== currentUser
         )
@@ -116,8 +116,8 @@ export default function Sidebar({ inviteUser }) {
       </CurrentUserDisplay>
 
       <MenuContainer variants={menuVariants}>
-        {users.length > 0 &&
-          users.map(({ userId }, ind) => (
+        {onlineUsers.length > 0 &&
+          onlineUsers.map(({ userId }, ind) => (
             <MenuItem
               key={userId}
               onTap={() => inviteUser([currentUser, userId])}>
