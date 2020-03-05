@@ -14,9 +14,9 @@ const popOver = {
 };
 
 const containerStyles = {
-  alignItems: 'flex-start',
+  alignItems: 'flex-end',
   paddingLeft: '15px',
-  marginTop: '-10px',
+  marginTop: '0px',
   flexDirection: 'row',
 };
 
@@ -57,32 +57,17 @@ export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
 
   return (
     <InputContainer {...MotionProps} style={containerStyles}>
-      <AnimatePresence>
-        <RevealButton
-          name='colorPicker'
-          key='revealButtn'
-          positionTransition={tween}
-          exit={{ opacity: 0 }}
-          type='button'
-          value={btnText}
+      <div
+        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <TwitterPicker
           color={inputValue}
-          onClick={handleClick}
+          triangle='hide'
+          onChangeComplete={handleColorChange}
         />
-        {displayColorPicker && (
-          <motion.div
-            key='colorPickerContainer'
-            variants={colorPickerVariant}
-            animate={displayColorPicker ? 'visible' : 'hidden'}
-            exit='hidden'
-            style={popOver}>
-            <TwitterPicker
-              color={inputValue}
-              triangle='hide'
-              onChangeComplete={handleColorChange}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <p className='color-display' style={{ color: `${inputValue}` }}>
+          {btnText}
+        </p>
+      </div>
     </InputContainer>
   );
 }

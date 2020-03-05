@@ -10,14 +10,14 @@ const AuthPage = styled.div.attrs({
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--main);
+  background: ${({ theme }) => theme.main};
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   overflow: hidden;
 `;
 
 const SwitchText = styled(motion.p)`
-  color: var(--sub);
+  color: ${({ theme }) => theme.sub};
   text-transform: uppercase;
   font-family: var(--font1);
   font-size: 1.2rem;
@@ -25,6 +25,8 @@ const SwitchText = styled(motion.p)`
   letter-spacing: 0.2rem;
   word-spacing: 0.2rem;
   font-weight: bolder;
+  position: fixed;
+  bottom: 12px;
   margin-bottom: 5px;
 `;
 
@@ -40,8 +42,8 @@ export default function Auth({ location, setAuth }) {
     <AuthPage>
       <Form setAuth={setAuth} formType={state} />
       <SwitchText
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 90 }}
+        animate={{ opacity: 1, y: -10 }}
         transition={{ ...spring, delay: 1.9 }}
         layoutTransition={spring2}
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>

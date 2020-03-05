@@ -4,24 +4,28 @@ import styled from 'styled-components';
 import ColorPicker from './CustomColorPicker';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
-import { extractFormData } from '../utils/helper';
 import { motion, AnimatePresence } from 'framer-motion';
+import { extractFormData, hexToRgb } from '../utils/helper';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
-import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 import { handleLogin, handleSignUp, setAvatarColor } from '../utils/authFunc';
+import {
+  containerVariant,
+  itemVariant,
+  spring,
+  tween,
+} from '../utils/motionObj';
 
 const FormContainer = styled(motion.form)`
-  display: flex;
-  color: var(--sub);
+  display: grid;
   background: inherit;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 85%;
-  flex-basis: 85%;
-  height: fit-content;
-  position: relative;
-  transition: 0.3s ease;
+  width: 45%;
+  padding: 2%;
+  height: ${({ length }) => (length === 4 ? '58%' : '70%')};
+  grid-template-rows: ${({ length }) => `repeat(${length - 2}, 1fr)`} auto 1fr;
+  gap: 14px;
+  background: transparent;
+  margin-top: -10px;
+  overflow: hidden;
 `;
 
 export default function Form({ setAuth, formType }) {
@@ -50,91 +54,95 @@ export default function Form({ setAuth, formType }) {
   };
 
   return (
-    <FormContainer
-      variants={containerVariant}
-      ref={formRef}
-      onSubmit={handleSubmit}
-      initial='hidden'
-      animate='visible'
-      autoComplete='off'>
-      {authed && <Redirect to='/' />}
+    <>
+      <FormTitle
+        key='form-title'
+        exit='hidden'
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...spring, delay: 1.9 }}
+        layoutTransition={spring}>
+        {formType === 'login' ? 'Sign In' : 'Sign Up'}
+      </FormTitle>
+      <FormContainer
+        length={formType === 'login' ? 4 : 5}
+        variants={containerVariant}
+        ref={formRef}
+        onSubmit={handleSubmit}
+        initial='hidden'
+        animate='visible'
+        autoComplete='off'>
+        {authed && <Redirect to='/' />}
 
-      {!authed && (
-        <AnimatePresence>
-          <FormTitle
-            key='form-title'
-            exit='hidden'
-            variants={itemVariant}
-            positionTransition={spring}>
-            {formType === 'login' ? 'Login' : 'Create An Account'}
-          </FormTitle>
-
-          <InputField
-            key='id-field'
-            MotionProps={{
-              variants: itemVariant,
-              layoutTransition: spring,
-              exit: 'hidden',
-            }}
-            name='id'
-            label='Username'
-            formState={{ formType, setInputFieldError }}
-          />
-
-          <InputField
-            key='password-field'
-            MotionProps={{
-              variants: itemVariant,
-              layoutTransition: spring,
-              exit: 'hidden',
-            }}
-            formState={{ formType, setInputFieldError }}
-            name='password'
-            type='password'
-            label='Password'
-          />
-
-          {formType !== 'login' && (
+        {!authed && (
+          <AnimatePresence>
             <InputField
-              key='confirmPassword-field'
+              key='name-field'
+              MotionProps={{
+                variants: itemVariant,
+                layoutTransition: spring,
+                exit: 'hidden',
+              }}
+              name='name'
+              label='Username'
+              formState={{ formType, setInputFieldError }}
+            />
+
+            <InputField
+              key='password-field'
               MotionProps={{
                 variants: itemVariant,
                 layoutTransition: spring,
                 exit: 'hidden',
               }}
               formState={{ formType, setInputFieldError }}
-              name='confirmPassword'
+              name='password'
               type='password'
-              label='Confirm Password'
+              label='Password'
             />
-          )}
 
-          <ColorPicker
-            key='colorInput'
-            setAuthColor={setAuth}
-            btnText={
-              formType === 'login' ? 'Change avatar Color' : 'pick a color'
-            }
-            MotionProps={{
-              variants: itemVariant,
-              layoutTransition: spring,
-              exit: 'hidden',
-            }}
-          />
+            {formType !== 'login' && (
+              <InputField
+                key='confirmPassword-field'
+                MotionProps={{
+                  variants: itemVariant,
+                  layoutTransition: spring,
+                  exit: 'hidden',
+                }}
+                formState={{ formType, setInputFieldError }}
+                name='confirmPassword'
+                type='password'
+                label='Confirm Password'
+              />
+            )}
 
-          <SubmitButton
-            key='submit-button'
-            exit='hidden'
-            type='submit'
-            name='btn'
-            variants={itemVariant}
-            layoutTransition={spring}
-            disabled={inputFieldError}
-            value={formType === 'login' ? 'Login' : 'Sign Up'}
-          />
-        </AnimatePresence>
-      )}
-    </FormContainer>
+            <ColorPicker
+              key='colorInput'
+              setAuthColor={setAuth}
+              btnText={
+                formType === 'login' ? 'Change avatar Color' : 'pick a color'
+              }
+              MotionProps={{
+                variants: itemVariant,
+                layoutTransition: spring,
+                exit: 'hidden',
+              }}
+            />
+
+            <SubmitButton
+              key='submit-button'
+              exit='hidden'
+              type='submit'
+              name='btn'
+              variants={itemVariant}
+              layoutTransition={spring}
+              disabled={inputFieldError}
+              value={formType === 'login' ? 'Login' : 'Sign Up'}
+            />
+          </AnimatePresence>
+        )}
+      </FormContainer>
+    </>
   );
 }
 

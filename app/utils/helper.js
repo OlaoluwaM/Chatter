@@ -54,3 +54,41 @@ export function getContrast(hexcolor) {
   // Check contrast
   return yiq >= 128 ? 'black' : 'white';
 }
+
+/**
+ *
+ * @param {string} hex
+ * @param {number} alpha
+ * @returns {string}
+ */
+
+export function hexToRgb(hex, alpha = 1) {
+  const { r, g, b } = {
+    r: parseInt(hex.substr(1, 2), 16),
+    g: parseInt(hex.substr(3, 2), 16),
+    b: parseInt(hex.substr(5, 2), 16),
+  };
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// export function percentageOf(value1, value2) {
+//   return (value1 / value2) * 100;
+// }
+
+export function randomID() {
+  return `_${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
+}
+
+export function filterObject(obj, properties) {
+  return properties.reduce((acc, curr) => {
+    if (Array.isArray(curr)) {
+      // console.log(curr);
+      acc[curr[0]] = obj[curr[1]];
+    } else {
+      acc[curr] = obj[curr];
+    }
+    return acc;
+  }, {});
+}

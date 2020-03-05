@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPaperPlane } from 'react-icons/fa';
+import { IoIosChatbubbles } from 'react-icons/io';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
+import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
-import { headerVariant, buttonVariant } from '../utils/motionObj';
+import { headerVariant, buttonVariant, spring2 } from '../utils/motionObj';
 
 const HomePage = styled.div.attrs({
   className: 'wrapper',
 })`
   position: relative;
-  background: var(--main);
+  background: ${({ theme }) => theme.main};
 
-  div {
+  & > svg {
+    position: absolute;
+  }
+
+  & > div:first-of-type {
     z-index: 10;
     position: absolute;
     top: 50%;
@@ -22,57 +27,67 @@ const HomePage = styled.div.attrs({
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 85%;
-    height: 33%;
+    width: 70%;
+    height: 27%;
+    background: transparent;
+    color: ${({ theme }) => theme.sub};
 
     h1 {
       text-align: center;
-      font-size: 4rem;
+      font-size: 5rem;
       font-family: var(--font1);
-      color: var(--sub);
       font-weight: lighter;
       margin-bottom: 0;
-      margin-top: 18px;
+      margin-top: 0px;
       letter-spacing: 0.1rem;
       word-spacing: 0.2rem;
     }
   }
 `;
 
-const iconStyles = {
-  fill: 'var(--main)',
-  marginRight: '15px',
-};
+const ChatButton = styled(motion.button).attrs({
+  className: 'button',
+})`
+  color: ${({ theme }) => theme.sub};
+  font-family: var(--font1);
+  font-weight: 100;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  fill: ${({ theme }) => theme.sub};
+  border-radius: 50px;
 
-const buttonStyles = {
-  fontFamily: 'var(--font1)',
-  fontWeight: 100,
-  background: 'var(--sub)',
-  color: 'var(--main)',
-  textTransform: 'uppercase',
-  fontSize: '1.3rem',
-};
+  border: none;
+  background: ${({ theme }) => theme.main};
+
+  & > svg {
+    fill: inherit;
+    margin-right: 15px;
+    transform: scale(1.3);
+  }
+`;
 
 export default function Home() {
   const { user, authed } = React.useContext(AuthContext);
 
   return (
     <HomePage>
-      <div>
+      <div className='home-content'>
         <motion.h1 variants={headerVariant} initial='hidden' animate='visible'>
-          {authed ? `Welcome to Chatter ${user}` : 'Welcome to Chatter'}
+          Welcome to Chatter
         </motion.h1>
-
         <Link to={authed ? '/Chat' : '/Auth'}>
-          <motion.button
+          <ChatButton
             variants={buttonVariant}
             initial='hidden'
             animate='visible'
-            className='button'
-            style={buttonStyles}>
-            <FaPaperPlane style={iconStyles} />
-            Chat
-          </motion.button>
+            whileTap='tap'>
+            {authed && (
+              <>
+                <IoIosChatbubbles /> Chat
+              </>
+            )}
+            {!authed && 'Sign In'}
+          </ChatButton>
         </Link>
       </div>
     </HomePage>

@@ -8,15 +8,15 @@ import { strongRegex } from './helper';
 
 export function handleSignUp(data) {
   const users = JSON.parse(localStorage.getItem('Users')) || [];
-  const { id, password, color } = data;
+  const { name, password, color } = data;
 
   data['loggedIn'] = true;
   const { loggedIn } = data;
-  users.push({ id, password, color, loggedIn });
+  users.push({ name, password, color, loggedIn });
 
   localStorage.setItem('Users', JSON.stringify(users));
   sessionStorage.setItem('CurrentUser', JSON.stringify(data));
-  return { user: id, color, authed: true };
+  return { user: name, color, authed: true };
 }
 
 /**s
@@ -28,23 +28,23 @@ export function handleSignUp(data) {
 
 export function handleLogin(data) {
   const users = JSON.parse(localStorage.getItem('Users'));
-  const { id, password, color } = data;
+  const { name, password, color } = data;
 
   const userData = users.find(
-    ({ id: DBusername, password: DBpassword }) =>
-      id === DBusername && password === DBpassword
+    ({ name: DBusername, password: DBpassword }) =>
+      name === DBusername && password === DBpassword
   );
 
   let index = users.indexOf(userData);
   userData.color = color;
-  updateUserMessageAvatar(id, color);
+  updateUserMessageAvatar(name, color);
 
   userData.loggedIn = true;
   users.splice(index, 1, userData);
   localStorage.setItem('Users', JSON.stringify(users));
   sessionStorage.setItem('CurrentUser', JSON.stringify(userData));
 
-  return { user: id, color, authed: true };
+  return { user: name, color, authed: true };
 }
 
 // Validation Functions -------------------------------------
@@ -58,7 +58,7 @@ export function handleLogin(data) {
 function duplicateUserValidation(name) {
   const users = JSON.parse(localStorage.getItem('Users')) || [];
 
-  if (users.some(({ id }) => id === name)) {
+  if (users.some(({ name: id }) => id === name)) {
     return { text: 'User Already Exists', color: 'red' };
   } else {
     return { text: `${name} is available`, color: 'green' };
@@ -103,7 +103,7 @@ function passwordStrengthValidation(value) {
 function validateUserExists(name) {
   const users = JSON.parse(localStorage.getItem('Users')) || [];
 
-  if (users.length > 0 && users.find(({ id }) => id === name)) {
+  if (users.length > 0 && users.find(({ name: id }) => id === name)) {
     return { text: `Welcome back ${name}`, color: 'green' };
   } else {
     return { text: 'User does not exist', color: 'red' };
@@ -117,13 +117,13 @@ function validateUserExists(name) {
  */
 
 export function validateUserPasswordIntegrity(value) {
-  const username = document.querySelector('input[name="id"]').value;
+  const username = document.querySelector('input[name="name"]').value;
   const password = value;
 
   const users = JSON.parse(localStorage.getItem('Users')) || [];
 
   const userData = users.find(
-    ({ id: DBusername, password: DBpassword }) =>
+    ({ name: DBusername, password: DBpassword }) =>
       username === DBusername && password === DBpassword
   );
 
@@ -145,7 +145,7 @@ export function validateUserPasswordIntegrity(value) {
 export function inputValidation(name, inputValue, isLoginForm) {
   if (!inputValue || inputValue === '' || inputValue.length < 2) return;
   switch (name) {
-    case 'id':
+    case 'name':
       return isLoginForm
         ? validateUserExists(inputValue)
         : duplicateUserValidation(inputValue);
@@ -187,8 +187,10 @@ function updateUserMessageAvatar(user, newColor) {
 
 export function setAvatarColor(data, avatarColor) {
   const users = JSON.parse(localStorage.getItem('Users')) || [];
-  if (users.length > 0) {
-    const { color } = users.find(({ id }) => id === data.id);
+  const existingUser =
+    users.length > 0 ? users.find(({ name }) => name === data.name) : false;
+  if (existingUser) {
+    const { color } = existingUser;
     return avatarColor === '#7339ac' ? color : avatarColor;
   } else {
     return avatarColor;

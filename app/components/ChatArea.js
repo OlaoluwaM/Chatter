@@ -2,118 +2,92 @@ import React from 'react';
 import Input from './Input';
 import styled from 'styled-components';
 import MessageArea from './Messages';
-import { AuthContext } from '../context/Context';
+import { randomID } from '../utils/helper';
+import { ChatContext } from '../context/Context';
+import { extractNeededMessageData } from '../utils/chatFunctions';
 
 const ChatAreaWrapper = styled.div`
-  background: var(--main);
+  background: ${({ theme }) => theme.darkMain};
   height: 100%;
   flex-grow: 1;
-  margin-top: 15px;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
+  padding-bottom: 8px;
 `;
 
 export default function ChatArea() {
-  const { user, authed, color } = React.useContext(AuthContext);
-  const chatUser = React.useRef({ id: user, color });
-
-  const [state, setState] = React.useState({
-    messages: JSON.parse(localStorage.getItem(`${user}M`)) || [],
-    member: chatUser,
-  });
-
-  const [drone, setDrone] = React.useState(() => {
-    return new window.Scaledrone('QdpHluDuUEgfYxqm', {
-      data: chatUser.current,
-    });
-  });
-
-  const [chatErrorState, setChatErrorState] = React.useState({
-    errorOccurred: false,
-    text: '',
-  });
+  const { sb, chatManager, dispatch } = React.useContext(ChatContext);
 
   React.useEffect(() => {
-    drone.on('open', error => {
-      if (error) {
-        setChatErrorState({
-          errorOccurred: true,
-          text: 'Something went wrong, try reloading',
-        });
-      }
+    const channelHandler = new sb.ChannelHandler();
+    const connectionHandler = new sb.ConnectionHandler();
 
-      const member = { ...chatUser.current };
-      member.id = drone.clientId;
+    const HANDLER_ID1 = randomID();
+    const HANDLER_ID2 = randomID();
 
-      setState(s => {
-        const prevMessages = s.messages;
-        return { messages: prevMessages, member };
-      });
-    });
-
-    const room = drone.subscribe('observable-room');
-    console.log(room);
-
-    room.on('data', (data, member) => {
-      const userMessages = JSON.parse(localStorage.getItem(`${user}M`)) || [];
-      console.log(member, data);
-      try {
-        if (member.id === user || user === member.clientData.id) {
-          userMessages.push({ text: data, member: { ...member.clientData } });
-          localStorage.setItem(`${user}M`, JSON.stringify(userMessages));
+    try {
+      channelHandler.onMessageReceived = (channel, message) => {
+        if (chatManager !== null && chatManager.hasOwnProperty('userChannel')) {
+          dispatch({
+            type: 'New message',
+            messages: [extractNeededMessageData(message)],
+          });
+        } else {
+          dispatch({
+            type: 'New channel and message',
+            channel,
+            messages: [extractNeededMessageData(message)],
+          });
         }
-      } catch (error) {
-        console.error(error);
-        setChatErrorState({
-          errorOccurred: true,
-          text: 'Something went wrong, try reloading',
-        });
-      }
+      };
 
-      setState(s => {
-        const { messages, member: Cuser } = s;
-        messages.push({ text: data, member });
-        return { messages, member: Cuser };
-      });
+      connectionHandler.onReconnectStarted = function() {
+        console.log('reconnecting');
+      };
+      connectionHandler.onReconnectSucceeded = function() {
+        console.log('reconnected');
+      };
+      connectionHandler.onReconnectFailed = function() {
+        console.log('reload');
+      };
 
-      document
-        .querySelector('.message-area')
-        .scrollTo(0, document.querySelector('.message-area').scrollHeight);
-    });
+      sb.addChannelHandler(HANDLER_ID1, channelHandler);
+      sb.addConnectionHandler(HANDLER_ID2, connectionHandler);
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'Error', error });
+    }
 
     return () => {
-      setDrone(null);
-      setChatErrorState({ errorOccurred: false, text: '' });
+      sb.removeChannelHandler(HANDLER_ID1);
+      sb.removeConnectionHandler(HANDLER_ID2);
     };
-    //   if (!authed && user === '') {
-    // };
   }, []);
 
-  console.log(state.member);
   const onSendMessage = message => {
-    drone.publish({
-      room: 'observable-room',
-      message,
-    });
-  };
+    const { userChannel } = chatManager;
+    const { url } = userChannel;
 
-  const conditions = {
-    success: drone && !chatErrorState.errorOccurred,
-    loading: !drone && !chatErrorState.errorOccurred,
-    error: chatErrorState.errorOccurred,
+    sb.GroupChannel.getChannel(url, (groupChannel, error) => {
+      if (error) dispatch({ type: 'Error', error: error.message });
+
+      groupChannel.sendUserMessage(message, '', '', (message, error) => {
+        if (error) dispatch({ type: 'Error', error: error.message });
+
+        dispatch({
+          type: 'New message',
+          messages: [extractNeededMessageData(message)],
+        });
+      });
+    });
   };
 
   return (
     <ChatAreaWrapper>
-      <MessageArea
-        conditions={conditions}
-        messages={state.messages}
-        currentMember={state.member}
-        chatErrorState={chatErrorState}
-      />
-      <Input conditions={conditions} onSendMessage={onSendMessage} />
+      <MessageArea messages={chatManager.messages || []} />
+      <Input onSendMessage={onSendMessage} />
     </ChatAreaWrapper>
   );
 }

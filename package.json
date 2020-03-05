@@ -4,7 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --colors",
     "build": "NODE_ENV='production' webpack",
     "window-build": "SET NODE_ENV='production' && webpack"
   },
@@ -12,12 +12,15 @@
   "author": "Olaoluwa Mustapha <jomeemustapha@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@animated-burgers/burger-slip": "^1.1.2",
+    "classnames": "^2.2.6",
     "framer-motion": "^1.7.0",
     "react": "^16.12.0",
     "react-color": "^2.17.3",
     "react-dom": "^16.12.0",
     "react-icons": "^3.8.0",
     "react-router-dom": "^5.1.2",
+    "sendbird": "^3.0.117",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {
@@ -25,6 +28,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.7.4",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
+    "autoprefixer": "^9.7.4",
     "babel-loader": "^8.0.6",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-polyfill": "^6.26.0",
@@ -32,8 +36,11 @@
     "css-loader": "^3.2.0",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "^4.13.1",
+    "postcss-loader": "^3.0.0",
     "prop-types": "^15.7.2",
     "react-hot-loader": "^4.12.18",
+    "sass-loader": "^8.0.2",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
