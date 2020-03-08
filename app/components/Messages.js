@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { hexToRgb } from '../utils/helper';
 import { spring2 } from '../utils/motionObj';
 import { AuthContext } from '../context/Context';
-import { default as styled, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { default as styled, css } from 'styled-components';
 
 const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
@@ -98,9 +99,8 @@ const MessageWrapper = styled(motion.li)`
         `
       : css`
           & ${MessageText} {
-            background: ${({ theme }) => theme.main};
-            filter: brightness(40%);
-            color: ${({ theme }) => theme.black};
+            background: ${({ theme }) => hexToRgb(theme.black, 0.5)};
+            color: ${({ theme }) => theme.main};
           }
         `}
   &:last-of-type {
@@ -108,11 +108,12 @@ const MessageWrapper = styled(motion.li)`
   }
 `;
 
-function Message({ message, currentMember, exit }) {
+function Message({ message, sender, exit }) {
   const { user, color } = React.useContext(AuthContext);
-  const { metaData, userId } = currentMember;
+
+  const { metaData, userId } = sender;
   const { avatarColor } = metaData;
-  console.log(avatarColor);
+  console.log(sender);
 
   const isMyMessage = userId === user;
 
@@ -154,10 +155,10 @@ export default function MessageArea(props) {
       <AnimatePresence>
         {messages.map(({ messageId, sender, text }) => (
           <Message
-            currentMember={sender}
+            sender={sender}
             message={text}
             key={messageId}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, x: -120 }}
           />
         ))}
       </AnimatePresence>
@@ -171,5 +172,5 @@ MessageArea.propTypes = {
 
 Message.propTypes = {
   message: PropTypes.string.isRequired,
-  currentMember: PropTypes.object.isRequired,
+  sender: PropTypes.object.isRequired,
 };

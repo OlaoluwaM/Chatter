@@ -2,6 +2,8 @@ import React from 'react';
 import Input from './Input';
 import styled from 'styled-components';
 import MessageArea from './Messages';
+import DefaultDisplay from './DefaultDisplay';
+import ChatOverHead from './ChatOverhead';
 import { randomID } from '../utils/helper';
 import { ChatContext } from '../context/Context';
 import { extractNeededMessageData } from '../utils/chatFunctions';
@@ -86,8 +88,17 @@ export default function ChatArea() {
 
   return (
     <ChatAreaWrapper>
-      <MessageArea messages={chatManager.messages || []} />
-      <Input onSendMessage={onSendMessage} />
+      {!chatManager.userChannel && (
+        <DefaultDisplay text='Select a user or a channel to start chatting' />
+      )}
+
+      {chatManager.userChannel && (
+        <>
+          {/* <ChatOverHead /> */}
+          <MessageArea messages={chatManager.messages || []} />
+          <Input onSendMessage={onSendMessage} />
+        </>
+      )}
     </ChatAreaWrapper>
   );
 }

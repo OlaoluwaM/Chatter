@@ -10,8 +10,9 @@ import { filterObject } from './helper';
 export function createUserMetaData(user, desiredData) {
   const { metaData } = user;
   Object.keys(desiredData).forEach(key => {
-    if (!metaData.hasOwnProperty(key) || metaData[key] !== desiredData[key]) {
-      // user.createMetaData({ [key]: desiredData[key] });
+    if (!metaData.hasOwnProperty(key)) {
+      user.createMetaData({ [key]: desiredData[key] });
+    } else if (metaData[key] !== desiredData[key]) {
       user.updateMetaData({ [key]: desiredData[key] });
     } else return;
   });
@@ -85,12 +86,18 @@ export function chatManagerReducer(state, action) {
         user: action.user,
       };
 
+    case 'New Chat':
+      return {
+        ...state,
+        userChannel: 'Changing',
+        messages: [],
+      };
+
     case 'Error':
       return {
         ...state,
         error: action.error,
       };
-
     case 'Reset':
       return null;
 

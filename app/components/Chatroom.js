@@ -1,8 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import ChatArea from './ChatArea';
 import Sidebar from './Sidebar';
+import ChatArea from './ChatArea';
 import * as SendBird from 'sendbird';
+import styled from 'styled-components';
 import { filterObject } from '../utils/helper';
 import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
@@ -32,7 +32,7 @@ export default function Chatroom() {
     try {
       sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
-        console.log(color);
+
         createUserMetaData(user, { avatarColor: color });
 
         const filteredUserObj = filterObject(user, [
@@ -64,7 +64,11 @@ export default function Chatroom() {
     const { '0': currentUser, '1': invitee } = users;
     const { userChannel } = chatManager;
 
-    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) return;
+    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) {
+      return;
+    } else if (userChannel) {
+      dispatch({ type: 'New Chat' });
+    }
 
     const gCParams = new sb.GroupChannelParams();
 
@@ -91,17 +95,15 @@ export default function Chatroom() {
       });
     });
   };
-  console.log(chatManager);
+
   const chatManagerIsSetup =
     chatManager !== null ? Object.keys(chatManager).length > 0 : false;
 
-  const conditions = {
+  const { success, loading, error } = {
     success: sb && chatManagerIsSetup && !chatManager.error,
     loading: !sb && chatManagerIsSetup && !chatManager.error,
     error: chatManagerIsSetup && chatManager.error !== undefined,
   };
-
-  const { success, loading, error } = conditions;
 
   const chatContextObj = {
     sb,
