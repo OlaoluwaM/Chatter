@@ -158,7 +158,7 @@ export default function MessageArea(props) {
             sender={sender}
             message={text}
             key={messageId}
-            exit={{ opacity: 0, x: -120 }}
+            exit={{ y: -20, opacity: 0 }}
           />
         ))}
       </AnimatePresence>

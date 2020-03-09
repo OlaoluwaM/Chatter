@@ -29,6 +29,7 @@ const MenuContainer = styled(motion.menu)`
   grid-template-rows: ${({ children }) => `repeat(${children.length}, auto)`};
   padding: 10px;
   margin: 0;
+  overflow-x: hidden;
   padding-top: 0px;
   color: ${({ theme }) => theme.black};
 
@@ -42,8 +43,7 @@ const MenuItem = styled(motion.div).attrs({
   exit: 'hidden',
 })`
   width: 100%;
-  padding: 3%;
-  height: 91%;
+  padding: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 5px;
@@ -52,6 +52,7 @@ const MenuItem = styled(motion.div).attrs({
   justify-self: center;
   align-self: center;
   cursor: pointer;
+  height: 92%;
 `;
 
 export const CurrentUserDisplay = styled(MenuItem).attrs({
@@ -59,7 +60,6 @@ export const CurrentUserDisplay = styled(MenuItem).attrs({
 })`
   width: 96%;
   height: auto;
-  padding: 3%;
   background: ${({ theme }) => theme.main};
   color: ${({ theme }) => theme.sub};
   margin: 7px;

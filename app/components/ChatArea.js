@@ -94,7 +94,7 @@ export default function ChatArea() {
 
       {chatManager.userChannel && (
         <>
-          {/* <ChatOverHead /> */}
+          <ChatOverHead />
           <MessageArea messages={chatManager.messages || []} />
           <Input onSendMessage={onSendMessage} />
         </>

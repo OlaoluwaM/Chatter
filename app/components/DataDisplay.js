@@ -29,7 +29,6 @@ const Avatar = styled.div`
     background: ${({ color }) => color};
     width: 50px;
     height: 50px;
-    border: 1.5px solid ${({ theme }) => theme.main};
   }
 
   div:after {
@@ -38,8 +37,9 @@ const Avatar = styled.div`
     border-radius: 50%;
     height: 10px;
     width: 10px;
-    bottom: 1px;
-    right: 5px;
+    bottom: 0px;
+    right: 4px;
+    border: 1px solid ${({ theme }) => theme.black};
     background: ${({ status }) => (status === 'online' ? 'lightgreen' : 'red')};
   }
 `;
