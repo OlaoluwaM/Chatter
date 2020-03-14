@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext, ChatContext } from '../context/Context';
 import { MdSettings, MdSearch, MdNotifications, MdBlock } from 'react-icons/md';
 import {
-  menuVariants,
   menuItemVariant,
   simpleVariant,
   currentUserDisplayVariants,
@@ -29,7 +28,7 @@ const SidebarContainer = styled.nav`
 `;
 
 const MenuContainer = styled(motion.menu)`
-  height: 64%;
+  height: 66%;
   width: 100%;
   position: absolute;
   overflow-y: auto;
@@ -58,11 +57,12 @@ const AlertText = styled(motion.p).attrs({
 
 const MenuItem = styled(motion.div).attrs({
   variants: menuItemVariant,
+  positionTransition: true,
   exit: 'hidden',
   initial: 'hidden',
   animate: 'visible',
 })`
-  width: 100%;
+  width: 95%;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
@@ -73,6 +73,11 @@ const MenuItem = styled(motion.div).attrs({
   align-self: center;
   cursor: pointer;
   height: auto;
+
+  &.user {
+    position: absolute;
+    top: ${({ position }) => `calc(88px * ${position})`};
+  }
 `;
 
 export const CurrentUserDisplay = styled(MenuItem).attrs({
@@ -210,7 +215,7 @@ function AvailableUser(props) {
 
   const [isBlocked, setBlocked] = React.useState(false);
   const [isFriend, setIsFriend] = React.useState(() =>
-    getFriendList(currentUserData).includes(userData.userId)
+    getFriendList(currentUserData).includes(userData.userId.toLowerCase())
   );
 
   const handleBlock = targetUser => {
@@ -238,11 +243,13 @@ function AvailableUser(props) {
     <MenuItem
       blocked={isBlocked}
       custom={ind}
+      position={ind}
+      className='user'
       onClick={e => handleInvite(e, userData)}>
       <UserDisplay data={userData}>
         {isFriend && (
           <FiUserMinus
-            style={{ fill: 'red' }}
+            style={{ stroke: 'red' }}
             onClick={() => {
               setIsFriend(false);
               unFriend(userData, true);
@@ -287,7 +294,7 @@ function Menu({ category, inviteUser }) {
     if (category !== 'friends') {
       setItems(userList);
     } else {
-      setItems(friendList.length > 0 ? friendList : 'Nobody Yet');
+      setItems(friendList.length > 0 ? friendList : 'No one Yet');
     }
 
     return () => setItems(null);
@@ -298,7 +305,7 @@ function Menu({ category, inviteUser }) {
       setFilter(input);
     } else {
       if (input === '') {
-        setItems(friendList.length > 0 ? friendList : 'Nobody yet');
+        setItems(friendList.length > 0 ? friendList : 'No one yet');
       } else {
         setItems(
           friendList.filter(
