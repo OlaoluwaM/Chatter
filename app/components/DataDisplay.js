@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { default as styled, css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/Context';
@@ -59,24 +59,35 @@ const Content = styled.div`
   p:first-of-type {
     margin-bottom: 5px;
   }
+
   p:last-of-type {
     font-size: small;
+    ${({ isOverhead }) =>
+      isOverhead &&
+      css`
+        font-size: 1.2rem;
+        margin-bottom: 0;
+      `}
     font-weight: 600;
     font-family: var(--font1);
   }
 `;
 
-const OptionalInfo = styled.div`
+const ActionInfo = styled.div.attrs({
+  className: 'action-area',
+})`
   display: flex;
   flex-direction: ${({ dir }) => dir};
-  justify-content: center;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
   height: 100%;
   flex-basis: 30%;
   font-size: 1.6rem;
 `;
 
 export function UserDisplay(props) {
-  const { type, data, subData, children, dir } = props;
+  const { isOverhead, data, subData, children, dir } = props;
   const { color } = React.useContext(AuthContext);
 
   const { userId, metaData, connectionStatus } = data;
@@ -85,18 +96,17 @@ export function UserDisplay(props) {
   return (
     <DataContainer>
       <Avatar
-        status={connectionStatus}
+        status={isOverhead ? 'online' : connectionStatus}
         color={avatarColor ? avatarColor : color}>
         <div></div>
       </Avatar>
 
-      <Content>
+      <Content isOverhead={isOverhead}>
         <p>{userId}</p>
         {subData && <p>{subData}</p>}
-        {type === 'overhead' && <p>{connectionStatus}</p>}
       </Content>
 
-      {children && <OptionalInfo dir={dir}>{children}</OptionalInfo>}
+      {children && <ActionInfo dir={dir}>{children}</ActionInfo>}
     </DataContainer>
   );
 }
@@ -109,16 +119,16 @@ export function GroupDisplay({ data, subData, children, dir }) {
         {subData && <p>{subData}</p>}
       </Content>
 
-      {children && <OptionalInfo dir={dir}>{children}</OptionalInfo>}
+      {children && <ActionInfo dir={dir}>{children}</ActionInfo>}
     </DataContainer>
   );
 }
 
 UserDisplay.propTypes = {
-  type: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
   dir: PropTypes.string,
   subData: PropTypes.string,
+  isOverhead: PropTypes.bool,
 };
 
 GroupDisplay.propTypes = {
@@ -129,6 +139,7 @@ GroupDisplay.propTypes = {
 
 UserDisplay.defaultProps = {
   dir: 'row',
+  isOverhead: false,
 };
 
 GroupDisplay.defaultProps = {

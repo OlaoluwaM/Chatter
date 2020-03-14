@@ -26,7 +26,10 @@ const DefaultContainer = styled(motion.div)`
 
 export default function DefaultDisplay({ icon = true, text }) {
   return (
-    <DefaultContainer variants={simpleVariant} initial='hide' animate='show2'>
+    <DefaultContainer
+      variants={simpleVariant}
+      initial='hide'
+      animate='showDisplay'>
       {icon && <DefaultDisplaySVG />}
       <motion.p>{text}</motion.p>
     </DefaultContainer>

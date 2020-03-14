@@ -201,17 +201,22 @@ export const menuVariants = {
 };
 
 export const menuItemVariant = {
-  visible: {
+  visible: i => ({
     opacity: 1,
     x: 0,
     transition: {
       ...spring2,
+      delay: i * 0.1,
     },
-  },
-  hidden: {
+  }),
+  hidden: i => ({
     opacity: 0,
     x: '-100%',
-  },
+    transition: {
+      ...spring2,
+      delay: 0.1 * i,
+    },
+  }),
 };
 
 export const currentUserDisplayVariants = {
@@ -220,7 +225,7 @@ export const currentUserDisplayVariants = {
 };
 
 export const simpleVariant = {
-  show: { opacity: 1, transition: { delay: 1.8 } },
-  show2: { opacity: 1, transition: { delay: 0.5 } },
+  showDisplay: { opacity: 1, transition: { delay: 0.5 } },
+  show: { opacity: 1, transition: { delay: 0.7 } },
   hide: { opacity: 0 },
 };

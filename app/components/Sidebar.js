@@ -1,13 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { hexToRgb } from '../utils/helper';
-import { MdSettings } from 'react-icons/md';
-import { UserDisplay, GroupDisplay } from './DataDisplay';
+import {
+  getFriendList,
+  addFriend,
+  removeFriend,
+  handlefriendLogic,
+} from '../utils/chatFunctions';
+import { UserDisplay } from './DataDisplay';
+import { useUserFilter, useFriendList } from '../custom-hooks/chatHooks';
+import { FiUserPlus, FiUserMinus } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext, ChatContext } from '../context/Context';
+import { MdSettings, MdSearch, MdNotifications, MdBlock } from 'react-icons/md';
 import {
   menuVariants,
   menuItemVariant,
+  simpleVariant,
   currentUserDisplayVariants,
 } from '../utils/motionObj';
 
@@ -20,39 +29,50 @@ const SidebarContainer = styled.nav`
 `;
 
 const MenuContainer = styled(motion.menu)`
-  height: auto;
+  height: 64%;
   width: 100%;
   position: absolute;
   overflow-y: auto;
   z-index: 3;
-  display: grid;
-  grid-template-rows: ${({ children }) => `repeat(${children.length}, auto)`};
   padding: 10px;
   margin: 0;
   overflow-x: hidden;
   padding-top: 0px;
-  color: ${({ theme }) => theme.black};
 
   &::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
   }
+`;
+
+const AlertText = styled(motion.p).attrs({
+  variants: simpleVariant,
+  initial: 'hide',
+  animate: 'show',
+})`
+  color: ${({ theme }) => theme.darkSub};
+  padding-left: 27px;
+  margin-bottom: 0;
+  position: absolute;
+  top: 0;
 `;
 
 const MenuItem = styled(motion.div).attrs({
   variants: menuItemVariant,
   exit: 'hidden',
+  initial: 'hidden',
+  animate: 'visible',
 })`
   width: 100%;
   padding: 10px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border-radius: 5px;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme, blocked }) =>
+    !blocked ? theme.main : hexToRgb(theme.black, 0.5)};
   color: ${({ theme }) => theme.sub};
   justify-self: center;
   align-self: center;
   cursor: pointer;
-  height: 92%;
+  height: auto;
 `;
 
 export const CurrentUserDisplay = styled(MenuItem).attrs({
@@ -69,10 +89,10 @@ export const CurrentUserDisplay = styled(MenuItem).attrs({
 const SideBarCategory = styled.ul`
   width: 100%;
   margin: 0;
-  margin-top: 45px;
-  margin-bottom: -5px;
+  margin-top: 60px;
+  margin-bottom: 3px;
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   font-size: 0.8rem;
   list-style: none;
@@ -85,60 +105,263 @@ const SideBarCategory = styled.ul`
   li {
     transition: 0.3s ease;
     cursor: pointer;
+    margin-left: 28px;
+    &:not(:first-of-type) {
+      margin-left: 40px;
+    }
   }
 `;
 
-export default function Sidebar({ inviteUser }) {
-  const { user: currentUser, color } = React.useContext(AuthContext);
-  const { chatManager } = React.useContext(ChatContext);
+const SearchBarForm = styled(motion.form)`
+  width: 100%;
+  display: flex;
+  padding: 10px;
+  padding-top: 0;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 12px;
 
-  const categories = ['users', 'groups', 'friends'];
+  & > input {
+    border: none;
+    border-bottom: 1.5px double ${({ theme }) => hexToRgb(theme.black, 0.4)};
+    flex-basis: 75%;
+    outline: transparent;
+    background: transparent;
+    text-indent: 12px;
+    transition: 0.5s ease;
+    font-family: var(--font2);
+    font-size: 1.1rem;
+    font-weight: 100;
+    border-radius: 2px;
+    padding: 3px;
 
-  const [category, setCategory] = React.useState(categories[0]);
-  const [items, setItems] = React.useState(null);
-  const { sb, dispatch } = React.useContext(ChatContext);
+    &:focus {
+      border-color: ${({ theme }) => theme.darkSub};
+    }
+  }
 
-  React.useEffect(() => {
-    if (category === categories[2]) return;
+  & > div {
+    background: ${({ theme }) => theme.main};
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    transform: scaleX(-1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 
-    const applicationUserListQuery = sb.createApplicationUserListQuery();
-    const groupChannelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
+    svg {
+      stroke-width: 1.1px;
+      stroke: ${({ theme }) => theme.sub};
+      fill: ${({ theme }) => theme.sub};
+    }
+  }
+`;
 
-    const queryArray = [applicationUserListQuery, groupChannelListQuery];
+function CurrentUser({ user }) {
+  return (
+    <CurrentUserDisplay
+      variants={currentUserDisplayVariants}
+      initial='hidden'
+      animate='visible'>
+      <UserDisplay isOverhead={true} data={user}>
+        <MdSettings style={{ cursor: 'pointer' }} />
+        <MdNotifications style={{ cursor: 'pointer' }} />
+      </UserDisplay>
+    </CurrentUserDisplay>
+  );
+}
 
-    const categoryObj = categories.reduce((obj, curr, currInd) => {
-      if (currInd === 2) return obj;
-      obj[curr] = queryArray[currInd];
-      return obj;
-    }, {});
+function SearchUser({ searchForUser, motionProps }) {
+  const [input, setInput] = React.useState('');
 
-    categoryObj[category].next(function(value, error) {
-      if (error) dispatch({ type: 'Error', error: error.message });
+  const handleSubmit = e => {
+    e.preventDefault();
+    searchForUser(input);
+  };
 
-      setItems(value.filter(({ userId }) => userId !== currentUser));
-    });
-
-    return () => setItems(null);
-  }, [category]);
-
-  const toggleCategory = ind => setCategory(categories[ind]);
-
-  const { success, loading, empty } = {
-    success: Array.isArray(items) && items.length > 0,
-    loading: !Array.isArray(items) && items === null,
-    empty: Array.isArray(items) && items.length === 0,
+  const handleInputChange = e => {
+    if (e.target.value === '') {
+      searchForUser('');
+    }
+    setInput(e.target.value);
   };
 
   return (
+    <SearchBarForm {...motionProps} onSubmit={handleSubmit}>
+      <input onChange={handleInputChange} value={input} />
+      <div onClick={() => searchForUser(input)}>
+        <MdSearch />
+      </div>
+    </SearchBarForm>
+  );
+}
+
+function AvailableUser(props) {
+  const { user: currentUserName } = React.useContext(AuthContext);
+  const { sb, dispatch, chatManager } = React.useContext(ChatContext);
+
+  const { user: currentUserData } = chatManager;
+  const { userData, ind, funcs } = props;
+  const { beFriend, unFriend, inviteUser } = funcs;
+
+  const [isBlocked, setBlocked] = React.useState(false);
+  const [isFriend, setIsFriend] = React.useState(() =>
+    getFriendList(currentUserData).includes(userData.userId)
+  );
+
+  const handleBlock = targetUser => {
+    sb.blockUser(targetUser, (user, error) => {
+      if (error) dispatch({ type: 'Error', error: error.message });
+      console.log(`${user} has been blocked`);
+      setBlocked(true);
+    });
+  };
+
+  const handleUnBlock = blockedUser => {
+    sb.unblockUser(blockedUser, (user, error) => {
+      if (error) dispatch({ type: 'Error', error: error.message });
+      console.log(`${user} has been unblocked`);
+      setBlocked(false);
+    });
+  };
+
+  const handleInvite = (e, userData) => {
+    if (e.target.matches('.action-area') || e.target.matches('svg')) return;
+    inviteUser([currentUserName, userData.userId]);
+  };
+
+  return (
+    <MenuItem
+      blocked={isBlocked}
+      custom={ind}
+      onClick={e => handleInvite(e, userData)}>
+      <UserDisplay data={userData}>
+        {isFriend && (
+          <FiUserMinus
+            style={{ fill: 'red' }}
+            onClick={() => {
+              setIsFriend(false);
+              unFriend(userData, true);
+            }}
+          />
+        )}
+
+        {!isFriend && (
+          <FiUserPlus
+            onClick={() => {
+              setIsFriend(true);
+              beFriend(userData);
+            }}
+          />
+        )}
+
+        {!isBlocked && (
+          <MdBlock
+            style={{ stroke: 'red' }}
+            onClick={() => handleBlock(userData)}
+          />
+        )}
+
+        {isBlocked && <p onClick={() => handleUnBlock(userData)}>k</p>}
+      </UserDisplay>
+    </MenuItem>
+  );
+}
+
+function Menu({ category, inviteUser }) {
+  const { user: currentUserName } = React.useContext(AuthContext);
+
+  const { sb, dispatch, chatManager } = React.useContext(ChatContext);
+  const { user: currentUserObj } = chatManager;
+
+  const [items, setItems] = React.useState(null);
+  const [userList, setFilter] = useUserFilter(sb, dispatch);
+
+  const [friendList] = useFriendList(sb, dispatch, currentUserObj);
+
+  React.useEffect(() => {
+    if (category !== 'friends') {
+      setItems(userList);
+    } else {
+      setItems(friendList.length > 0 ? friendList : 'Nobody Yet');
+    }
+
+    return () => setItems(null);
+  }, [category, userList]);
+
+  const searchForUser = input => {
+    if (category !== 'friends') {
+      setFilter(input);
+    } else {
+      if (input === '') {
+        setItems(friendList.length > 0 ? friendList : 'Nobody yet');
+      } else {
+        setItems(
+          friendList.filter(
+            ({ userId }) => userId.includes(input) || input === userId
+          )
+        );
+      }
+    }
+  };
+
+  const { success, empty } = {
+    success: Array.isArray(items) && items.length > 0,
+    empty: Array.isArray(items) && items.length === 0,
+  };
+
+  const funcs = {
+    beFriend(targetUser) {
+      handlefriendLogic(targetUser, currentUserObj);
+    },
+    unFriend(friend) {
+      handlefriendLogic(friend, currentUserObj, true);
+    },
+    inviteUser,
+  };
+
+  return (
+    <>
+      <SearchUser searchForUser={searchForUser} />
+      <MenuContainer>
+        {typeof items === 'string' && <AlertText>{items}</AlertText>}
+
+        <AnimatePresence>
+          {success &&
+            items.map((data, ind) => {
+              const { userId } = data;
+              return (
+                <AvailableUser
+                  key={userId}
+                  funcs={funcs}
+                  ind={ind}
+                  userData={data}
+                />
+              );
+            })}
+        </AnimatePresence>
+
+        {empty && <AlertText>User does not exist</AlertText>}
+      </MenuContainer>
+    </>
+  );
+}
+
+export default function Sidebar({ inviteUser }) {
+  const { chatManager } = React.useContext(ChatContext);
+
+  const categories = ['users', 'friends'];
+  const [category, setCategory] = React.useState(categories[0]);
+
+  const toggleCategory = ind => setCategory(categories[ind]);
+
+  return (
     <SidebarContainer>
-      <CurrentUserDisplay
-        variants={currentUserDisplayVariants}
-        initial='hidden'
-        animate='visible'>
-        <UserDisplay type='overhead' data={chatManager.user}>
-          <MdSettings style={{ cursor: 'pointer' }} />
-        </UserDisplay>
-      </CurrentUserDisplay>
+      <CurrentUser user={chatManager.user} />
 
       <SideBarCategory>
         {categories.map((text, ind) => (
@@ -151,37 +374,11 @@ export default function Sidebar({ inviteUser }) {
         ))}
       </SideBarCategory>
 
-      {loading && <p>Loading</p>}
-
-      {success && (
-        <AnimatePresence>
-          <MenuContainer
-            variants={menuVariants}
-            initial='hidden'
-            animate='visible'
-            exit='hidden'>
-            {items.map((data, ind) => {
-              if (category === 'groups') {
-                return (
-                  <MenuItem key={ind}>
-                    <GroupDisplay data={data} />
-                  </MenuItem>
-                );
-              } else {
-                return (
-                  <MenuItem
-                    key={data.userId}
-                    onTap={() => inviteUser([currentUser, data.userId])}>
-                    <UserDisplay type='user' data={data} />
-                  </MenuItem>
-                );
-              }
-            })}
-          </MenuContainer>
-        </AnimatePresence>
-      )}
-
-      {empty && <p>Nothing yet</p>}
+      <Menu
+        category={category}
+        categories={categories}
+        inviteUser={inviteUser}
+      />
     </SidebarContainer>
   );
 }

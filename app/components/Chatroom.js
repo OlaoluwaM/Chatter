@@ -33,21 +33,27 @@ export default function Chatroom() {
       sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
 
-        createUserMetaData(user, { avatarColor: color });
+        // TODO fix error on user creation
+        const array = user.metaData.friends ?? JSON.stringify([]);
 
-        const filteredUserObj = filterObject(user, [
-          'userId',
-          'connectionStatus',
-          'lastSeenAt',
-          'isBlockedByMe',
-          'isBlockingMe',
-          'metaData',
-          'isActive',
-          'friendDiscoveryKey',
-          'friendName',
-        ]);
+        createUserMetaData(user, {
+          avatarColor: color,
+          friends: array,
+        });
 
-        dispatch({ type: 'New user', user: filteredUserObj });
+        // const filteredUserObj = filterObject(user, [
+        //   'userId',
+        //   'connectionStatus',
+        //   'lastSeenAt',
+        //   'isBlockedByMe',
+        //   'isBlockingMe',
+        //   'metaData',
+        //   'isActive',
+        //   'friendDiscoveryKey',
+        //   'friendName',
+        // ]);
+
+        dispatch({ type: 'New user', user });
       });
     } catch (e) {
       console.error(e);
@@ -97,7 +103,7 @@ export default function Chatroom() {
   };
 
   const chatManagerIsSetup =
-    chatManager !== null ? Object.keys(chatManager).length > 0 : false;
+    chatManager !== null ? Object.keys(chatManager).length >= 1 : false;
 
   const { success, loading, error } = {
     success: sb && chatManagerIsSetup && !chatManager.error,

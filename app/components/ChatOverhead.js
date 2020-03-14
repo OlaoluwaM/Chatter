@@ -28,7 +28,7 @@ export default function ChatOverHead() {
     <CurrentUserDisplay
       initial='hidden'
       animate={chat.isChatting ? 'visible' : 'hidden'}>
-      {chat.isChatting && <UserDisplay type='user' data={chat.invitee} />}
+      {chat.isChatting && <UserDisplay isOverhead={true} data={chat.invitee} />}
     </CurrentUserDisplay>
   );
 }
