@@ -211,10 +211,10 @@ export const menuItemVariant = {
   }),
   hidden: i => ({
     opacity: 0,
-    x: -85,
+    x: '-100%',
     transition: {
       ...spring2,
-      delay: i * 0.1,
+      delay: 0.1 * i,
     },
   }),
 };

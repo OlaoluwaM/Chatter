@@ -110,19 +110,19 @@ export function chatManagerReducer(state, action) {
 export function getFriendList(user) {
   const { metaData } = user;
   const { friends } = metaData;
-  return friends ? JSON.parse(friends).map(str => str.toLowerCase()) : [];
+  return friends ? JSON.parse(friends) : [];
 }
 
 export function addFriend(friend, user) {
   const friendsArray = getFriendList(user);
-  friendsArray.push(friend.userId.toLowerCase());
+  friendsArray.push(friend.userId);
 
   return JSON.stringify([...new Set(friendsArray)]);
 }
 
 export function removeFriend(friend, user) {
   const friendsArray = getFriendList(user).filter(
-    user => user !== friend.userId.toLowerCase()
+    user => user !== friend.userId
   );
 
   return JSON.stringify([...new Set(friendsArray)]);
@@ -132,4 +132,6 @@ export function handlefriendLogic(friend, user, remove = false) {
   createUserMetaData(user, {
     friends: remove ? removeFriend(friend, user) : addFriend(friend, user),
   });
+  console.log(user);
+  return user;
 }

@@ -14,9 +14,7 @@ export function useFriendList(sb, dispatch, user) {
 
     applicationUserListQuery.next(function(users, error) {
       if (error) dispatch({ type: 'Error', error: error.message });
-      setFriendList(
-        users.filter(({ userId }) => Userfriends.includes(userId.toLowerCase()))
-      );
+      setFriendList(users.filter(({ userId }) => Userfriends.includes(userId)));
     });
   }, [Userfriends.length]);
 
@@ -29,12 +27,9 @@ export function useUserFilter(sb, dispatch) {
   const [filter, setFilter] = React.useState('');
 
   React.useEffect(() => {
-    const searchInput = filter.toLowerCase();
-    const current = currentUser.toLowerCase();
-
-    if (searchInput === current) {
+    if (filter === currentUser) {
       setUserList("That's you!");
-    } else if (searchInput === '' || searchInput === null) {
+    } else if (filter === '' || filter === null) {
       setUserList(null);
     } else {
       const applicationUserListQuery = sb.createApplicationUserListQuery();
@@ -43,10 +38,9 @@ export function useUserFilter(sb, dispatch) {
         if (error) dispatch({ type: 'Error', error: error.message });
 
         setUserList(
-          users.filter(({ userId }) => {
-            const usersName = userId.toLowerCase();
-            return usersName.includes(searchInput) && usersName !== current;
-          })
+          users.filter(
+            ({ userId }) => userId.includes(filter) && userId !== currentUser
+          )
         );
       });
     }
