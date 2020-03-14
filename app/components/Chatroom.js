@@ -1,8 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import ChatArea from './ChatArea';
 import Sidebar from './Sidebar';
+import ChatArea from './ChatArea';
 import * as SendBird from 'sendbird';
+import styled from 'styled-components';
 import { filterObject } from '../utils/helper';
 import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
@@ -32,22 +32,28 @@ export default function Chatroom() {
     try {
       sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
-        console.log(color);
-        createUserMetaData(user, { avatarColor: color });
 
-        const filteredUserObj = filterObject(user, [
-          'userId',
-          'connectionStatus',
-          'lastSeenAt',
-          'isBlockedByMe',
-          'isBlockingMe',
-          'metaData',
-          'isActive',
-          'friendDiscoveryKey',
-          'friendName',
-        ]);
+        // TODO fix error on user creation
+        const array = user.metaData.friends ?? JSON.stringify([]);
 
-        dispatch({ type: 'New user', user: filteredUserObj });
+        createUserMetaData(user, {
+          avatarColor: color,
+          friends: array,
+        });
+
+        // const filteredUserObj = filterObject(user, [
+        //   'userId',
+        //   'connectionStatus',
+        //   'lastSeenAt',
+        //   'isBlockedByMe',
+        //   'isBlockingMe',
+        //   'metaData',
+        //   'isActive',
+        //   'friendDiscoveryKey',
+        //   'friendName',
+        // ]);
+
+        dispatch({ type: 'New user', user });
       });
     } catch (e) {
       console.error(e);
@@ -64,7 +70,11 @@ export default function Chatroom() {
     const { '0': currentUser, '1': invitee } = users;
     const { userChannel } = chatManager;
 
-    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) return;
+    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) {
+      return;
+    } else if (userChannel) {
+      dispatch({ type: 'New Chat' });
+    }
 
     const gCParams = new sb.GroupChannelParams();
 
@@ -91,17 +101,15 @@ export default function Chatroom() {
       });
     });
   };
-  console.log(chatManager);
-  const chatManagerIsSetup =
-    chatManager !== null ? Object.keys(chatManager).length > 0 : false;
 
-  const conditions = {
+  const chatManagerIsSetup =
+    chatManager !== null ? Object.keys(chatManager).length >= 1 : false;
+
+  const { success, loading, error } = {
     success: sb && chatManagerIsSetup && !chatManager.error,
     loading: !sb && chatManagerIsSetup && !chatManager.error,
     error: chatManagerIsSetup && chatManager.error !== undefined,
   };
-
-  const { success, loading, error } = conditions;
 
   const chatContextObj = {
     sb,

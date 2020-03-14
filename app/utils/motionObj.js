@@ -186,27 +186,13 @@ export const navItemVariant = {
   },
 };
 
-export const sideBarVariant = {
-  visible: {
-    flexBasis: '30%',
-    width: '100%',
-    transition: {
-      when: 'beforeChildren',
-      staggerChildren: 0.2,
-    },
-  },
-  hidden: {
-    flexBasis: 0,
-    width: '0%',
-  },
-};
-
 export const menuVariants = {
   visible: {
     opacity: 1,
     transition: {
       when: 'beforeChildren',
       staggerChildren: 0.1,
+      delayChildren: 0.6,
     },
   },
   hidden: {
@@ -215,15 +201,31 @@ export const menuVariants = {
 };
 
 export const menuItemVariant = {
-  visible: {
+  visible: i => ({
     opacity: 1,
     x: 0,
     transition: {
       ...spring2,
+      delay: i * 0.1,
     },
-  },
-  hidden: {
+  }),
+  hidden: i => ({
     opacity: 0,
     x: '-100%',
-  },
+    transition: {
+      ...spring2,
+      delay: 0.1 * i,
+    },
+  }),
+};
+
+export const currentUserDisplayVariants = {
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' } },
+  hidden: { opacity: 0, y: -50 },
+};
+
+export const simpleVariant = {
+  showDisplay: { opacity: 1, transition: { delay: 0.5 } },
+  show: { opacity: 1, transition: { delay: 0.7 } },
+  hide: { opacity: 0 },
 };

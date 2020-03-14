@@ -163,7 +163,7 @@ export function InputField(props) {
   }, [error]);
 
   const handleDebouncedInputValidation = React.useCallback(
-    debounce(() => setError(inputValidation(name, inputValue, LoginForm)), 500),
+    debounce(() => setError(inputValidation(name, inputValue, LoginForm)), 700),
     [name, inputValue, LoginForm]
   );
 
