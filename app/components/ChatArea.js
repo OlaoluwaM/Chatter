@@ -31,16 +31,17 @@ export default function ChatArea() {
 
     try {
       channelHandler.onMessageReceived = (channel, message) => {
+        const messages = [extractNeededMessageData(message)];
         if (chatManager !== null && chatManager.hasOwnProperty('userChannel')) {
           dispatch({
             type: 'New message',
-            messages: [extractNeededMessageData(message)],
+            messages,
           });
         } else {
           dispatch({
             type: 'New channel and message',
             channel,
-            messages: [extractNeededMessageData(message)],
+            messages,
           });
         }
       };
