@@ -1,24 +1,39 @@
 import React from 'react';
-import { getFriendList } from '../utils/chatFunctions';
-import { AuthContext } from '../context/Context';
+import { getFriendList, createUserMetaData } from '../utils/chatFunctions';
+import { AuthContext, ChatContext } from '../context/Context';
 
-export function useFriendList(sb, dispatch, user) {
+export function useFriendList(dispatch) {
+  const { sb } = React.useContext(ChatContext);
+  const { currentUser } = sb;
+
   const [friendList, setFriendList] = React.useState([]);
-
-  const Userfriends = React.useMemo(() => getFriendList(user), [
-    JSON.parse(user.metaData.friends).length,
-  ]);
+  const [friendNames, setFriendNames] = React.useState(() =>
+    getFriendList(currentUser)
+  );
 
   React.useEffect(() => {
+    setFriendNames(getFriendList(currentUser));
+
+    return () => {
+      setFriendList([]);
+      setFriendNames(null);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    createUserMetaData(sb.currentUser, {
+      friends: JSON.stringify(friendNames),
+    });
+
     const applicationUserListQuery = sb.createApplicationUserListQuery();
 
     applicationUserListQuery.next(function(users, error) {
       if (error) dispatch({ type: 'Error', error: error.message });
-      setFriendList(users.filter(({ userId }) => Userfriends.includes(userId)));
+      setFriendList(users.filter(({ userId }) => friendNames.includes(userId)));
     });
-  }, [Userfriends.length]);
+  }, [friendNames.length]);
 
-  return [friendList];
+  return [friendList, friendNames, setFriendNames];
 }
 
 export function useUserFilter(sb, dispatch) {

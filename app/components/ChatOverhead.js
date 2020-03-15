@@ -7,15 +7,15 @@ import { CurrentUserDisplay } from './Sidebar';
 export default function ChatOverHead() {
   const [chat, setChat] = React.useState({ isChatting: false });
 
-  const { chatManager } = React.useContext(ChatContext);
+  const { sb, chatManager } = React.useContext(ChatContext);
   const newChat = typeof chatManager.userChannel !== 'string';
 
   React.useEffect(() => {
     if (newChat) {
-      const { userChannel, user } = chatManager;
+      const { currentUser: user } = sb;
       setChat({
         isChatting: true,
-        invitee: userChannel.members.find(
+        invitee: chatManager.userChannel.members.find(
           ({ userId }) => userId !== user.userId
         ),
       });

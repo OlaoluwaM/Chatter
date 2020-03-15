@@ -1,12 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { hexToRgb } from '../utils/helper';
-import {
-  getFriendList,
-  addFriend,
-  removeFriend,
-  handlefriendLogic,
-} from '../utils/chatFunctions';
+import { hexToRgb, debounce } from '../utils/helper';
+import { createUserMetaData } from '../utils/chatFunctions';
 import { UserDisplay } from './DataDisplay';
 import { useUserFilter, useFriendList } from '../custom-hooks/chatHooks';
 import { FiUserPlus, FiUserMinus } from 'react-icons/fi';
@@ -180,8 +175,12 @@ function CurrentUser({ user }) {
   );
 }
 
-function SearchUser({ searchForUser, motionProps }) {
+function SearchUser({ category, searchForUser, motionProps }) {
   const [input, setInput] = React.useState('');
+
+  React.useEffect(() => {
+    setInput('');
+  }, [category]);
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -207,15 +206,14 @@ function SearchUser({ searchForUser, motionProps }) {
 
 function AvailableUser(props) {
   const { user: currentUserName } = React.useContext(AuthContext);
-  const { sb, dispatch, chatManager } = React.useContext(ChatContext);
+  const { sb, dispatch } = React.useContext(ChatContext);
 
-  const { user: currentUserData } = chatManager;
-  const { userData, ind, funcs } = props;
+  const { userData, ind, funcs, friends } = props;
   const { beFriend, unFriend, inviteUser } = funcs;
 
   const [isBlocked, setBlocked] = React.useState(false);
   const [isFriend, setIsFriend] = React.useState(() =>
-    getFriendList(currentUserData).includes(userData.userId.toLowerCase())
+    friends.includes(userData.userId)
   );
 
   const handleBlock = targetUser => {
@@ -280,15 +278,11 @@ function AvailableUser(props) {
 }
 
 function Menu({ category, inviteUser }) {
-  const { user: currentUserName } = React.useContext(AuthContext);
+  const { sb, dispatch } = React.useContext(ChatContext);
 
-  const { sb, dispatch, chatManager } = React.useContext(ChatContext);
-  const { user: currentUserObj } = chatManager;
-
-  const [items, setItems] = React.useState(null);
   const [userList, setFilter] = useUserFilter(sb, dispatch);
-
-  const [friendList] = useFriendList(sb, dispatch, currentUserObj);
+  const [friendList, friendNames, setFriendNames] = useFriendList(dispatch);
+  const [items, setItems] = React.useState(null);
 
   React.useEffect(() => {
     if (category !== 'friends') {
@@ -297,7 +291,9 @@ function Menu({ category, inviteUser }) {
       setItems(friendList.length > 0 ? friendList : 'No one Yet');
     }
 
-    return () => setItems(null);
+    return () => {
+      setItems(null);
+    };
   }, [category, userList]);
 
   const searchForUser = input => {
@@ -322,18 +318,19 @@ function Menu({ category, inviteUser }) {
   };
 
   const funcs = {
-    beFriend(targetUser) {
-      handlefriendLogic(targetUser, currentUserObj);
+    beFriend(friend) {
+      setFriendNames(arr => [...arr, friend.userId]);
     },
     unFriend(friend) {
-      handlefriendLogic(friend, currentUserObj, true);
+      const { userId: friendName } = friend;
+      setFriendNames(arr => arr.filter(Id => Id !== friendName));
     },
     inviteUser,
   };
 
   return (
     <>
-      <SearchUser searchForUser={searchForUser} />
+      <SearchUser category={category} searchForUser={searchForUser} />
       <MenuContainer>
         {typeof items === 'string' && <AlertText>{items}</AlertText>}
 
@@ -347,6 +344,7 @@ function Menu({ category, inviteUser }) {
                   funcs={funcs}
                   ind={ind}
                   userData={data}
+                  friends={friendNames}
                 />
               );
             })}
@@ -359,7 +357,7 @@ function Menu({ category, inviteUser }) {
 }
 
 export default function Sidebar({ inviteUser }) {
-  const { chatManager } = React.useContext(ChatContext);
+  const { sb } = React.useContext(ChatContext);
 
   const categories = ['users', 'friends'];
   const [category, setCategory] = React.useState(categories[0]);
@@ -368,7 +366,7 @@ export default function Sidebar({ inviteUser }) {
 
   return (
     <SidebarContainer>
-      <CurrentUser user={chatManager.user} />
+      <CurrentUser user={sb.currentUser} />
 
       <SideBarCategory>
         {categories.map((text, ind) => (
