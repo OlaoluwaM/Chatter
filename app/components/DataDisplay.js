@@ -88,7 +88,7 @@ const ActionInfo = styled.div.attrs({
 
 export function UserDisplay(props) {
   const { isOverhead, data, subData, children, dir } = props;
-  const { color } = React.useContext(AuthContext);
+  // const { color } = React.useContext(AuthContext);
 
   const { userId, metaData, connectionStatus } = data;
   const { avatarColor } = metaData;
@@ -97,7 +97,7 @@ export function UserDisplay(props) {
     <DataContainer>
       <Avatar
         status={isOverhead ? 'online' : connectionStatus}
-        color={avatarColor ? avatarColor : color}>
+        color={avatarColor ? avatarColor : '#000'}>
         <div></div>
       </Avatar>
 

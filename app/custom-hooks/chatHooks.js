@@ -63,3 +63,22 @@ export function useUserFilter(sb, dispatch) {
 
   return [userList, setFilter];
 }
+
+export function useBlockedUsers(category, dispatch) {
+  const { sb } = React.useContext(ChatContext);
+
+  const [blockedUsersList, setBlockedList] = React.useState([]);
+  const [blockMessage, setBlockMessage] = React.useState('initial');
+
+  React.useEffect(() => {
+    const blockedUserlistQuery = sb.createBlockedUserListQuery();
+
+    blockedUserlistQuery.next(function(blockedUsers, error) {
+      if (error) dispatch({ type: 'Error', error: error.message });
+      console.log(blockedUsers);
+      setBlockedList(blockedUsers);
+    });
+  }, [blockMessage]);
+
+  return [blockedUsersList, setBlockMessage];
+}

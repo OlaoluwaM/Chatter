@@ -112,3 +112,19 @@ export function getFriendList(user) {
   const { friends } = metaData;
   return friends ? JSON.parse(friends) : [];
 }
+
+export function handleBlock(targetUser, sb) {
+  sb.blockUser(targetUser, (user, error) => {
+    if (error) throw new Error(error.message);
+    console.log(`${user.userId} has been blocked`);
+  });
+  return `${targetUser.userId} has been blocked`;
+}
+
+export function handleUnBlock(blockedUser, sb) {
+  sb.unblockUser(blockedUser, (user, error) => {
+    if (error) throw new Error(error.message);
+  });
+  console.log(`${blockedUser.userId} has been unblocked`);
+  return `${blockedUser.userId} has been unblocked`;
+}
