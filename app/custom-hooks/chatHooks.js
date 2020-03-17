@@ -64,13 +64,14 @@ export function useUserFilter(sb, dispatch) {
   return [userList, setFilter];
 }
 
-export function useBlockedUsers(category, dispatch) {
+export function useBlockedUsers(dispatch) {
   const { sb } = React.useContext(ChatContext);
 
   const [blockedUsersList, setBlockedList] = React.useState([]);
   const [blockMessage, setBlockMessage] = React.useState('initial');
 
   React.useEffect(() => {
+    console.log('updated');
     const blockedUserlistQuery = sb.createBlockedUserListQuery();
 
     blockedUserlistQuery.next(function(blockedUsers, error) {

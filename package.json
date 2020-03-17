@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@animated-burgers/burger-slip": "^1.1.2",
+    "@auth0/auth0-spa-js": "^1.6.4",
     "classnames": "^2.2.6",
     "framer-motion": "^1.7.0",
     "react": "^16.12.0",

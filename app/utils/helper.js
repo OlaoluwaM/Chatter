@@ -85,11 +85,69 @@ export function randomID() {
 export function filterObject(obj, properties) {
   return properties.reduce((acc, curr) => {
     if (Array.isArray(curr)) {
-      // console.log(curr);
       acc[curr[0]] = obj[curr[1]];
     } else {
       acc[curr] = obj[curr];
     }
     return acc;
   }, {});
+}
+
+function formatDate(date) {
+  const dateOptions = {
+    year: 'numeric',
+    day: 'numeric',
+    month: 'long',
+    weekday: 'short',
+    hour: 'numeric',
+    minute: 'numeric',
+  };
+
+  return new Intl.DateTimeFormat('default', dateOptions).format(new Date(date));
+}
+
+function prettyDateFormat(dateArr, removeYear = true) {
+  if (removeYear) {
+    dateArr.splice(3, 1, 'at');
+  } else {
+    dateArr.splice(3, 0, 'at');
+  }
+
+  return `Last seen ${dateArr.join(' ')}`;
+}
+
+export function formatTimeString(timeString) {
+  const currentDateArr = formatDate(Date.now()).split(' ');
+  const {
+    '1': cMonth,
+    '2': cDay,
+    '3': cYear,
+    '4': cTime,
+    '5': cTimeOfDay,
+  } = currentDateArr;
+
+  const dateArr = formatDate(timeString).split(' ');
+  const {
+    '1': month,
+    '2': day,
+    '3': year,
+    '4': time,
+    '5': timeOfDay,
+  } = dateArr;
+
+  if (cYear !== year) return prettyDateFormat(dateArr, false);
+
+  if (cMonth === month) {
+    const diff = Number(cDay) - Number(day);
+
+    if (diff === 0) {
+      return `Last seen today at ${time}, ${timeOfDay}`;
+    } else if (diff >= 1 && diff <= 7) {
+      return `Last seen ${
+        diff === 1 ? `yesterday` : `${diff} days ago`
+      }, at ${time}, ${timeOfDay}`;
+    } else {
+      return prettyDateFormat(dateArr);
+    }
+  } else return prettyDateFormat(dateArr);
 }

@@ -73,6 +73,11 @@ const MenuItem = styled(motion.div).attrs({
   cursor: pointer;
   height: auto;
 
+  ${({ status }) =>
+    status === 'offline' &&
+    css`
+      filter: opacity(0.4) brightness(0.4);
+    `}
   &.user {
     position: absolute;
     top: ${({ position }) => `calc(88px * ${position})`};
@@ -85,6 +90,7 @@ const MenuItem = styled(motion.div).attrs({
 
 export const CurrentUserDisplay = styled(MenuItem).attrs({
   variants: currentUserDisplayVariants,
+  exit: 'hidden',
 })`
   width: 96%;
   height: auto;
@@ -184,7 +190,7 @@ function CurrentUser({ user }) {
       variants={currentUserDisplayVariants}
       initial='hidden'
       animate='visible'>
-      <UserDisplay isOverhead={true} data={user}>
+      <UserDisplay isCurrentUser={true} data={user}>
         <MdSettings style={{ cursor: 'pointer' }} />
         <MdNotifications style={{ cursor: 'pointer' }} />
       </UserDisplay>
@@ -243,7 +249,7 @@ function AvailableUser(props) {
       const message = isBlocked
         ? handleUnBlock(targetUser, sb)
         : handleBlock(targetUser, sb);
-
+      console.log(message);
       setBlockMessage(message);
       setBlocked(isBlocked ? false : true);
     } catch (error) {
@@ -274,6 +280,7 @@ function AvailableUser(props) {
     <MenuItem
       custom={ind}
       position={ind}
+      status={userData.connectionStatus}
       className='user'
       onClick={e => handleInvite(e, userData, isBlocked)}>
       <UserDisplay
@@ -382,7 +389,7 @@ function Menu({ category, inviteUser }) {
               positionTransition: true,
               initial: { opacity: 0 },
               animate: { opacity: 1, transition: { delay: 0.7 } },
-              exit: { opacity: 0, transition: { delay: 0.3 } },
+              exit: { opacity: 0, transition: { delay: 0.7 } },
             }}
             category={category}
             searchForUser={searchForUser}

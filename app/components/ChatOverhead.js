@@ -3,11 +3,14 @@ import { ChatContext } from '../context/Context';
 import { UserDisplay } from './DataDisplay';
 import { AnimatePresence } from 'framer-motion';
 import { CurrentUserDisplay } from './Sidebar';
+import { formatTimeString } from '../utils/helper';
+import { currentUserDisplayVariants } from '../utils/motionObj';
 
 export default function ChatOverHead() {
   const [chat, setChat] = React.useState({ isChatting: false });
 
   const { sb, chatManager } = React.useContext(ChatContext);
+
   const newChat = typeof chatManager.userChannel !== 'string';
 
   React.useEffect(() => {
@@ -24,11 +27,26 @@ export default function ChatOverHead() {
     }
   }, [newChat]);
 
+  const subData = chat.isChatting
+    ? chat.invitee.connectionStatus === 'offline'
+      ? formatTimeString(chat.invitee.lastSeenAt)
+      : chat.invitee.connectionStatus
+    : null;
+
   return (
-    <CurrentUserDisplay
-      initial='hidden'
-      animate={chat.isChatting ? 'visible' : 'hidden'}>
-      {chat.isChatting && <UserDisplay isOverhead={true} data={chat.invitee} />}
-    </CurrentUserDisplay>
+    <AnimatePresence exitBeforeEnter>
+      <CurrentUserDisplay key={chat.invitee} initial='hidden' animate='visible'>
+        {chat.isChatting && (
+          <UserDisplay
+            motionProps={{
+              variants: currentUserDisplayVariants,
+              exit: 'hidden',
+            }}
+            data={chat.invitee}
+            subData={subData}
+          />
+        )}
+      </CurrentUserDisplay>
+    </AnimatePresence>
   );
 }

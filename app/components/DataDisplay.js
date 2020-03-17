@@ -62,14 +62,14 @@ const Content = styled.div`
 
   p:last-of-type {
     font-size: small;
-    ${({ isOverhead }) =>
-      isOverhead &&
+    ${({ isCurrentUser }) =>
+      isCurrentUser &&
       css`
         font-size: 1.2rem;
         margin-bottom: 0;
       `}
-    font-weight: 600;
-    font-family: var(--font1);
+    font-weight: 200;
+    font-family: var(--font2);
   }
 `;
 
@@ -87,21 +87,20 @@ const ActionInfo = styled.div.attrs({
 `;
 
 export function UserDisplay(props) {
-  const { isOverhead, data, subData, children, dir } = props;
-  // const { color } = React.useContext(AuthContext);
+  const { isCurrentUser, data, subData, children, dir, motionProps } = props;
 
   const { userId, metaData, connectionStatus } = data;
   const { avatarColor } = metaData;
 
   return (
-    <DataContainer>
+    <DataContainer {...motionProps}>
       <Avatar
-        status={isOverhead ? 'online' : connectionStatus}
+        status={isCurrentUser ? 'online' : connectionStatus}
         color={avatarColor ? avatarColor : '#000'}>
         <div></div>
       </Avatar>
 
-      <Content isOverhead={isOverhead}>
+      <Content isCurrentUser={isCurrentUser}>
         <p>{userId}</p>
         {subData && <p>{subData}</p>}
       </Content>
@@ -128,7 +127,7 @@ UserDisplay.propTypes = {
   data: PropTypes.object.isRequired,
   dir: PropTypes.string,
   subData: PropTypes.string,
-  isOverhead: PropTypes.bool,
+  isCurrentUser: PropTypes.bool,
 };
 
 GroupDisplay.propTypes = {
@@ -139,7 +138,7 @@ GroupDisplay.propTypes = {
 
 UserDisplay.defaultProps = {
   dir: 'row',
-  isOverhead: false,
+  isCurrentUser: false,
 };
 
 GroupDisplay.defaultProps = {
