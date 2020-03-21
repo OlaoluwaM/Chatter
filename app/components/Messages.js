@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { hexToRgb, isColor } from '../utils/helper';
+import { hexToRgb } from '../utils/helper';
 import { spring2 } from '../utils/motionObj';
 import { AuthContext } from '../context/Context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,15 +53,7 @@ const Avatar = styled.span`
   display: inline-block;
   margin: 0 10px -10px;
   border: 1.5px double ${({ theme }) => theme.main};
-  ${({ bg }) =>
-    isColor(bg)
-      ? css`
-          background: ${bg};
-        `
-      : css`
-          background: url(${bg}) center no-repeat;
-          background-size: contain;
-        `}
+  background: ${({ bg }) => bg};
 `;
 
 const MessageContent = styled.div`
@@ -92,7 +84,7 @@ const MessageWrapper = styled(motion.li)`
   font-family: var(--font2);
   display: flex;
   margin-top: 30px;
-  ${({ mymessage, theme }) =>
+  ${({ mymessage }) =>
     mymessage === 1
       ? css`
           flex-direction: row-reverse;
@@ -101,14 +93,14 @@ const MessageWrapper = styled(motion.li)`
             align-items: center;
           }
           & ${MessageText} {
-            background: ${theme.sub};
-            color: ${theme.main};
+            background: ${({ theme }) => theme.sub};
+            color: ${({ theme }) => theme.main};
           }
         `
       : css`
           & ${MessageText} {
-            background: ${hexToRgb(theme.black, 0.5)};
-            color: ${theme.main};
+            background: ${({ theme }) => hexToRgb(theme.black, 0.5)};
+            color: ${({ theme }) => theme.main};
           }
         `}
   &:last-of-type {
@@ -117,9 +109,11 @@ const MessageWrapper = styled(motion.li)`
 `;
 
 function Message({ message, sender, exit }) {
-  const { activeUserName: user } = React.useContext(AuthContext);
+  const { user, color } = React.useContext(AuthContext);
 
-  const { profileUrl, nickname } = sender;
+  const { metaData, userId } = sender;
+  const { avatarColor } = metaData;
+  console.log(sender);
 
   const isMyMessage = userId === user;
 
@@ -144,9 +138,9 @@ function Message({ message, sender, exit }) {
       mymessage={isMyMessage ? 1 : 0}
       custom={isMyMessage}
       exit={exit}>
-      <Avatar bg={profileUrl} />
+      <Avatar bg={isMyMessage ? color : avatarColor} />
       <MessageContent>
-        <Username>{nickname ?? ' '}</Username>
+        <Username>{userId ? userId : user}</Username>
         <MessageText>{message}</MessageText>
       </MessageContent>
     </MessageWrapper>

@@ -98,14 +98,8 @@ export function chatManagerReducer(state, action) {
         ...state,
         error: action.error,
       };
-
     case 'Reset':
       return null;
-
-    case 'Chat Reset':
-      return {
-        connected: true,
-      };
 
     default:
       console.error('action does not exist');

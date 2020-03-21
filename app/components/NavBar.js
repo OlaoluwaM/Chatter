@@ -64,12 +64,13 @@ function CustomLink({ to, exact, children, ...rest }) {
 
 export default function Nav() {
   const { location } = React.useContext(__RouterContext);
-  const { isAuthenticated } = React.useContext(AuthContext);
+  const { authed } = React.useContext(AuthContext);
 
+  const { pathname } = location;
   return (
     <NavContainer>
       <NavUl variants={navUlVariant} initial='hidden' animate='visible'>
-        {!isAuthenticated && (
+        {!authed && (
           <>
             <CustomLink
               motionProps={{
@@ -87,7 +88,7 @@ export default function Nav() {
                 whileHover: 'hover',
               }}
               to={{
-                pathname: '/authorize',
+                pathname: '/Auth',
                 state: {
                   formType: 'login',
                 },
@@ -103,7 +104,7 @@ export default function Nav() {
               }}
               exact={true}
               to={{
-                pathname: '/authorize',
+                pathname: '/Auth',
                 state: {
                   formType: 'sign-up',
                 },
@@ -113,14 +114,14 @@ export default function Nav() {
           </>
         )}
 
-        {isAuthenticated && (
+        {authed && (
           <>
             <CustomLink
               motionProps={{
                 variants: navItemVariant,
                 whileHover: 'hover',
               }}
-              to='/chat'>
+              to='/Chat'>
               Chatroom
             </CustomLink>
 

@@ -24,11 +24,11 @@ const LogoutPage = styled.div.attrs({
 `;
 
 export default function Logout({ setAuth }) {
-  const { activeUserId, isAuthenticated } = React.useContext(AuthContext);
+  const { user, authed } = React.useContext(AuthContext);
   const usersArray = JSON.parse(localStorage.getItem('Users'));
 
   const updatedUsers = usersArray.map(obj => {
-    if (obj.Id === activeUserId) {
+    if (obj.id === user) {
       obj.loggedIn = false;
       return obj;
     }
@@ -39,14 +39,10 @@ export default function Logout({ setAuth }) {
   sessionStorage.removeItem('CurrentUser');
 
   setTimeout(() => {
-    setAuth({
-      activeUserName: null,
-      activeUserId: null,
-      isAuthenticated: false,
-    });
+    setAuth({ user: '', color: '#7339ac', authed: false });
   }, 2000);
 
-  return !isAuthenticated ? (
+  return !authed ? (
     <Redirect to='/' />
   ) : (
     <LogoutPage>

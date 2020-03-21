@@ -1,8 +1,8 @@
 import React from 'react';
+import { default as styled, css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
-import { isColor } from '../utils/helper';
-import { default as styled, css } from 'styled-components';
+import { AuthContext } from '../context/Context';
 
 const DataContainer = styled(motion.div)`
   position: relative;
@@ -26,15 +26,7 @@ const Avatar = styled.div`
   div {
     position: relative;
     border-radius: 50%;
-    ${({ bg }) =>
-      isColor(bg)
-        ? css`
-            background: ${bg};
-          `
-        : css`
-            background: url(${bg}) center no-repeat;
-            background-size: contain;
-          `}
+    background: ${({ color }) => color};
     width: 50px;
     height: 50px;
   }
@@ -97,18 +89,32 @@ const ActionInfo = styled.div.attrs({
 export function UserDisplay(props) {
   const { isCurrentUser, data, subData, children, dir, motionProps } = props;
 
-  const { nickname, connectionStatus, profileUrl } = data;
+  const { userId, metaData, connectionStatus } = data;
+  const { avatarColor } = metaData;
 
   return (
     <DataContainer {...motionProps}>
       <Avatar
         status={isCurrentUser ? 'online' : connectionStatus}
-        bg={profileUrl ?? '#000'}>
+        color={avatarColor ? avatarColor : '#000'}>
         <div></div>
       </Avatar>
 
       <Content isCurrentUser={isCurrentUser}>
-        <p>{nickname}</p>
+        <p>{userId}</p>
+        {subData && <p>{subData}</p>}
+      </Content>
+
+      {children && <ActionInfo dir={dir}>{children}</ActionInfo>}
+    </DataContainer>
+  );
+}
+
+export function GroupDisplay({ data, subData, children, dir }) {
+  return (
+    <DataContainer>
+      <Content>
+        <p>{groupName}</p>
         {subData && <p>{subData}</p>}
       </Content>
 
@@ -124,7 +130,17 @@ UserDisplay.propTypes = {
   isCurrentUser: PropTypes.bool,
 };
 
+GroupDisplay.propTypes = {
+  data: PropTypes.object.isRequired,
+  dir: PropTypes.string,
+  subData: PropTypes.string,
+};
+
 UserDisplay.defaultProps = {
   dir: 'row',
   isCurrentUser: false,
+};
+
+GroupDisplay.defaultProps = {
+  dir: 'row',
 };

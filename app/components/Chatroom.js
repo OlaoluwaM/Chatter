@@ -22,24 +22,22 @@ const ChatRoomContainer = styled.div.attrs({
 `;
 
 export default function Chatroom() {
-  const { activeUserId, activeUserName } = React.useContext(AuthContext);
+  const { user: userId, color } = React.useContext(AuthContext);
 
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
   React.useEffect(() => {
     try {
-      sb.connect(activeUserId, (user, error) => {
+      sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
 
-        console.log(user);
         const array = user.metaData.friends ?? JSON.stringify([]);
 
         createUserMetaData(user, {
+          avatarColor: color,
           friends: array,
         });
-
-        user.nickname = activeUserName;
 
         dispatch({ type: 'Connect', isConnected: user !== null });
       });

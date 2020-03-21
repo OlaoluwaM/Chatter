@@ -37,7 +37,7 @@ export function useFriendList(dispatch) {
 }
 
 export function useUserFilter(sb, dispatch) {
-  const { activeUserName: currentUser } = React.useContext(AuthContext);
+  const { user: currentUser } = React.useContext(AuthContext);
   const [userList, setUserList] = React.useState(null);
   const [filter, setFilter] = React.useState('');
 

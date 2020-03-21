@@ -151,22 +151,3 @@ export function formatTimeString(timeString) {
     }
   } else return prettyDateFormat(dateArr);
 }
-
-export function randomColor() {
-  return `#${Math.floor(Math.random() * 16777216).toString(16)}`;
-}
-
-export function hash(string) {
-  let h = 0xdeadbeef;
-  for (let i = 0; i < string.length; i++)
-    h = Math.imul(h ^ string.charCodeAt(i), 2654435761);
-  return (h ^ (h >>> 16)) >>> 0;
-}
-
-export function isColor(str) {
-  const regexp = new RegExp(
-    /^((0x){0,1}|#{0,1})([0-9A-F]{8}|[0-9A-F]{6})$/,
-    'ig'
-  );
-  return !!str.match(regexp);
-}
