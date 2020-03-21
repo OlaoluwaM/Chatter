@@ -121,7 +121,6 @@ export default function Form({ setAuth, formType }) {
               value={formType === 'login' ? 'Login' : 'Sign Up'}
             />
           </AnimatePresence>
-          )
         </FormContainer>
       </>
     );

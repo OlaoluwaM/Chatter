@@ -97,7 +97,7 @@ export const headerVariant = {
   },
   hidden: {
     opacity: 0,
-    y: -100,
+    y: -50,
   },
 };
 

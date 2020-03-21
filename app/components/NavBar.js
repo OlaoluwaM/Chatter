@@ -66,36 +66,38 @@ export default function Nav() {
   const { isAuthenticated } = React.useContext(AuthContext);
 
   if (isAuthenticated) {
-    <NavContainer>
-      <NavUl variants={navUlVariant} initial='hidden' animate='visible'>
-        <CustomLink
-          motionProps={{
-            variants: navItemVariant,
-            whileHover: 'hover',
-          }}
-          to='/chat'>
-          Chatroom
-        </CustomLink>
+    return (
+      <NavContainer>
+        <NavUl variants={navUlVariant} initial='hidden' animate='visible'>
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            to='/chat'>
+            Chatroom
+          </CustomLink>
 
-        <CustomLink
-          motionProps={{
-            variants: navItemVariant,
-            whileHover: 'hover',
-          }}
-          to='/logout'>
-          Logout
-        </CustomLink>
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            to='/logout'>
+            Logout
+          </CustomLink>
 
-        <CustomLink
-          motionProps={{
-            variants: navItemVariant,
-            whileHover: 'hover',
-          }}
-          to='/delete-account'>
-          Delete account
-        </CustomLink>
-      </NavUl>
-    </NavContainer>;
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            to='/delete-account'>
+            Delete account
+          </CustomLink>
+        </NavUl>
+      </NavContainer>
+    );
   } else
     return (
       <NavContainer>

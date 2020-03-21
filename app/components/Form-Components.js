@@ -134,7 +134,7 @@ const MotionInputInfo = styled(motion.p)`
 
 export function InputInfo({ error, motionProps }) {
   return (
-    <MotionInputInfo error={error.color} {...motionProps}>
+    <MotionInputInfo error={error} {...motionProps}>
       {error.text}
     </MotionInputInfo>
   );
@@ -186,18 +186,19 @@ export function InputField(props) {
       <InputLabel>{label}</InputLabel>
 
       <AnimatePresence exitBeforeEnter>
-        <InputInfo
-          key='Input-Info'
-          motionProps={{
-            initial: 'hidden',
-            animate: 'visible',
-            exit: 'hidden',
-            variants: InputInfoVariant,
-            positionTransition: true,
-          }}
-          error={error}
-        />
-        )
+        {error && (
+          <InputInfo
+            key='Input-Info'
+            motionProps={{
+              initial: 'hidden',
+              animate: 'visible',
+              exit: 'hidden',
+              variants: InputInfoVariant,
+              positionTransition: true,
+            }}
+            error={error}
+          />
+        )}
       </AnimatePresence>
     </InputContainer>
   );

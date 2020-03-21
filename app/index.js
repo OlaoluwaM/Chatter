@@ -18,11 +18,11 @@ import { themeObj } from './context/Context';
 import './index.scss';
 
 function App() {
-  const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser')) || '';
+  const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser')) || null;
 
   const [isAuthed, setAuthed] = React.useState({
     activeUserName: currentUser?.name ?? null,
-    isAuthenticated: currentUser !== null,
+    isAuthenticated: currentUser,
   });
 
   return (

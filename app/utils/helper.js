@@ -154,5 +154,5 @@ export function formatTimeString(timeString) {
 
 export function isColor(str) {
   const regexp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'igm');
-  return !!str.search(regexp);
+  return !!str.match(regexp);
 }
