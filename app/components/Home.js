@@ -1,10 +1,9 @@
-import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { IoIosChatbubbles } from 'react-icons/io';
-import { motion } from 'framer-motion';
+import React from 'react';
 import styled from 'styled-components';
-import { hexToRgb } from '../utils/helper';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { AuthContext } from '../context/Context';
+import { IoIosChatbubbles } from 'react-icons/io';
 import { headerVariant, buttonVariant, spring2 } from '../utils/motionObj';
 
 const HomePage = styled.div.attrs({
@@ -67,7 +66,7 @@ const ChatButton = styled(motion.button).attrs({
 `;
 
 export default function Home() {
-  const { user, authed } = React.useContext(AuthContext);
+  const { isAuthenticated } = React.useContext(AuthContext);
 
   return (
     <HomePage>
@@ -75,18 +74,18 @@ export default function Home() {
         <motion.h1 variants={headerVariant} initial='hidden' animate='visible'>
           Welcome to Chatter
         </motion.h1>
-        <Link to={authed ? '/Chat' : '/Auth'}>
+        <Link to={isAuthenticated ? '/chat' : '/authorize'}>
           <ChatButton
             variants={buttonVariant}
             initial='hidden'
             animate='visible'
             whileTap='tap'>
-            {authed && (
+            {isAuthenticated && (
               <>
                 <IoIosChatbubbles /> Chat
               </>
             )}
-            {!authed && 'Sign In'}
+            {!isAuthenticated && 'Sign In'}
           </ChatButton>
         </Link>
       </div>

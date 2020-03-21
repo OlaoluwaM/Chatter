@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { debounce, hexToRgb } from '../utils/helper';
+import PropTypes from 'prop-types';
 import { inputValidation } from '../utils/authFunc';
 import { InputInfoVariant } from '../utils/motionObj';
+import { debounce, hexToRgb } from '../utils/helper';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const FormTitle = styled(motion.h1)`
@@ -26,8 +26,7 @@ export const Bar = styled.span`
   height: 4px;
   flex-basis: 4px;
   border-radius: 50px;
-  background: ${({ theme, color }) =>
-    color ? color.color : hexToRgb(theme.sub, 0.2)};
+  background: ${({ theme, error }) => error?.color ?? hexToRgb(theme.sub, 0.2)};
   transition: 0.5s ease-out;
 
   ::before {
@@ -41,7 +40,7 @@ export const Bar = styled.span`
     transform: scaleX(0);
     height: 100%;
     border-radius: 50px;
-    background: ${({ theme, color }) => (color ? color.color : theme.sub)};
+    background: ${({ theme, error }) => error?.color ?? theme.sub};
   }
 `;
 
@@ -122,7 +121,7 @@ export const SubmitButton = styled(motion.input).attrs({
 
 const MotionInputInfo = styled(motion.p)`
   margin: 0;
-  color: ${({ color }) => color};
+  color: ${({ error }) => error.color};
   font-family: var(--font2);
   font-size: 0.89rem;
   font-weight: 300;
@@ -133,16 +132,18 @@ const MotionInputInfo = styled(motion.p)`
   padding-left: 2%;
 `;
 
-export function InputInfo({ error, color, MotionProps }) {
+export function InputInfo({ error, motionProps }) {
+  const { text, color: errorColor } = error;
+
   return (
-    <MotionInputInfo color={color} {...MotionProps}>
-      {error}
+    <MotionInputInfo error={error} {...motionProps}>
+      {text}
     </MotionInputInfo>
   );
 }
 
 export function InputField(props) {
-  const { name, required, type, label, MotionProps, ...rest } = props;
+  const { name, required, type, label, motionProps, ...rest } = props;
   const { formState } = rest;
   const { formType, setInputFieldError } = formState;
   const [error, setError] = React.useState(null);
@@ -157,7 +158,7 @@ export function InputField(props) {
   }, [formType]);
 
   React.useEffect(() => {
-    if (error && error.color === 'red') {
+    if (error?.color === 'red') {
       setInputFieldError(true);
     } else setInputFieldError(false);
   }, [error]);
@@ -171,7 +172,7 @@ export function InputField(props) {
     setError(inputValidation(name, inputValue, LoginForm));
 
   return (
-    <InputContainer {...MotionProps} color={error}>
+    <InputContainer {...motionProps}>
       <Input
         onKeyUp={handleDebouncedInputValidation}
         onFocus={handleInputValidation}
@@ -180,24 +181,24 @@ export function InputField(props) {
         type={type}
         required={required}
         name={name}
-        color={error}
         {...rest}
       />
 
-      <Bar color={error} />
-      <InputLabel color={error}>{label}</InputLabel>
-      <AnimatePresence>
+      <Bar error={error} />
+      <InputLabel>{label}</InputLabel>
+
+      <AnimatePresence exitBeforeEnter>
         {error && (
           <InputInfo
             key='Input-Info'
-            MotionProps={{
-              animate: error ? 'visible' : 'hidden',
+            motionProps={{
+              initial: 'hidden',
+              animate: 'visible',
+              exit: 'hidden',
               variants: InputInfoVariant,
               positionTransition: true,
-              exit: 'hidden',
             }}
-            color={error.color}
-            error={error.text}
+            error={error}
           />
         )}
       </AnimatePresence>

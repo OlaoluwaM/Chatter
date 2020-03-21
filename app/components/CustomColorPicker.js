@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { InputContainer } from './Form-Components';
 import { TwitterPicker } from 'react-color';
-import { motion, AnimatePresence } from 'framer-motion';
-import { colorPickerVariant, tween } from '../utils/motionObj';
+import { motion } from 'framer-motion';
 import { getContrast } from '../utils/helper';
 import { AuthContext } from '../context/Context';
 
@@ -40,18 +39,14 @@ const RevealButton = styled(motion.input)`
 `;
 
 export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
-  const { color } = React.useContext(AuthContext);
-  const [displayColorPicker, setDisplay] = React.useState(false);
-  const [inputValue, setValue] = React.useState(color);
-
-  const handleClick = () => setDisplay(dcp => !dcp);
+  const [inputValue, setValue] = React.useState(avatar);
 
   const handleColorChange = color => {
     setValue(color.hex);
     console.log(color);
     setAuthColor(auth => {
-      const { user, authed } = auth;
-      return { user, color: color.hex, authed };
+      const { user, isAuthenticated } = auth;
+      return { user, color: color.hex, isAuthenticated };
     });
   };
 
@@ -71,3 +66,5 @@ export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
     </InputContainer>
   );
 }
+
+// TODO needs work

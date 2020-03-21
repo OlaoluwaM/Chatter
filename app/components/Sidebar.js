@@ -73,11 +73,22 @@ const MenuItem = styled(motion.div).attrs({
   cursor: pointer;
   height: auto;
 
-  ${({ status }) =>
+  ${({ status, theme }) =>
     status === 'offline' &&
     css`
-      filter: opacity(0.4) brightness(0.4);
+      &:after {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        border-radius: inherit;
+        left: 0;
+        background: ${hexToRgb(theme.black, 0.6)};
+      }
     `}
+
   &.user {
     position: absolute;
     top: ${({ position }) => `calc(88px * ${position})`};
@@ -98,6 +109,7 @@ export const CurrentUserDisplay = styled(MenuItem).attrs({
   color: ${({ theme }) => theme.sub};
   margin: 7px;
   cursor: default;
+  position: relative;
 `;
 
 const SideBarCategory = styled.ul`
@@ -228,7 +240,7 @@ function SearchUser({ category, searchForUser, motionProps }) {
 }
 
 function AvailableUser(props) {
-  const { user: currentUserName } = React.useContext(AuthContext);
+  const { activeUserName: currentUserName } = React.useContext(AuthContext);
   const { sb, dispatch } = React.useContext(ChatContext);
   const { sub } = React.useContext(ThemeContext);
 

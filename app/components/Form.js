@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import ColorPicker from './CustomColorPicker';
+import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
+import { extractFormData } from '../utils/helper';
 import { motion, AnimatePresence } from 'framer-motion';
-import { extractFormData, hexToRgb } from '../utils/helper';
+import { handleLogin, handleSignUp } from '../utils/authFunc';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
-import { handleLogin, handleSignUp, setAvatarColor } from '../utils/authFunc';
 import {
   containerVariant,
   itemVariant,
@@ -31,7 +30,8 @@ const FormContainer = styled(motion.form)`
 export default function Form({ setAuth, formType }) {
   const [inputFieldError, setInputFieldError] = React.useState(false);
   const formRef = React.useRef();
-  const { authed, color } = React.useContext(AuthContext);
+
+  const { isAuthenticated } = React.useContext(AuthContext);
 
   React.useEffect(() => {
     return () => setInputFieldError(false);
@@ -43,12 +43,10 @@ export default function Form({ setAuth, formType }) {
 
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
-    extractedFormData['color'] = setAvatarColor(extractedFormData, color);
+    formRef.current.style.opacity = 0.4;
     if (formType === 'login') {
-      formRef.current.style.opacity = 0.4;
       setTimeout(() => setAuth(handleLogin(extractedFormData)), 1500);
     } else {
-      formRef.current.style.opacity = 0.4;
       setTimeout(() => setAuth(handleSignUp(extractedFormData)), 1500);
     }
   };
@@ -57,13 +55,13 @@ export default function Form({ setAuth, formType }) {
     <>
       <FormTitle
         key='form-title'
-        exit='hidden'
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ ...spring, delay: 1.9 }}
+        transition={{ ...spring, delay: 1.2 }}
         layoutTransition={spring}>
         {formType === 'login' ? 'Sign In' : 'Sign Up'}
       </FormTitle>
+
       <FormContainer
         length={formType === 'login' ? 4 : 5}
         variants={containerVariant}
@@ -72,13 +70,13 @@ export default function Form({ setAuth, formType }) {
         initial='hidden'
         animate='visible'
         autoComplete='off'>
-        {authed && <Redirect to='/' />}
+        {isAuthenticated && <Redirect to='/' />}
 
-        {!authed && (
+        {!isAuthenticated && (
           <AnimatePresence>
             <InputField
               key='name-field'
-              MotionProps={{
+              motionProps={{
                 variants: itemVariant,
                 layoutTransition: spring,
                 exit: 'hidden',
@@ -90,7 +88,7 @@ export default function Form({ setAuth, formType }) {
 
             <InputField
               key='password-field'
-              MotionProps={{
+              motionProps={{
                 variants: itemVariant,
                 layoutTransition: spring,
                 exit: 'hidden',
@@ -104,7 +102,7 @@ export default function Form({ setAuth, formType }) {
             {formType !== 'login' && (
               <InputField
                 key='confirmPassword-field'
-                MotionProps={{
+                motionProps={{
                   variants: itemVariant,
                   layoutTransition: spring,
                   exit: 'hidden',
@@ -116,25 +114,12 @@ export default function Form({ setAuth, formType }) {
               />
             )}
 
-            <ColorPicker
-              key='colorInput'
-              setAuthColor={setAuth}
-              btnText={
-                formType === 'login' ? 'Change avatar Color' : 'pick a color'
-              }
-              MotionProps={{
-                variants: itemVariant,
-                layoutTransition: spring,
-                exit: 'hidden',
-              }}
-            />
-
             <SubmitButton
+              variants={itemVariant}
               key='submit-button'
               exit='hidden'
               type='submit'
               name='btn'
-              variants={itemVariant}
               layoutTransition={spring}
               disabled={inputFieldError}
               value={formType === 'login' ? 'Login' : 'Sign Up'}

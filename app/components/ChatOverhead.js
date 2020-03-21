@@ -1,15 +1,24 @@
 import React from 'react';
+import { TiTimes } from 'react-icons/ti';
 import { ChatContext } from '../context/Context';
 import { UserDisplay } from './DataDisplay';
 import { AnimatePresence } from 'framer-motion';
-import { CurrentUserDisplay } from './Sidebar';
 import { formatTimeString } from '../utils/helper';
+import { CurrentUserDisplay } from './Sidebar';
 import { currentUserDisplayVariants } from '../utils/motionObj';
+
+const svgStyles = {
+  width: '35px',
+  height: '35px',
+  fill: 'red',
+  marginLeft: '50px',
+  cursor: 'pointer',
+};
 
 export default function ChatOverHead() {
   const [chat, setChat] = React.useState({ isChatting: false });
 
-  const { sb, chatManager } = React.useContext(ChatContext);
+  const { sb, chatManager, dispatch } = React.useContext(ChatContext);
 
   const newChat = typeof chatManager.userChannel !== 'string';
 
@@ -33,6 +42,11 @@ export default function ChatOverHead() {
       : chat.invitee.connectionStatus
     : null;
 
+  const resetChat = () => {
+    setChat({ isChatting: false });
+    dispatch({ type: 'Chat Reset' });
+  };
+
   return (
     <AnimatePresence exitBeforeEnter>
       <CurrentUserDisplay key={chat.invitee} initial='hidden' animate='visible'>
@@ -43,8 +57,9 @@ export default function ChatOverHead() {
               exit: 'hidden',
             }}
             data={chat.invitee}
-            subData={subData}
-          />
+            subData={subData}>
+            <TiTimes style={svgStyles} onClick={resetChat} />
+          </UserDisplay>
         )}
       </CurrentUserDisplay>
     </AnimatePresence>

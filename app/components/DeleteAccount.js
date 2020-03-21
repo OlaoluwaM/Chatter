@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { spring } from '../utils/motionObj';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
-import { spring } from '../utils/motionObj';
 import { motion, AnimatePresence } from 'framer-motion';
 import { headerVariant, buttonVariant } from '../utils/motionObj';
 
@@ -27,7 +27,7 @@ const DeleteBtn = styled(motion.button)`
   text-transform: uppercase;
   font-weight: bolder;
   background: red;
-  color: var(--main);
+  color: ${({ theme }) => theme.main};
   outline: none;
   border: none;
   margin-top: 30px;
@@ -35,30 +35,39 @@ const DeleteBtn = styled(motion.button)`
 
 export default function DeleteAccount({ setAuth }) {
   const [delBtnHasBeenClicked, setButtonClickState] = React.useState(false);
-  const { user, authed } = React.useContext(AuthContext);
+
+  const { activeUserName: username, isAuthenticated } = React.useContext(
+    AuthContext
+  );
 
   React.useEffect(() => {
     if (delBtnHasBeenClicked) {
       const users = JSON.parse(localStorage.getItem('Users'));
       const currentUserIndex = users.findIndex(
-        ({ id, loggedIn }) => id === user && loggedIn === true
+        ({ id, loggedIn }) => id === username && loggedIn === true
       );
       const updatedUsersArray = users.filter(
-        (o, ind) => ind !== currentUserIndex
+        (_, ind) => ind !== currentUserIndex
       );
 
       localStorage.setItem('Users', JSON.stringify(updatedUsersArray));
+
       sessionStorage.removeItem('CurrentUser');
-      localStorage.removeItem(`${user}M`);
+      localStorage.removeItem(`${username}M`);
+
       setTimeout(() => {
-        setAuth({ user: '', color: '#7339ac', authed: false });
+        setAuth({
+          activeUserName: null,
+          activeUserId: null,
+          isAuthenticated: false,
+        });
       }, 2000);
     }
   }, [delBtnHasBeenClicked]);
 
   return (
     <>
-      {!authed ? (
+      {!isAuthenticated ? (
         <Redirect to='/' />
       ) : (
         <DeleteAccPage>
