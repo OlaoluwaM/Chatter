@@ -38,9 +38,8 @@ const RevealButton = styled(motion.input)`
   margin-right: 50px;
   text-transform: lowercase;
 `;
-
+// todo fix color picker component if still needed
 export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
-  const { color } = React.useContext(AuthContext);
   const [displayColorPicker, setDisplay] = React.useState(false);
   const [inputValue, setValue] = React.useState(color);
 
@@ -50,8 +49,8 @@ export default function ColorPicker({ MotionProps, setAuthColor, btnText }) {
     setValue(color.hex);
     console.log(color);
     setAuthColor(auth => {
-      const { user, authed } = auth;
-      return { user, color: color.hex, authed };
+      const { user, isAuthenticated } = auth;
+      return { user, color: color.hex, isAuthenticated };
     });
   };
 

@@ -21,9 +21,8 @@ function App() {
   const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser')) || '';
 
   const [isAuthed, setAuthed] = React.useState({
-    user: currentUser ? currentUser.name : '',
-    color: currentUser ? currentUser.color : themeObj.sub,
-    authed: currentUser !== '',
+    activeUserName: currentUser?.name ?? null,
+    isAuthenticated: currentUser !== null,
   });
 
   return (
@@ -31,21 +30,21 @@ function App() {
       <AuthProvider value={isAuthed}>
         <Nav />
 
-        {!isAuthed.authed && <Redirect to='/' />}
+        {!isAuthed.isAuthenticated && <Redirect to='/' />}
 
         <Switch>
           <Route exact path='/' component={Home} />
-          <Route path='/Chat' component={Chatroom} />
+          <Route path='/chat' component={Chatroom} />
           <Route
-            path='/Auth'
+            path='/authenticate'
             render={props => <Auth {...props} setAuth={setAuthed} />}
           />
           <Route
-            path='/Logout'
+            path='/logout'
             render={props => <Logout {...props} setAuth={setAuthed} />}
           />
           <Route
-            path='/DeleteAccount'
+            path='/delete-account'
             render={props => <DeleteAccount {...props} setAuth={setAuthed} />}
           />
         </Switch>

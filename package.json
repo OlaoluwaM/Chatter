@@ -20,6 +20,7 @@
     "react-icons": "^3.8.0",
     "react-router-dom": "^5.1.2",
     "sendbird": "^3.0.117",
+    "store": "^2.0.12",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {

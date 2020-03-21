@@ -151,3 +151,8 @@ export function formatTimeString(timeString) {
     }
   } else return prettyDateFormat(dateArr);
 }
+
+export function isColor(str) {
+  const regexp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'igm');
+  return !!str.search(regexp);
+}

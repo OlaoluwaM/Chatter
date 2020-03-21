@@ -78,6 +78,7 @@ const MenuItem = styled(motion.div).attrs({
     css`
       filter: opacity(0.4) brightness(0.4);
     `}
+
   &.user {
     position: absolute;
     top: ${({ position }) => `calc(88px * ${position})`};
@@ -228,7 +229,7 @@ function SearchUser({ category, searchForUser, motionProps }) {
 }
 
 function AvailableUser(props) {
-  const { user: currentUserName } = React.useContext(AuthContext);
+  const { activeUserName: currentUserName } = React.useContext(AuthContext);
   const { sb, dispatch } = React.useContext(ChatContext);
   const { sub } = React.useContext(ThemeContext);
 
@@ -249,7 +250,7 @@ function AvailableUser(props) {
       const message = isBlocked
         ? handleUnBlock(targetUser, sb)
         : handleBlock(targetUser, sb);
-      console.log(message);
+
       setBlockMessage(message);
       setBlocked(isBlocked ? false : true);
     } catch (error) {

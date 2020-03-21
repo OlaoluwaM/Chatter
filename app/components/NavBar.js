@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
+import { Route, Link } from 'react-router-dom';
 import { navUlVariant, navItemVariant } from '../utils/motionObj';
-import { Route, Link, __RouterContext } from 'react-router-dom';
 
 const NavContainer = styled.nav`
   position: relative;
@@ -63,88 +63,83 @@ function CustomLink({ to, exact, children, ...rest }) {
 }
 
 export default function Nav() {
-  const { location } = React.useContext(__RouterContext);
-  const { authed } = React.useContext(AuthContext);
+  const { isAuthenticated } = React.useContext(AuthContext);
 
-  const { pathname } = location;
-  return (
+  if (isAuthenticated) {
     <NavContainer>
       <NavUl variants={navUlVariant} initial='hidden' animate='visible'>
-        {!authed && (
-          <>
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              to='/'
-              exact={true}>
-              Home
-            </CustomLink>
+        <CustomLink
+          motionProps={{
+            variants: navItemVariant,
+            whileHover: 'hover',
+          }}
+          to='/chat'>
+          Chatroom
+        </CustomLink>
 
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              to={{
-                pathname: '/Auth',
-                state: {
-                  formType: 'login',
-                },
-              }}
-              exact={true}>
-              Login
-            </CustomLink>
+        <CustomLink
+          motionProps={{
+            variants: navItemVariant,
+            whileHover: 'hover',
+          }}
+          to='/logout'>
+          Logout
+        </CustomLink>
 
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              exact={true}
-              to={{
-                pathname: '/Auth',
-                state: {
-                  formType: 'sign-up',
-                },
-              }}>
-              Sign Up
-            </CustomLink>
-          </>
-        )}
-
-        {authed && (
-          <>
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              to='/Chat'>
-              Chatroom
-            </CustomLink>
-
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              to='/Logout'>
-              Logout
-            </CustomLink>
-
-            <CustomLink
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-              }}
-              to='/DeleteAccount'>
-              Delete account
-            </CustomLink>
-          </>
-        )}
+        <CustomLink
+          motionProps={{
+            variants: navItemVariant,
+            whileHover: 'hover',
+          }}
+          to='/delete-account'>
+          Delete account
+        </CustomLink>
       </NavUl>
-    </NavContainer>
-  );
+    </NavContainer>;
+  } else
+    return (
+      <NavContainer>
+        <NavUl variants={navUlVariant} initial='hidden' animate='visible'>
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            to='/'
+            exact={true}>
+            Home
+          </CustomLink>
+
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            to={{
+              pathname: '/authenticate',
+              state: {
+                formType: 'login',
+              },
+            }}
+            exact={true}>
+            Login
+          </CustomLink>
+
+          <CustomLink
+            motionProps={{
+              variants: navItemVariant,
+              whileHover: 'hover',
+            }}
+            exact={true}
+            to={{
+              pathname: '/authenticate',
+              state: {
+                formType: 'sign-up',
+              },
+            }}>
+            Sign Up
+          </CustomLink>
+        </NavUl>
+      </NavContainer>
+    );
 }

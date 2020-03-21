@@ -67,7 +67,7 @@ const ChatButton = styled(motion.button).attrs({
 `;
 
 export default function Home() {
-  const { user, authed } = React.useContext(AuthContext);
+  const { isAuthenticated } = React.useContext(AuthContext);
 
   return (
     <HomePage>
@@ -75,18 +75,18 @@ export default function Home() {
         <motion.h1 variants={headerVariant} initial='hidden' animate='visible'>
           Welcome to Chatter
         </motion.h1>
-        <Link to={authed ? '/Chat' : '/Auth'}>
+        <Link to={isAuthenticated ? '/Chat' : '/Auth'}>
           <ChatButton
             variants={buttonVariant}
             initial='hidden'
             animate='visible'
             whileTap='tap'>
-            {authed && (
+            {isAuthenticated && (
               <>
                 <IoIosChatbubbles /> Chat
               </>
             )}
-            {!authed && 'Sign In'}
+            {!isAuthenticated && 'Sign In'}
           </ChatButton>
         </Link>
       </div>

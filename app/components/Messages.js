@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { hexToRgb } from '../utils/helper';
 import { spring2 } from '../utils/motionObj';
 import { AuthContext } from '../context/Context';
+import { hexToRgb, isColor } from '../utils/helper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { default as styled, css } from 'styled-components';
 
@@ -53,7 +53,15 @@ const Avatar = styled.span`
   display: inline-block;
   margin: 0 10px -10px;
   border: 1.5px double ${({ theme }) => theme.main};
-  background: ${({ bg }) => bg};
+  ${({ bg }) =>
+    isColor(bg)
+      ? css`
+          background: ${({ bg }) => bg};
+        `
+      : css`
+          background: url(${bg}) center no-repeat;
+          background-size: contain;
+        `}
 `;
 
 const MessageContent = styled.div`
@@ -84,23 +92,25 @@ const MessageWrapper = styled(motion.li)`
   font-family: var(--font2);
   display: flex;
   margin-top: 30px;
-  ${({ mymessage }) =>
-    mymessage === 1
+  ${({ myMessage, theme }) =>
+    myMessage === 1
       ? css`
           flex-direction: row-reverse;
           text-align: right;
+
           & > ${MessageContent} {
             align-items: center;
           }
+
           & ${MessageText} {
-            background: ${({ theme }) => theme.sub};
-            color: ${({ theme }) => theme.main};
+            background: ${theme.sub};
+            color: ${theme.main};
           }
         `
       : css`
           & ${MessageText} {
-            background: ${({ theme }) => hexToRgb(theme.black, 0.5)};
-            color: ${({ theme }) => theme.main};
+            background: ${hexToRgb(theme.black, 0.5)};
+            color: ${theme.main};
           }
         `}
   &:last-of-type {
@@ -109,13 +119,11 @@ const MessageWrapper = styled(motion.li)`
 `;
 
 function Message({ message, sender, exit }) {
-  const { user, color } = React.useContext(AuthContext);
+  const { activeUserName: username } = React.useContext(AuthContext);
 
-  const { metaData, userId } = sender;
-  const { avatarColor } = metaData;
-  console.log(sender);
+  const { profileUrl, userId } = sender;
 
-  const isMyMessage = userId === user;
+  const isMyMessage = userId === username;
 
   const messageVariant = {
     visible: {
@@ -123,6 +131,7 @@ function Message({ message, sender, exit }) {
       x: 0,
       transition: { ...spring2 },
     },
+
     hidden: isMyMessage => ({
       opacity: 0,
       x: isMyMessage ? 50 : -50,
@@ -135,12 +144,12 @@ function Message({ message, sender, exit }) {
       variants={messageVariant}
       initial='hidden'
       animate='visible'
-      mymessage={isMyMessage ? 1 : 0}
+      myMessage={isMyMessage ? 1 : 0}
       custom={isMyMessage}
       exit={exit}>
-      <Avatar bg={isMyMessage ? color : avatarColor} />
+      <Avatar bg={profileUrl} />
       <MessageContent>
-        <Username>{userId ? userId : user}</Username>
+        <Username>{userId ?? username}</Username>
         <MessageText>{message}</MessageText>
       </MessageContent>
     </MessageWrapper>

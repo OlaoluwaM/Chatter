@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { hexToRgb } from '../utils/helper';
-import { AuthContext } from '../context/Context';
 import { FaPaperPlane } from 'react-icons/fa';
+import { default as styled, ThemeContext } from 'styled-components';
 import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
 
 const InputContainer = styled(motion.form)`
@@ -76,7 +74,7 @@ const SendButton = styled(motion.button)`
 `;
 
 export default function Input({ onSendMessage }) {
-  const { color } = React.useContext(AuthContext);
+  const { sub } = React.useContext(ThemeContext);
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
@@ -101,7 +99,7 @@ export default function Input({ onSendMessage }) {
         autoFocus={true}
       />
 
-      <SendButton fill={color} variants={inputItemVariant} type='submit'>
+      <SendButton fill={sub} variants={inputItemVariant} type='submit'>
         <FaPaperPlane />
       </SendButton>
     </InputContainer>
