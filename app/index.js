@@ -56,7 +56,6 @@ function App() {
     window.addEventListener('beforeunload', unloadEventListener);
 
     return () => {
-      console.log('removing events');
       document.removeEventListener(
         documentVisibility(),
         memoizedVisibilityListener
