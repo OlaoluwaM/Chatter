@@ -181,7 +181,7 @@ export function unloadEventListener(e) {
   e.preventDefault();
   document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
     8
-  )}; path=/`;
+  )};`;
   e.returnValue = 'Please logout before exiting the application';
   return 'Please logout before exiting the application';
 }

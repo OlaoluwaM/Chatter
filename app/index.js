@@ -43,9 +43,11 @@ function App() {
   );
 
   React.useEffect(() => {
-    if (!document.cookie) return;
+    if (!document.cookie && !!sessionStorage.getItem('CurrentUser')) return;
     sessionStorage.setItem('CurrentUser', extractCurrentUserFromCookie());
-    document.cookie = '';
+    document.cookie = `CurrentUserName= ; expires=${new Date(
+      0
+    )}; max-age= ${-10}`;
   }, []);
 
   React.useEffect(() => {
@@ -54,6 +56,7 @@ function App() {
     window.addEventListener('beforeunload', unloadEventListener);
 
     return () => {
+      console.log('removing events');
       document.removeEventListener(
         documentVisibility(),
         memoizedVisibilityListener
