@@ -1,4 +1,5 @@
-import { strongRegex } from './helper';
+import { strongRegex, sessionTimeout } from './helper';
+import store from 'store';
 
 /**
  *
@@ -7,15 +8,16 @@ import { strongRegex } from './helper';
  */
 
 export function handleSignUp(data) {
-  const users = JSON.parse(localStorage.getItem('Users')) || [];
+  const users = store.get('users') ?? [];
   const { name, password } = data;
 
-  data['loggedIn'] = true;
-  const { loggedIn } = data;
-  users.push({ name, password, loggedIn });
+  const newUser = { name, password };
+  users.push(newUser);
 
-  localStorage.setItem('Users', JSON.stringify(users));
-  sessionStorage.setItem('CurrentUser', JSON.stringify(data));
+  store.set('users', users);
+  sessionStorage.setItem('CurrentUser', name);
+
+  // todo use storeJS expire plugin for user session functionality
 
   return { activeUserName: name, isAuthenticated: true };
 }
@@ -28,7 +30,7 @@ export function handleSignUp(data) {
  */
 
 export function handleLogin(data) {
-  const users = JSON.parse(localStorage.getItem('Users'));
+  const users = store.get('users') ?? [];
   const { name, password } = data;
 
   const userData = users.find(
@@ -36,13 +38,7 @@ export function handleLogin(data) {
       name === dbUsername && password === dbPassword
   );
 
-  let index = users.indexOf(userData);
-
-  userData.loggedIn = true;
-  users.splice(index, 1, userData);
-
-  localStorage.setItem('Users', JSON.stringify(users));
-  sessionStorage.setItem('CurrentUser', JSON.stringify(userData));
+  sessionStorage.setItem('CurrentUser', name);
 
   return { activeUserName: name, isAuthenticated: true };
 }
@@ -56,7 +52,7 @@ export function handleLogin(data) {
  */
 
 function duplicateUserValidation(name) {
-  const users = JSON.parse(localStorage.getItem('Users')) || [];
+  const users = store.get('users') ?? [];
 
   if (users.some(({ name: id }) => id === name)) {
     return { text: 'User Already Exists', color: 'red' };
@@ -89,7 +85,7 @@ function passwordEqualityValidation(value) {
  */
 
 function passwordStrengthValidation(value) {
-  if (value.match(strongRegex)) {
+  if (!!value.match(strongRegex)) {
     return { text: 'Strength 100% 🙌', color: 'green' };
   } else return { text: 'Weak 😒', color: 'red' };
 }
@@ -101,7 +97,7 @@ function passwordStrengthValidation(value) {
  */
 
 function validateUserExists(name) {
-  const users = JSON.parse(localStorage.getItem('Users')) || [];
+  const users = store.get('users') ?? [];
 
   if (users.length > 0 && users.find(({ name: id }) => id === name)) {
     return { text: `Welcome back ${name}`, color: 'green' };
@@ -120,7 +116,7 @@ export function validateUserPasswordIntegrity(value) {
   const username = document.querySelector('input[name="name"]').value;
   const password = value;
 
-  const users = JSON.parse(localStorage.getItem('Users')) || [];
+  const users = store.get('users') ?? [];
 
   const userData = users.find(
     ({ name: dbUsername, password: dbPassword }) =>
@@ -144,15 +140,18 @@ export function validateUserPasswordIntegrity(value) {
 
 export function inputValidation(name, inputValue, isLoginForm) {
   if (!inputValue || inputValue === '' || inputValue.length < 2) return;
+
   switch (name) {
     case 'name':
       return isLoginForm
         ? validateUserExists(inputValue)
         : duplicateUserValidation(inputValue);
+
     case 'password':
       return !isLoginForm
         ? passwordStrengthValidation(inputValue)
         : validateUserPasswordIntegrity(inputValue);
+
     case 'confirmPassword':
       return !isLoginForm && passwordEqualityValidation(inputValue);
   }

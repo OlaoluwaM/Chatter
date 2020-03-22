@@ -1,4 +1,5 @@
 import React from 'react';
+import store from 'store';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
@@ -24,22 +25,12 @@ const LogoutPage = styled.div.attrs({
 `;
 
 export default function Logout({ setAuth }) {
-  const { user, isAuthenticated } = React.useContext(AuthContext);
-  const usersArray = JSON.parse(localStorage.getItem('Users'));
+  const { isAuthenticated } = React.useContext(AuthContext);
 
-  const updatedUsers = usersArray.map(obj => {
-    if (obj.id === user) {
-      obj.loggedIn = false;
-      return obj;
-    }
-    return obj;
-  });
-
-  localStorage.setItem('Users', JSON.stringify(updatedUsers));
   sessionStorage.removeItem('CurrentUser');
 
   setTimeout(() => {
-    setAuth({ user: '', color: '#7339ac', isAuthenticated: false });
+    setAuth({ activeUserName: null, isAuthenticated: false });
   }, 2000);
 
   return !isAuthenticated ? (

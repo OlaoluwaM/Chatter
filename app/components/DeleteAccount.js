@@ -1,4 +1,5 @@
 import React from 'react';
+import store from 'store';
 import styled from 'styled-components';
 import { spring } from '../utils/motionObj';
 import { Redirect } from 'react-router-dom';
@@ -35,25 +36,22 @@ const DeleteBtn = styled(motion.button)`
 
 export default function DeleteAccount({ setAuth }) {
   const [delBtnHasBeenClicked, setButtonClickState] = React.useState(false);
-  const { activeUserName: user, isAuthenticated } = React.useContext(
+  const { activeUserName: username, isAuthenticated } = React.useContext(
     AuthContext
   );
 
   React.useEffect(() => {
     if (delBtnHasBeenClicked) {
-      const users = JSON.parse(localStorage.getItem('Users'));
+      const users = store.get('users');
 
-      const currentUserIndex = users.findIndex(
-        ({ id, loggedIn }) => id === username && loggedIn === true
-      );
+      const currentUserIndex = users.findIndex(({ name }) => name === username);
 
       const updatedUsersArray = users.filter(
-        (o, ind) => ind !== currentUserIndex
+        (_, ind) => ind !== currentUserIndex
       );
 
-      localStorage.setItem('Users', JSON.stringify(updatedUsersArray));
+      store.set('users', updatedUsersArray);
       sessionStorage.removeItem('CurrentUser');
-      localStorage.removeItem(`${username}M`);
 
       setTimeout(() => {
         setAuth({ activeUserName: null, isAuthenticated: false });

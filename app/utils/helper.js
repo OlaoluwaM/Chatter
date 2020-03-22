@@ -156,3 +156,41 @@ export function isColor(str) {
   const regexp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'igm');
   return !!str.match(regexp);
 }
+
+export function documentVisibility() {
+  let visibilityChange;
+  if (typeof document.hidden !== undefined) {
+    visibilityChange = 'visibilitychange';
+  } else if (typeof document.msHidden !== undefined) {
+    visibilityChange = 'msvisibilitychange';
+  } else {
+    visibilityChange = 'webkitvisibilitychange';
+  }
+  return visibilityChange;
+}
+
+/**
+ *
+ * Converts specified number in minutes to milliseconds equivalent
+ * @param {number} num - number in minutes
+ */
+export const sessionTimeout = (num = 20) => num * 60000;
+
+export function unloadEventListener(e) {
+  const activeUserName = sessionStorage.getItem('CurrentUser');
+  e.preventDefault();
+  document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
+    8
+  )}; path=/`;
+  e.returnValue = 'Please logout before exiting the application';
+  return 'Please logout before exiting the application';
+}
+
+export function extractCurrentUserFromCookie() {
+  const cookie = document.cookie;
+  if (!cookie) return null;
+
+  const cookieArray = cookie.split('; ');
+  const currentUserPair = cookieArray[0].split('=');
+  return currentUserPair[1];
+}
