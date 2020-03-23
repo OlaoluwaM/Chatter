@@ -37,6 +37,7 @@ function App() {
   const memoizedVisibilityListener = React.useCallback(
     debounce(() => {
       alert('You will be logged out due to extended inactivity');
+      sessionStorage.removeItem('CurrentUser');
       setAuthed({ activeUserName: null, isAuthenticated: false });
     }, sessionTimeout()),
     []

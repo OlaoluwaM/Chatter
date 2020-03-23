@@ -93,11 +93,17 @@ export function chatManagerReducer(state, action) {
         messages: [],
       };
 
+    case 'Exit Chat':
+      return {
+        connected: true,
+      };
+
     case 'Error':
       return {
         ...state,
         error: action.error,
       };
+
     case 'Reset':
       return null;
 

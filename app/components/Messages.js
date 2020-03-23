@@ -16,7 +16,7 @@ const MessageAreaWrapper = styled.ul.attrs({
   overflow-y: auto;
   background: inherit;
   overflow-x: hidden;
-  flex-grow: 1;
+  flex-basis: 81%;
   padding-bottom: 12px;
 
   * {
@@ -71,7 +71,7 @@ const MessageContent = styled.div`
 
 const Username = styled.div`
   display: block;
-  color: ${({ theme }) => theme.main};
+  color: ${({ theme }) => hexToRgb(theme.black, 0.6)};
   font-size: 15px;
   padding-bottom: 5px;
   font-weight: 100;
@@ -162,11 +162,11 @@ export default function MessageArea(props) {
   return (
     <MessageAreaWrapper>
       <AnimatePresence>
-        {messages.map(({ messageId, sender, text }) => (
+        {messages.map(({ messageId, sender, text }, ind) => (
           <Message
             sender={sender}
             message={text}
-            key={messageId}
+            key={messageId + ind}
             exit={{ y: -20, opacity: 0 }}
           />
         ))}

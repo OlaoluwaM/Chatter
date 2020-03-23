@@ -178,12 +178,9 @@ export const sessionTimeout = (num = 20) => num * 60000;
 
 export function unloadEventListener(e) {
   const activeUserName = sessionStorage.getItem('CurrentUser');
-  e.preventDefault();
   document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
     8
   )};`;
-  e.returnValue = 'Please logout before exiting the application';
-  return 'Please logout before exiting the application';
 }
 
 export function extractCurrentUserFromCookie() {

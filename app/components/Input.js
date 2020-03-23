@@ -7,8 +7,7 @@ import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
 
 const InputContainer = styled(motion.form)`
   width: 91%;
-  flex-basis: 7vh;
-  height: 7vh;
+  flex-grow: 1;
   display: flex;
   justify-content: space-between;
   padding: 10px;

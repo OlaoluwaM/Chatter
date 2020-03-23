@@ -32,16 +32,27 @@ export default function ChatArea() {
     try {
       channelHandler.onMessageReceived = (channel, message) => {
         const messages = [extractNeededMessageData(message)];
-        if (chatManager !== null && chatManager.hasOwnProperty('userChannel')) {
+
+        if (chatManager?.hasOwnProperty('userChannel')) {
           dispatch({
             type: 'New message',
             messages,
           });
         } else {
-          dispatch({
-            type: 'New channel and message',
-            channel,
-            messages,
+          console.log('once');
+          const prevMessageListQuery = channel.createPreviousMessageListQuery();
+          prevMessageListQuery.limit = 50;
+          prevMessageListQuery.reverse = false;
+
+          prevMessageListQuery.load(function(prevMessages, error) {
+            if (error) throw new Error(error.message);
+            const ms = prevMessages.map(extractNeededMessageData);
+
+            dispatch({
+              type: 'New channel and message',
+              channel,
+              messages: [...ms, ...messages],
+            });
           });
         }
       };
@@ -78,7 +89,7 @@ export default function ChatArea() {
 
       groupChannel.sendUserMessage(message, '', '', (message, error) => {
         if (error) dispatch({ type: 'Error', error: error.message });
-
+        console.log(groupChannel);
         dispatch({
           type: 'New message',
           messages: [extractNeededMessageData(message)],

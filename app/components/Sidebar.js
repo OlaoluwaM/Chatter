@@ -193,7 +193,6 @@ function CurrentUser({ user }) {
       animate='visible'>
       <UserDisplay isCurrentUser={true} data={user}>
         <MdSettings style={{ cursor: 'pointer' }} />
-        <MdNotifications style={{ cursor: 'pointer' }} />
       </UserDisplay>
     </CurrentUserDisplay>
   );
