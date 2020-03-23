@@ -40,12 +40,12 @@ export const containerVariant = {
 export const itemVariant = {
   visible: {
     opacity: 1,
-    x: 0,
+    y: 0,
     transition: { ...spring2 },
   },
   hidden: {
     opacity: 0,
-    x: 110,
+    y: -70,
     transition: { ...tween },
   },
 };
@@ -55,12 +55,12 @@ export const itemVariant = {
 export const InputInfoVariant = {
   visible: {
     opacity: 1,
-    x: 0,
+    y: 0,
     transition: { ...spring2 },
   },
   hidden: {
     opacity: 0,
-    x: 50,
+    y: -10,
     transition: { ...spring2 },
   },
 };
@@ -91,13 +91,13 @@ export const regularTexVariant = {
 
 export const headerVariant = {
   visible: {
-    opacity: 1,
     y: 0,
-    transition: { ...spring },
+    opacity: 1,
+    transition: { ...spring, delay: 1.2 },
   },
   hidden: {
-    opacity: 0,
     y: -50,
+    opacity: 0,
   },
 };
 
@@ -159,6 +159,7 @@ export const navUlVariant = {
       when: 'beforeChildren',
       delayChildren: 0.5,
       staggerChildren: 0.1,
+      staggerDirection: -1,
     },
   },
   hidden: {

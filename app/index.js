@@ -37,14 +37,15 @@ function App() {
   const memoizedVisibilityListener = React.useCallback(
     debounce(() => {
       alert('You will be logged out due to extended inactivity');
+      // todo change this alert to a pop up
       sessionStorage.removeItem('CurrentUser');
       setAuthed({ activeUserName: null, isAuthenticated: false });
-    }, sessionTimeout()),
+    }, sessionTimeout(0.5)),
     []
   );
 
   React.useEffect(() => {
-    if (!document.cookie && !!sessionStorage.getItem('CurrentUser')) return;
+    if (!document.cookie || document.cookie.length < 4) return;
     sessionStorage.setItem('CurrentUser', extractCurrentUserFromCookie());
     document.cookie = `CurrentUserName= ; expires=${new Date(
       0

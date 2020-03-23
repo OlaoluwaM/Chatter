@@ -17,8 +17,6 @@ export function handleSignUp(data) {
   store.set('users', users);
   sessionStorage.setItem('CurrentUser', name);
 
-  // todo use storeJS expire plugin for user session functionality
-
   return { activeUserName: name, isAuthenticated: true };
 }
 

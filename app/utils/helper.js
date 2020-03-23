@@ -178,6 +178,7 @@ export const sessionTimeout = (num = 20) => num * 60000;
 
 export function unloadEventListener(e) {
   const activeUserName = sessionStorage.getItem('CurrentUser');
+  if (!activeUserName) return;
   document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
     8
   )};`;
@@ -190,4 +191,9 @@ export function extractCurrentUserFromCookie() {
   const cookieArray = cookie.split('; ');
   const currentUserPair = cookieArray[0].split('=');
   return currentUserPair[1];
+}
+
+export function colorMapping(colorName) {
+  const map = { red: '#ff0000', green: '#008000' };
+  return map[colorName];
 }

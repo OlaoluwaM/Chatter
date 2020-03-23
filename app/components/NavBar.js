@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
-import { Route, Link } from 'react-router-dom';
+import { Route, Link, useLocation } from 'react-router-dom';
 import { navUlVariant, navItemVariant } from '../utils/motionObj';
 
 const NavContainer = styled.nav`
@@ -61,9 +61,11 @@ function CustomLink({ to, exact, children, ...rest }) {
     />
   );
 }
+// TODO fix the look of the navbar when login and sign up links disappear
 
 export default function Nav() {
   const { isAuthenticated } = React.useContext(AuthContext);
+  const { pathname } = useLocation();
 
   if (isAuthenticated) {
     return (
@@ -112,35 +114,47 @@ export default function Nav() {
             Home
           </CustomLink>
 
-          <CustomLink
-            motionProps={{
-              variants: navItemVariant,
-              whileHover: 'hover',
-            }}
-            to={{
-              pathname: '/authenticate',
-              state: {
-                formType: 'login',
-              },
-            }}
-            exact={true}>
-            Login
-          </CustomLink>
+          <AnimatePresence>
+            {pathname !== '/authenticate' && (
+              <>
+                <CustomLink
+                  key='login'
+                  motionProps={{
+                    exit: { opacity: 0 },
+                    variants: navItemVariant,
+                    whileHover: 'hover',
+                    positionTransition: true,
+                  }}
+                  to={{
+                    pathname: '/authenticate',
+                    state: {
+                      formType: 'login',
+                    },
+                  }}
+                  exact={true}>
+                  Login
+                </CustomLink>
 
-          <CustomLink
-            motionProps={{
-              variants: navItemVariant,
-              whileHover: 'hover',
-            }}
-            exact={true}
-            to={{
-              pathname: '/authenticate',
-              state: {
-                formType: 'sign-up',
-              },
-            }}>
-            Sign Up
-          </CustomLink>
+                <CustomLink
+                  key='sign-up'
+                  motionProps={{
+                    variants: navItemVariant,
+                    whileHover: 'hover',
+                    positionTransition: true,
+                    exit: { opacity: 0 },
+                  }}
+                  exact={true}
+                  to={{
+                    pathname: '/authenticate',
+                    state: {
+                      formType: 'sign-up',
+                    },
+                  }}>
+                  Sign Up
+                </CustomLink>
+              </>
+            )}
+          </AnimatePresence>
         </NavUl>
       </NavContainer>
     );

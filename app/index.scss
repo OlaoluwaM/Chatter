@@ -86,17 +86,3 @@ li.active {
 .burger .burger-lines:before {
   background-color: $sub;
 }
-
-.pulse {
-  box-shadow: 0 0 0 0 $dark-sub;
-  animation: pulse 1.5s infinite backwards;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0px lighten($sub, 40%);
-  }
-  70% {
-    box-shadow: 0 0 0 15px lighten($sub, 40%);
-  }
-}

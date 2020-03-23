@@ -44,7 +44,7 @@ export default function Auth({ location, setAuth }) {
       <SwitchText
         initial={{ opacity: 0, y: 90 }}
         animate={{ opacity: 1, y: -10 }}
-        transition={{ ...spring, delay: 1.9 }}
+        transition={{ ...spring, delay: 1.3 }}
         layoutTransition={spring2}
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>
         {state === 'login' ? ' Create an account' : ' Log into your account'}

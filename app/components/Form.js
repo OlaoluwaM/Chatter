@@ -10,16 +10,18 @@ import { FormTitle, InputField, SubmitButton } from './Form-Components';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 
 const FormContainer = styled(motion.form)`
-  display: grid;
+  display: flex;
   background: inherit;
   width: 45%;
-  padding: 2%;
-  height: ${({ length }) => (length === 4 ? '58%' : '70%')};
-  grid-template-rows: ${({ length }) => `repeat(${length - 2}, 1fr)`} auto 1fr;
-  gap: 14px;
+  padding: 1%;
+  height: 51%;
+  justify-content: space-evenly;
+  flex-direction: column;
   background: transparent;
-  margin-top: -10px;
-  overflow: hidden;
+  margin-top: 22px;
+  position: relative;
+  padding-top: 0;
+  padding-bottom: 0;
 `;
 
 export default function Form({ setAuth, formType }) {
@@ -57,12 +59,11 @@ export default function Form({ setAuth, formType }) {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 1.2 }}
-          layoutTransition={spring}>
+          positionTransition={true}>
           {formType === 'login' ? 'Sign In' : 'Sign Up'}
         </FormTitle>
 
         <FormContainer
-          length={formType === 'login' ? 4 : 5}
           variants={containerVariant}
           ref={formRef}
           onSubmit={handleSubmit}
@@ -74,7 +75,7 @@ export default function Form({ setAuth, formType }) {
               key='name-field'
               motionProps={{
                 variants: itemVariant,
-                layoutTransition: spring,
+                positionTransition: true,
                 exit: 'hidden',
               }}
               name='name'
@@ -86,7 +87,7 @@ export default function Form({ setAuth, formType }) {
               key='password-field'
               motionProps={{
                 variants: itemVariant,
-                layoutTransition: spring,
+                positionTransition: true,
                 exit: 'hidden',
               }}
               formState={{ formType, setInputFieldError }}
@@ -100,7 +101,7 @@ export default function Form({ setAuth, formType }) {
                 key='confirmPassword-field'
                 motionProps={{
                   variants: itemVariant,
-                  layoutTransition: spring,
+                  positionTransition: true,
                   exit: 'hidden',
                 }}
                 formState={{ formType, setInputFieldError }}
@@ -116,7 +117,7 @@ export default function Form({ setAuth, formType }) {
               type='submit'
               name='btn'
               variants={itemVariant}
-              layoutTransition={spring}
+              positionTransition={true}
               disabled={inputFieldError}
               value={formType === 'login' ? 'Login' : 'Sign Up'}
             />

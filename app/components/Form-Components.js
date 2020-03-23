@@ -1,21 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { debounce, hexToRgb } from '../utils/helper';
+import PropTypes from 'prop-types';
 import { inputValidation } from '../utils/authFunc';
 import { InputInfoVariant } from '../utils/motionObj';
 import { motion, AnimatePresence } from 'framer-motion';
+import { debounce, hexToRgb, colorMapping } from '../utils/helper';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
   color: ${({ theme }) => theme.sub};
   text-align: left;
-  padding-left: 12px;
+  padding-left: 1.4%;
   font-family: var(--font2);
-  font-size: 5rem;
+  font-size: 4rem;
+  width: 45%;
   letter-spacing: 0.2rem;
   font-weight: 800;
-  margin-top: -30px;
+  margin-top: -60px;
 `;
 
 export const Bar = styled.span`
@@ -52,8 +53,7 @@ export const InputLabel = styled.label`
   font-family: var(--font1);
   pointer-events: none;
   left: 2%;
-  top: 50%;
-  transform: translateY(-60%);
+  top: 20px;
   transition: 0.2s ease all;
 `;
 
@@ -63,9 +63,9 @@ const Input = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  text-indent: 2%;
+  padding-left: 2.2%;
   font-family: var(--font1);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 100;
 
   &:not([type='button']) {
@@ -79,17 +79,17 @@ export const InputContainer = styled(motion.div)`
   margin-bottom: 0px;
   position: relative;
   display: flex;
+  width: 97%;
+  flex-basis: 27%;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-
-  &:not(:last-of-type) {
-    justify-content: center;
-  }
+  justify-content: center;
+  padding-bottom: 20px;
+  overflow: hidden;
 
   &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: 9%;
-    font-size: 17px;
+    top: -2%;
+    font-size: 15px;
     color: ${({ theme }) => theme.sub};
   }
 
@@ -102,16 +102,17 @@ export const SubmitButton = styled(motion.input).attrs({
   className: 'button',
 })`
   border-radius: 50px;
-  background: ${({ theme }) => theme.sub};
   border: none;
   margin-bottom: 0px;
   margin-top: 10px;
-  color: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.main};
+  box-shadow: 20px 20px 60px #cfcfcf, -20px -20px 60px #ffffff;
+  color: ${({ theme }) => theme.sub};
   font-family: var(--font1);
   font-size: 1.3rem;
   font-weight: 500;
   letter-spacing: 0.1rem;
-  place-self: flex-end center;
+  align-self: center;
   text-transform: lowercase;
 
   &:disabled {
@@ -121,15 +122,17 @@ export const SubmitButton = styled(motion.input).attrs({
 
 const MotionInputInfo = styled(motion.p)`
   margin: 0;
-  color: ${({ error }) => error.color};
   font-family: var(--font2);
-  font-size: 0.89rem;
+  font-size: 0.9rem;
   font-weight: 300;
   text-align: left;
-  width: 100%;
+  width: 98%;
+  padding-left: 0.5%;
+  left: 2%;
   position: absolute;
-  bottom: 0px;
-  padding-left: 2%;
+  color: ${({ error }) => error.color};
+  background: ${({ error }) => hexToRgb(colorMapping(error.color), 0.2)};
+  bottom: 24px;
 `;
 
 export function InputInfo({ error, motionProps }) {

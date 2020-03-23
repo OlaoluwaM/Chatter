@@ -71,7 +71,9 @@ export default function Home() {
   return (
     <HomePage>
       <motion.div>
-        <h1>Welcome to Chatter</h1>
+        <motion.h1 variants={headerVariant} initial='hidden' animate='visible'>
+          Welcome to Chatter
+        </motion.h1>
 
         <Link to={isAuthenticated ? '/chat' : '/authenticate'}>
           <ChatButton
