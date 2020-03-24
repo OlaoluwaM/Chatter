@@ -12,9 +12,9 @@ import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 const FormContainer = styled(motion.form)`
   display: flex;
   background: inherit;
-  width: 45%;
+  width: 55%;
   padding: 1%;
-  height: 51%;
+  height: 52%;
   justify-content: space-evenly;
   flex-direction: column;
   background: transparent;
@@ -22,6 +22,10 @@ const FormContainer = styled(motion.form)`
   position: relative;
   padding-top: 0;
   padding-bottom: 0;
+
+  @media screen and (max-width: 870px) {
+    width: 80%;
+  }
 `;
 
 export default function Form({ setAuth, formType }) {

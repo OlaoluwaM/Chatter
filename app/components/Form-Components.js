@@ -10,13 +10,17 @@ export const FormTitle = styled(motion.h1)`
   margin: 0;
   color: ${({ theme }) => theme.sub};
   text-align: left;
-  padding-left: 1.4%;
+  padding-left: 1.6%;
   font-family: var(--font2);
   font-size: 4rem;
-  width: 45%;
+  width: 55%;
   letter-spacing: 0.2rem;
   font-weight: 800;
   margin-top: -60px;
+
+  @media screen and (max-width: 870px) {
+    width: 80%;
+  }
 `;
 
 export const Bar = styled.span`
@@ -47,13 +51,13 @@ export const Bar = styled.span`
 
 export const InputLabel = styled.label`
   color: ${({ theme }) => hexToRgb(theme.sub, 0.4)};
-  font-size: 1rem;
+  font-size: 1em;
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
   pointer-events: none;
-  left: 2%;
-  top: 20px;
+  left: 2.1%;
+  top: 31%;
   transition: 0.2s ease all;
 `;
 
@@ -63,13 +67,12 @@ const Input = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  padding-left: 2.2%;
+  padding-left: 2.1%;
   font-family: var(--font1);
-  font-size: 1.2rem;
+  font-size: 1.2em;
   font-weight: 100;
 
   &:not([type='button']) {
-    top: 0;
     flex-basis: 30%;
   }
 `;
@@ -88,8 +91,7 @@ export const InputContainer = styled(motion.div)`
   overflow: hidden;
 
   &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: -2%;
-    font-size: 15px;
+    top: 4%;
     color: ${({ theme }) => theme.sub};
   }
 
@@ -102,6 +104,7 @@ export const SubmitButton = styled(motion.input).attrs({
   className: 'button',
 })`
   border-radius: 50px;
+  width: 50%;
   border: none;
   margin-bottom: 0px;
   margin-top: 10px;
@@ -109,30 +112,31 @@ export const SubmitButton = styled(motion.input).attrs({
   box-shadow: 20px 20px 60px #cfcfcf, -20px -20px 60px #ffffff;
   color: ${({ theme }) => theme.sub};
   font-family: var(--font1);
-  font-size: 1.3rem;
+  font-size: 1.3em;
   font-weight: 500;
   letter-spacing: 0.1rem;
   align-self: center;
   text-transform: lowercase;
 
   &:disabled {
-    background: ${({ theme }) => hexToRgb(theme.sub, 0.3)};
+    color: ${({ theme }) => hexToRgb(theme.black, 0.5)};
+    filter: opacity(0.5);
   }
 `;
 
 const MotionInputInfo = styled(motion.p)`
   margin: 0;
   font-family: var(--font2);
-  font-size: 0.9rem;
+  font-size: 0.9em;
   font-weight: 300;
   text-align: left;
-  width: 98%;
+  width: 100%;
   padding-left: 0.5%;
-  left: 2%;
+  left: 1.9%;
   position: absolute;
   color: ${({ error }) => error.color};
   background: ${({ error }) => hexToRgb(colorMapping(error.color), 0.2)};
-  bottom: 24px;
+  top: 53%;
 `;
 
 export function InputInfo({ error, motionProps }) {

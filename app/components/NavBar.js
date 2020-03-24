@@ -6,12 +6,13 @@ import { AuthContext } from '../context/Context';
 import { Route, Link, useLocation } from 'react-router-dom';
 import { navUlVariant, navItemVariant } from '../utils/motionObj';
 
+// FIX Navbar responsiveness
+
 const NavContainer = styled.nav`
   position: relative;
   width: 100%;
   height: 7%;
   overflow: hidden;
-  display: grid;
   background: ${({ theme }) => theme.main};
 `;
 
@@ -19,7 +20,7 @@ const NavUl = styled(motion.ul)`
   width: auto;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 180px));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   grid-auto-flow: column;
   gap: 10px;
   justify-content: end;
@@ -31,7 +32,7 @@ const NavItem = styled(motion.li)`
   list-style-type: none;
   font-family: var(--font1);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   height: 100%;
   display: flex;
   text-align: center;
@@ -39,6 +40,13 @@ const NavItem = styled(motion.li)`
   justify-content: center;
   color: ${({ theme }) => hexToRgb(theme.black, 0.5)};
   letter-spacing: 0.1rem;
+
+  &:last-of-type {
+    grid-column: -3;
+  }
+  &:nth-of-type(2) {
+    grid-column: -2;
+  }
 
   a {
     color: inherit;

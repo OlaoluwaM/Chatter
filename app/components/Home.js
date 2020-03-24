@@ -16,7 +16,7 @@ const HomePage = styled.div.attrs({
     position: absolute;
   }
 
-  & > div:first-of-type {
+  & > div {
     z-index: 10;
     position: absolute;
     top: 50%;
@@ -25,21 +25,31 @@ const HomePage = styled.div.attrs({
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    width: 70%;
-    height: 27%;
+    justify-content: space-around;
+    width: 100%;
+    height: 32%;
     background: transparent;
     color: ${({ theme }) => theme.sub};
+    font-size: 1rem;
 
     h1 {
       text-align: center;
-      font-size: 5rem;
+      font-size: 4.2em;
+      padding: 10px;
       font-family: var(--font1);
       font-weight: lighter;
       margin-bottom: 0;
       margin-top: 0px;
       letter-spacing: 0.1rem;
       word-spacing: 0.2rem;
+    }
+
+    a {
+      font-size: 1.2rem;
+      width: 100%;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
     }
   }
 `;
@@ -50,12 +60,11 @@ const ChatButton = styled(motion.button).attrs({
   color: ${({ theme }) => theme.sub};
   font-family: var(--font1);
   font-weight: 100;
-  font-size: 1.3rem;
-  text-transform: uppercase;
-  fill: ${({ theme }) => theme.sub};
-  border-radius: 50px;
-
+  width: 250px;
+  max-width: 43%;
   border: none;
+  padding: 1.4rem 1.2rem;
+  fill: ${({ theme }) => theme.sub};
   background: ${({ theme }) => theme.main};
 
   & > svg {

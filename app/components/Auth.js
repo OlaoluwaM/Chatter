@@ -1,7 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import Form from './Form';
+import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { hexToRgb } from '../utils/helper';
 import { spring, spring2 } from '../utils/motionObj';
 
 const AuthPage = styled.div.attrs({
@@ -17,17 +18,20 @@ const AuthPage = styled.div.attrs({
 `;
 
 const SwitchText = styled(motion.p)`
-  color: ${({ theme }) => theme.sub};
-  text-transform: uppercase;
+  color: ${({ theme }) => hexToRgb(theme.sub, 0.3)};
+  text-transform: capitalize;
   font-family: var(--font1);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  letter-spacing: 0.2rem;
-  word-spacing: 0.2rem;
   font-weight: bolder;
   position: fixed;
   bottom: 12px;
   margin-bottom: 5px;
+  transition: color 0.3s;
+
+  &:hover {
+    color: ${({ theme }) => hexToRgb(theme.sub, 1)};
+  }
 `;
 
 export default function Auth({ location, setAuth }) {
@@ -45,7 +49,7 @@ export default function Auth({ location, setAuth }) {
         initial={{ opacity: 0, y: 90 }}
         animate={{ opacity: 1, y: -10 }}
         transition={{ ...spring, delay: 1.3 }}
-        layoutTransition={spring2}
+        layoutTransition={{ type: 'tween' }}
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>
         {state === 'login' ? ' Create an account' : ' Log into your account'}
       </SwitchText>
