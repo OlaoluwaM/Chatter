@@ -40,7 +40,7 @@ function App() {
       // todo change this alert to a pop up
       sessionStorage.removeItem('CurrentUser');
       setAuthed({ activeUserName: null, isAuthenticated: false });
-    }, sessionTimeout(0.5)),
+    }, sessionTimeout()),
     []
   );
 
