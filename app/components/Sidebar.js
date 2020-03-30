@@ -1,189 +1,85 @@
 import React from 'react';
-import { FiPlus } from 'react-icons/fi';
-import { hexToRgb } from '../utils/helper';
+import Menu from './Menu';
+import styled from 'styled-components';
+import { MenuItem } from './User';
 import { UserDisplay } from './DataDisplay';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AuthContext, ChatContext } from '../context/Context';
-import { handleUnBlock, handleBlock } from '../utils/chatFunctions';
-import { default as styled, css, ThemeContext } from 'styled-components';
-import { MdSettings, MdSearch, MdNotifications, MdBlock } from 'react-icons/md';
-import {
-  useUserFilter,
-  useFriendList,
-  useBlockedUsers,
-} from '../custom-hooks/chatHooks';
-import {
-  menuItemVariant,
-  simpleVariant,
-  currentUserDisplayVariants,
-} from '../utils/motionObj';
+import { ChatContext } from '../context/Context';
+import { FiMoreVertical } from 'react-icons/fi';
+import { currentUserDisplayVariants } from '../utils/motionObj';
+import { hexToRgb, lightenDarkenColor } from '../utils/helper';
 
 const SidebarContainer = styled.nav`
   position: relative;
   height: 100%;
   flex-basis: 30%;
   width: 100%;
-  color: ${({ theme }) => theme.sub};
-`;
-
-const MenuContainer = styled(motion.menu)`
-  height: 66%;
-  width: 100%;
-  position: absolute;
-  overflow-y: auto;
-  z-index: 3;
-  padding: 10px;
-  margin: 0;
-  overflow-x: hidden;
-  padding-top: 0px;
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => hexToRgb(theme.black, 0.4)};
-  }
-`;
-
-const AlertText = styled(motion.p).attrs({
-  variants: simpleVariant,
-  initial: 'hide',
-  animate: 'show',
-  exit: 'hide',
-})`
-  color: ${({ theme }) => theme.darkSub};
-  padding-left: 27px;
-  margin-bottom: 0;
-  position: absolute;
-  top: 0;
-`;
-
-const MenuItem = styled(motion.div).attrs({
-  variants: menuItemVariant,
-  positionTransition: true,
-  initial: 'hidden',
-  animate: 'visible',
-  exit: 'hidden',
-})`
-  width: 95%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  background: ${({ theme }) => theme.main};
-  color: ${({ theme }) => theme.sub};
-  justify-self: center;
-  align-self: center;
-  cursor: pointer;
-  height: auto;
-
-  ${({ status }) =>
-    status === 'offline' &&
-    css`
-      filter: opacity(0.4) brightness(0.4);
-    `}
-
-  &.user {
-    position: absolute;
-    top: ${({ position }) => `calc(88px * ${position})`};
-
-    svg {
-      transition: background 0.4s ease;
-    }
-  }
+  background: ${({ theme }) =>
+    lightenDarkenColor(theme.secondaryColorDark, -20)};
 `;
 
 export const CurrentUserDisplay = styled(MenuItem).attrs({
   variants: currentUserDisplayVariants,
   exit: 'hidden',
 })`
-  width: 96%;
+  width: 100%;
   height: auto;
-  background: ${({ theme }) => theme.main};
-  color: ${({ theme }) => theme.sub};
-  margin: 7px;
+  margin: 0px;
   cursor: default;
+  border-radius: 0;
+  color: ${({ theme }) => theme.primaryColor};
 `;
 
 const SideBarCategory = styled.ul`
   width: 100%;
+  height: 7%;
   margin: 0;
-  margin-top: 60px;
-  margin-bottom: 3px;
+  margin-top: 8px;
+  margin-bottom: 30px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-around;
   align-items: center;
-  font-size: 0.8rem;
   list-style: none;
-  padding: 10px;
+  padding: 0;
   font-family: var(--font1);
   font-weight: 600;
   text-transform: capitalize;
-  color: ${({ theme }) => hexToRgb(theme.black, 0.4)};
 
   li {
+    color: ${({ theme }) => hexToRgb(theme.primaryColor, 0.3)};
+    font-size: 0.9em;
     transition: 0.3s ease;
     cursor: pointer;
-    margin-left: 28px;
-    &:not(:first-of-type) {
-      margin-left: 40px;
-    }
-  }
-`;
-
-const SearchBarForm = styled(motion.form)`
-  width: 100%;
-  display: flex;
-  padding: 10px;
-  padding-top: 0;
-  justify-content: space-around;
-  align-items: center;
-  margin-bottom: 12px;
-
-  & > input {
-    border: none;
-    border-bottom: 1.5px double ${({ theme }) => hexToRgb(theme.black, 0.4)};
-    flex-basis: 75%;
-    outline: transparent;
-    background: transparent;
-    text-indent: 12px;
-    transition: 0.5s ease;
-    font-family: var(--font2);
-    font-size: 1.1rem;
-    font-weight: 100;
-    border-radius: 2px;
-    padding: 3px;
-
-    &:focus {
-      border-color: ${({ theme }) => theme.darkSub};
-    }
-  }
-
-  & > div {
-    background: ${({ theme }) => theme.main};
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.4rem;
-    transform: scaleX(-1);
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
+    transition: color 0.3s ease;
+    background: transparent;
+    position: relative;
 
-    svg {
-      stroke-width: 1.1px;
-      stroke: ${({ theme }) => theme.sub};
-      fill: ${({ theme }) => theme.sub};
+    &:after {
+      content: '';
+      position: absolute;
+      width: 70%;
+      height: 6%;
+      border-radius: 10px;
+      bottom: 0;
+      transform-origin: center;
+      transform: scaleX(0);
+      background: ${({ theme }) => theme.secondaryColor};
+      transition: transform 0.3s ease;
+    }
+
+    &.active {
+      color: ${({ theme }) => theme.primaryColor};
+
+      &:after {
+        transform: scaleX(1);
+      }
     }
   }
 `;
-const InitialSvgStyle = color => ({
-  stroke: color,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 0,
-  rotate: 0,
-  y: 0,
-});
 
 function CurrentUser({ user }) {
   return (
@@ -192,239 +88,9 @@ function CurrentUser({ user }) {
       initial='hidden'
       animate='visible'>
       <UserDisplay isCurrentUser={true} data={user}>
-        <MdSettings style={{ cursor: 'pointer' }} />
+        <FiMoreVertical style={{ cursor: 'pointer' }} />
       </UserDisplay>
     </CurrentUserDisplay>
-  );
-}
-
-function SearchUser({ category, searchForUser, motionProps }) {
-  const [input, setInput] = React.useState('');
-
-  React.useEffect(() => {
-    setInput('');
-  }, [category]);
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    searchForUser(input);
-  };
-
-  const handleInputChange = e => {
-    if (e.target.value === '') {
-      searchForUser('');
-    }
-    setInput(e.target.value);
-  };
-
-  return (
-    <SearchBarForm {...motionProps} onSubmit={handleSubmit}>
-      <input onChange={handleInputChange} value={input} />
-      <div onClick={() => searchForUser(input)}>
-        <MdSearch />
-      </div>
-    </SearchBarForm>
-  );
-}
-
-function AvailableUser(props) {
-  const { activeUserName: currentUserName } = React.useContext(AuthContext);
-  const { sb, dispatch } = React.useContext(ChatContext);
-  const { sub } = React.useContext(ThemeContext);
-
-  const { userData, ind, funcs, friends, blocked } = props;
-  const { blockedUsersList, setBlockMessage } = blocked;
-  const { beFriend, unFriend, inviteUser } = funcs;
-
-  const [isBlocked, setBlocked] = React.useState(() =>
-    blockedUsersList.map(obj => obj.userId).includes(userData.userId)
-  );
-
-  const [isFriend, setIsFriend] = React.useState(() =>
-    friends.includes(userData.userId)
-  );
-
-  const blockUser = targetUser => {
-    try {
-      const message = isBlocked
-        ? handleUnBlock(targetUser, sb)
-        : handleBlock(targetUser, sb);
-
-      setBlockMessage(message);
-      setBlocked(isBlocked ? false : true);
-    } catch (error) {
-      console.error(error);
-      dispatch({ type: 'Error', error });
-    }
-  };
-
-  const handleInvite = (e, userData, blocked) => {
-    if (blocked) return;
-    const actionArea = e.currentTarget.querySelector('.action-area');
-    if (!actionArea.contains(e.target)) {
-      inviteUser([currentUserName, userData.userId]);
-    } else return;
-  };
-
-  const handleFriend = () => {
-    if (isFriend) {
-      setIsFriend(false);
-      unFriend(userData, true);
-    } else {
-      setIsFriend(true);
-      beFriend(userData);
-    }
-  };
-
-  return (
-    <MenuItem
-      custom={ind}
-      position={ind}
-      status={userData.connectionStatus}
-      className='user'
-      onClick={e => handleInvite(e, userData, isBlocked)}>
-      <UserDisplay
-        data={userData}
-        subData={isBlocked ? 'Blocked' : userData.connectionStatus}>
-        {!isBlocked && (
-          <motion.div
-            style={InitialSvgStyle(sub)}
-            animate={
-              isFriend
-                ? {
-                    ...InitialSvgStyle(sub),
-                    y: 2,
-                    rotate: 45,
-                    stroke: 'rgba(245, 10, 10, .7)',
-                  }
-                : InitialSvgStyle(sub)
-            }
-            onTap={handleFriend}>
-            <FiPlus style={{ stroke: 'inherit' }} />
-          </motion.div>
-        )}
-
-        {!isFriend && (
-          <MdBlock
-            style={{ fill: isBlocked ? 'red' : sub }}
-            onClick={() => blockUser(userData)}
-          />
-        )}
-      </UserDisplay>
-    </MenuItem>
-  );
-}
-
-function Menu({ category, inviteUser }) {
-  const { sb, dispatch } = React.useContext(ChatContext);
-
-  const [userList, setFilter] = useUserFilter(sb, dispatch);
-  const [friendList, friendNames, setFriendNames] = useFriendList(dispatch);
-  const [blockedUsersList, setBlockMessage] = useBlockedUsers(
-    category,
-    dispatch
-  );
-
-  const [items, setItems] = React.useState(null);
-
-  React.useEffect(() => {
-    switch (category) {
-      case 'users':
-        setItems(userList);
-        break;
-
-      case 'friends':
-        setItems(friendList.length > 0 ? friendList : 'No one yet');
-        break;
-
-      case 'blocked':
-        setItems(blockedUsersList.length > 0 ? blockedUsersList : 'No one yet');
-        break;
-    }
-
-    return () => {
-      setItems(null);
-    };
-  }, [category, userList]);
-
-  const searchForUser = input => {
-    if (category !== 'friends') {
-      setFilter(input);
-    } else {
-      if (input === '') {
-        setItems(friendList.length > 0 ? friendList : 'No one yet');
-      } else {
-        setItems(
-          friendList.filter(
-            ({ userId }) => userId.includes(input) || input === userId
-          )
-        );
-      }
-    }
-  };
-
-  const { success, empty } = {
-    success: Array.isArray(items) && items.length > 0,
-    empty: Array.isArray(items) && items.length === 0,
-  };
-
-  const funcs = {
-    beFriend(friend) {
-      setFriendNames(arr => [...arr, friend.userId]);
-    },
-    unFriend(friend) {
-      const { userId: friendName } = friend;
-      setFriendNames(arr => arr.filter(Id => Id !== friendName));
-    },
-    inviteUser,
-  };
-
-  return (
-    <>
-      <AnimatePresence>
-        {category !== 'blocked' && (
-          <SearchUser
-            key='input'
-            motionProps={{
-              positionTransition: true,
-              initial: { opacity: 0 },
-              animate: { opacity: 1, transition: { delay: 0.7 } },
-              exit: { opacity: 0, transition: { delay: 0.7 } },
-            }}
-            category={category}
-            searchForUser={searchForUser}
-          />
-        )}
-
-        <MenuContainer
-          key='container'
-          exit={{ opacity: 0 }}
-          layoutTransition={true}>
-          {typeof items === 'string' && (
-            <AlertText key='custom-m'>{items}</AlertText>
-          )}
-
-          <AnimatePresence key='items'>
-            {success &&
-              items.map((data, ind) => {
-                const { userId } = data;
-                return (
-                  <AvailableUser
-                    key={userId}
-                    funcs={funcs}
-                    ind={ind}
-                    userData={data}
-                    friends={friendNames}
-                    blocked={{ blockedUsersList, setBlockMessage }}
-                  />
-                );
-              })}
-          </AnimatePresence>
-
-          {empty && <AlertText key='error-m'>User does not exist</AlertText>}
-        </MenuContainer>
-      </AnimatePresence>
-    </>
   );
 }
 

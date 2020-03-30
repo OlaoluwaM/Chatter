@@ -22,13 +22,13 @@ export const strongRegex = new RegExp(
 //   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
 // );
 
-export const debounce = (func, ms = 0) => {
+export function debounce(func, ms = 0) {
   let timeoutId;
   return function(...args) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(this, args), ms);
   };
-};
+}
 
 export function getContrast(hexcolor) {
   if (hexcolor.slice(0, 1) === '#') {
@@ -138,7 +138,7 @@ export function formatTimeString(timeString) {
   if (cYear !== year) return prettyDateFormat(dateArr, false);
 
   if (cMonth === month) {
-    const diff = Number(cDay) - Number(day);
+    const diff = parseInt(cDay) - parseInt(day);
 
     if (diff === 0) {
       return `Last seen today at ${time}, ${timeOfDay}`;
@@ -196,4 +196,51 @@ export function extractCurrentUserFromCookie() {
 export function colorMapping(colorName) {
   const map = { red: '#ff0000', green: '#008000' };
   return map[colorName];
+}
+
+export function removeHashTag(hex) {
+  return hex.replace('#', '');
+}
+
+/**
+ *
+ * @param {string} colorCode - color code in hex format
+ * @param {number} amt - positive integer to lighten; negative integer to darken
+ */
+
+export function lightenDarkenColor(colorCode, amt) {
+  let usePound = false;
+
+  if (colorCode[0] == '#') {
+    colorCode = colorCode.slice(1);
+    usePound = true;
+  }
+
+  let R = parseInt(colorCode.substring(0, 2), 16);
+  let G = parseInt(colorCode.substring(2, 4), 16);
+  let B = parseInt(colorCode.substring(4, 6), 16);
+
+  R = R + amt;
+  G = G + amt;
+  B = B + amt;
+
+  if (R > 255) R = 255;
+  else if (R < 0) R = 0;
+
+  if (G > 255) G = 255;
+  else if (G < 0) G = 0;
+
+  if (B > 255) B = 255;
+  else if (B < 0) B = 0;
+
+  var RR = R.toString(16).length == 1 ? '0' + R.toString(16) : R.toString(16);
+  var GG = G.toString(16).length == 1 ? '0' + G.toString(16) : G.toString(16);
+  var BB = B.toString(16).length == 1 ? '0' + B.toString(16) : B.toString(16);
+
+  return (usePound ? '#' : '') + RR + GG + BB;
+}
+
+export function generateRandomColor() {
+  const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+  return randomColor;
 }

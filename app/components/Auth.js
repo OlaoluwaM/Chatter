@@ -11,17 +11,19 @@ const AuthPage = styled.div.attrs({
   position: relative;
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
   align-items: center;
   justify-content: center;
   overflow: hidden;
 `;
 
 const SwitchText = styled(motion.p)`
-  color: ${({ theme }) => hexToRgb(theme.sub, 0.3)};
+  color: ${({ theme }) => hexToRgb(theme.secondaryColor, 0.3)};
   text-transform: capitalize;
   font-family: var(--font1);
   font-size: 1.1rem;
+  letter-spacing: 0.1rem;
+  word-spacing: 0.1rem;
   cursor: pointer;
   font-weight: bolder;
   position: fixed;
@@ -30,7 +32,7 @@ const SwitchText = styled(motion.p)`
   transition: color 0.3s;
 
   &:hover {
-    color: ${({ theme }) => hexToRgb(theme.sub, 1)};
+    color: ${({ theme }) => hexToRgb(theme.secondaryColor, 1)};
   }
 `;
 

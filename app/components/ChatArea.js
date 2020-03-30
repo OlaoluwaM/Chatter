@@ -4,12 +4,13 @@ import styled from 'styled-components';
 import MessageArea from './Messages';
 import DefaultDisplay from './DefaultDisplay';
 import ChatOverHead from './ChatOverhead';
-import { randomID } from '../utils/helper';
 import { ChatContext } from '../context/Context';
 import { extractNeededMessageData } from '../utils/chatFunctions';
+import { randomID, lightenDarkenColor } from '../utils/helper';
 
 const ChatAreaWrapper = styled.div`
-  background: ${({ theme }) => theme.darkMain};
+  background: ${({ theme }) =>
+    lightenDarkenColor(theme.secondaryColorDark, -15)};
   height: 100%;
   flex-grow: 1;
   overflow: hidden;
@@ -104,7 +105,7 @@ export default function ChatArea() {
         <DefaultDisplay text='Select a user or a channel to start chatting' />
       )}
 
-      {chatManager.userChannel && (
+      {chatManager.userChannel && chatManager.invitee && (
         <>
           <ChatOverHead />
           <MessageArea messages={chatManager.messages || []} />

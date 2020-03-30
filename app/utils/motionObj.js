@@ -56,12 +56,11 @@ export const InputInfoVariant = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { ...spring2 },
   },
   hidden: {
     opacity: 0,
     y: -10,
-    transition: { ...spring2 },
+    transition: { ...spring },
   },
 };
 
@@ -182,7 +181,7 @@ export const navItemVariant = {
     x: 20,
   },
   hover: {
-    color: themeObj.darkSub,
+    color: themeObj.secondaryColorDark,
     transition: { type: 'tween', ease: 'linear' },
   },
 };
@@ -206,22 +205,22 @@ export const menuItemVariant = {
     opacity: 1,
     x: 0,
     transition: {
-      ...spring2,
+      ...spring,
       delay: i * 0.1,
     },
   }),
   hidden: i => ({
     opacity: 0,
-    x: -80,
+    x: -40,
     transition: {
-      ...spring2,
-      delay: 0.1 * i,
+      ...spring,
+      delay: 0.03 * i,
     },
   }),
 };
 
 export const currentUserDisplayVariants = {
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' } },
+  visible: { opacity: 1, y: 0 },
   hidden: { opacity: 0, y: -50 },
 };
 

@@ -8,12 +8,12 @@ import { debounce, hexToRgb, colorMapping } from '../utils/helper';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   text-align: left;
   padding-left: 1.6%;
   font-family: var(--font2);
   font-size: 4rem;
-  width: 55%;
+  width: 50%;
   letter-spacing: 0.2rem;
   font-weight: 800;
   margin-top: -60px;
@@ -32,7 +32,8 @@ export const Bar = styled.span`
   flex-basis: 4px;
   border-radius: 50px;
   transition: 0.5s ease-out;
-  background: ${({ theme, error }) => error?.color ?? hexToRgb(theme.sub, 0.2)};
+  background: ${({ theme, error }) =>
+    error?.color ?? hexToRgb(theme.secondaryColor, 0.2)};
 
   ::before {
     transition: inherit;
@@ -45,19 +46,19 @@ export const Bar = styled.span`
     transform: scaleX(0);
     height: 100%;
     border-radius: 50px;
-    background: ${({ theme, error }) => error?.color ?? theme.sub};
+    background: ${({ theme, error }) => error?.color ?? theme.secondaryColor};
   }
 `;
 
 export const InputLabel = styled.label`
-  color: ${({ theme }) => hexToRgb(theme.sub, 0.4)};
+  color: ${({ theme }) => hexToRgb(theme.secondaryColor, 0.4)};
   font-size: 1em;
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
   pointer-events: none;
   left: 2.1%;
-  top: 31%;
+  top: 24%;
   transition: 0.2s ease all;
 `;
 
@@ -78,7 +79,7 @@ const Input = styled.input`
 `;
 
 export const InputContainer = styled(motion.div)`
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   margin-bottom: 0px;
   position: relative;
   display: flex;
@@ -91,8 +92,8 @@ export const InputContainer = styled(motion.div)`
   overflow: hidden;
 
   &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: 4%;
-    color: ${({ theme }) => theme.sub};
+    top: 2%;
+    color: ${({ theme }) => theme.secondaryColor};
   }
 
   &:focus-within ${Bar}::before, input:valid ~ ${Bar} {
@@ -108,9 +109,9 @@ export const SubmitButton = styled(motion.input).attrs({
   border: none;
   margin-bottom: 0px;
   margin-top: 10px;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
   box-shadow: 20px 20px 60px #cfcfcf, -20px -20px 60px #ffffff;
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   font-family: var(--font1);
   font-size: 1.3em;
   font-weight: 500;
@@ -127,11 +128,14 @@ export const SubmitButton = styled(motion.input).attrs({
 const MotionInputInfo = styled(motion.p)`
   margin: 0;
   font-family: var(--font2);
-  font-size: 0.9em;
+  font-size: 1em;
   font-weight: 300;
   text-align: left;
   width: 100%;
+  height: 21%;
   padding-left: 0.5%;
+  display: flex;
+  align-items: center;
   left: 1.9%;
   position: absolute;
   color: ${({ error }) => error.color};
@@ -166,11 +170,13 @@ export function InputField(props) {
     if (error && error.color === 'red') {
       setInputFieldError(true);
     } else setInputFieldError(false);
-  }, [error]);
+  }, [error?.text]);
 
   const handleDebouncedInputValidation = React.useCallback(
-    debounce(() => setError(inputValidation(name, inputValue, LoginForm)), 700),
-    [name, inputValue, LoginForm]
+    debounce(() =>
+      setError(inputValidation(name, inputValue, LoginForm), 1500)
+    ),
+    [inputValue]
   );
 
   const handleInputValidation = () =>
@@ -180,7 +186,7 @@ export function InputField(props) {
     <InputContainer {...motionProps}>
       <Input
         onKeyUp={handleDebouncedInputValidation}
-        onFocus={handleInputValidation}
+        onBlur={handleInputValidation}
         onChange={e => setInputValue(e.target.value)}
         value={inputValue}
         type={type}
@@ -197,8 +203,7 @@ export function InputField(props) {
           <InputInfo
             key='Input-Info'
             motionProps={{
-              initial: 'hidden',
-              animate: 'visible',
+              animate: error ? 'visible' : 'hidden',
               exit: 'hidden',
               variants: InputInfoVariant,
               positionTransition: true,

@@ -12,7 +12,7 @@ import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 const FormContainer = styled(motion.form)`
   display: flex;
   background: inherit;
-  width: 55%;
+  width: 50%;
   padding: 1%;
   height: 52%;
   justify-content: space-evenly;
@@ -30,8 +30,9 @@ const FormContainer = styled(motion.form)`
 
 export default function Form({ setAuth, formType }) {
   const [inputFieldError, setInputFieldError] = React.useState(false);
-  const formRef = React.useRef();
   const { isAuthenticated } = React.useContext(AuthContext);
+  const [authenticating, setAuthenticating] = React.useState(false);
+  const formRef = React.useRef();
 
   React.useEffect(() => {
     return () => setInputFieldError(false);
@@ -43,7 +44,7 @@ export default function Form({ setAuth, formType }) {
 
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
-    formRef.current.style.opacity = 0.4;
+    setAuthenticating(true);
 
     if (formType === 'login') {
       setTimeout(() => setAuth(handleLogin(extractedFormData)), 1500);
@@ -53,8 +54,10 @@ export default function Form({ setAuth, formType }) {
   };
 
   if (isAuthenticated) {
-    return <Redirect to='/' />;
-  } else
+    return <Redirect to='/chat' />;
+  } else if (authenticating) {
+    return <p>Authenticating</p>;
+  } else {
     return (
       <>
         <FormTitle
@@ -129,6 +132,7 @@ export default function Form({ setAuth, formType }) {
         </FormContainer>
       </>
     );
+  }
 }
 
 Form.propTypes = {

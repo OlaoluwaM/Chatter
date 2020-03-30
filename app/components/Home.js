@@ -10,7 +10,7 @@ const HomePage = styled.div.attrs({
   className: 'wrapper',
 })`
   position: relative;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
 
   & > svg {
     position: absolute;
@@ -29,7 +29,7 @@ const HomePage = styled.div.attrs({
     width: 100%;
     height: 32%;
     background: transparent;
-    color: ${({ theme }) => theme.sub};
+    color: ${({ theme }) => theme.secondaryColor};
     font-size: 1rem;
 
     h1 {
@@ -57,15 +57,15 @@ const HomePage = styled.div.attrs({
 const ChatButton = styled(motion.button).attrs({
   className: 'button',
 })`
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   font-family: var(--font1);
   font-weight: 100;
   width: 250px;
   max-width: 43%;
   border: none;
   padding: 1.4rem 1.2rem;
-  fill: ${({ theme }) => theme.sub};
-  background: ${({ theme }) => theme.main};
+  fill: ${({ theme }) => theme.secondaryColor};
+  background: ${({ theme }) => theme.primaryColor};
 
   & > svg {
     fill: inherit;

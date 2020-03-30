@@ -28,7 +28,7 @@ const DeleteBtn = styled(motion.button)`
   text-transform: uppercase;
   font-weight: bolder;
   background: red;
-  color: ${({ theme }) => theme.main};
+  color: ${({ theme }) => theme.primaryColor};
   outline: none;
   border: none;
   margin-top: 30px;

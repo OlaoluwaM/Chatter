@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import Nav from './components/NavBar';
 import Auth from './components/Auth';
 import Home from './components/Home';
-import store from 'store';
 import Logout from './components/Logout';
 import Chatroom from './components/Chatroom';
 import DeleteAccount from './components/DeleteAccount';
@@ -25,6 +24,13 @@ import {
 } from './utils/helper';
 import './index.scss';
 
+// todo change to one font, use a sans-serif
+// todo blocked function check
+// todo increase validation timeout
+// todo tooltips
+// todo make user search case-insensitive
+// todo password field guides
+
 function App() {
   const currentUserName =
     sessionStorage.getItem('CurrentUser') ?? extractCurrentUserFromCookie();
@@ -40,7 +46,8 @@ function App() {
       // todo change this alert to a pop up
       sessionStorage.removeItem('CurrentUser');
       setAuthed({ activeUserName: null, isAuthenticated: false });
-    }, sessionTimeout(0.5)),
+      return;
+    }, sessionTimeout()),
     []
   );
 
@@ -69,7 +76,7 @@ function App() {
   return (
     <ThemeProvider theme={themeObj}>
       <AuthProvider value={isAuthed}>
-        <Nav />
+        {!isAuthed.isAuthenticated && <Nav />}
 
         {!isAuthed.isAuthenticated && <Redirect to='/' />}
 

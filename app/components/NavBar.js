@@ -13,7 +13,7 @@ const NavContainer = styled.nav`
   width: 100%;
   height: 7%;
   overflow: hidden;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
 `;
 
 const NavUl = styled(motion.ul)`

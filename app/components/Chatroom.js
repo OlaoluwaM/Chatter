@@ -18,7 +18,7 @@ const ChatRoomContainer = styled.div.attrs({
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: ${({ theme }) => theme.darkMain};
+  background: ${({ theme }) => theme.primaryColorDark};
 `;
 
 export default function Chatroom() {

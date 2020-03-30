@@ -74,11 +74,15 @@ export function useBlockedUsers(dispatch) {
     console.log('updated');
     const blockedUserlistQuery = sb.createBlockedUserListQuery();
 
-    blockedUserlistQuery.next(function(blockedUsers, error) {
-      if (error) dispatch({ type: 'Error', error: error.message });
-      console.log(blockedUsers);
-      setBlockedList(blockedUsers);
-    });
+    const t = setTimeout(() => {
+      blockedUserlistQuery.next(function(blockedUsers, error) {
+        if (error) dispatch({ type: 'Error', error: error.message });
+        console.log(blockedUsers);
+        setBlockedList(blockedUsers);
+      });
+    }, 500);
+
+    return () => clearTimeout(t);
   }, [blockMessage]);
 
   return [blockedUsersList, setBlockMessage];

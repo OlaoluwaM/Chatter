@@ -49,12 +49,21 @@ export function extractNeededMessageData(messageObj) {
   ]);
 }
 
+function getInvitee(channel, activeUserName) {
+  const user = channel?.members?.find(
+    ({ userId }) => userId !== activeUserName
+  );
+
+  return user;
+}
+
 export function chatManagerReducer(state, action) {
   const messages = !state
     ? ''
     : state.messages === undefined
     ? []
     : state.messages;
+  const activeUser = sessionStorage.getItem('CurrentUser');
 
   switch (action.type) {
     case 'New message':
@@ -78,6 +87,7 @@ export function chatManagerReducer(state, action) {
       return {
         ...state,
         userChannel: action.channel,
+        invitee: getInvitee(action.channel, activeUser),
         messages,
       };
 
