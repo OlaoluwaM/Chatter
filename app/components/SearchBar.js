@@ -76,9 +76,7 @@ export default function SearchUser({ category, searchForUser, motionProps }) {
   };
 
   const handleInputChange = e => {
-    if (e.target.value === '') {
-      searchForUser('');
-    }
+    if (e.target.value === '') searchForUser('');
     setInput(e.target.value);
   };
 

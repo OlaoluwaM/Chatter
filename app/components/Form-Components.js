@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import useDebounce from '../custom-hooks/useDebounce';
 import { inputValidation } from '../utils/authFunc';
 import { InputInfoVariant } from '../utils/motionObj';
-import { motion, AnimatePresence } from 'framer-motion';
-import { debounce, hexToRgb, colorMapping } from '../utils/helper';
+import { AnimatePresence, motion } from 'framer-motion';
+import { colorMapping, hexToRgb } from '../utils/helper';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
@@ -155,9 +156,11 @@ export function InputField(props) {
   const { name, required, type, label, motionProps, ...rest } = props;
   const { formState } = rest;
   const { formType, setInputFieldError } = formState;
+
   const [error, setError] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const LoginForm = formType === 'login';
+  const debouncedInput = useDebounce(inputValue, 500);
 
   React.useEffect(() => {
     return () => {
@@ -172,12 +175,12 @@ export function InputField(props) {
     } else setInputFieldError(false);
   }, [error?.text]);
 
-  const handleDebouncedInputValidation = React.useCallback(
-    debounce(() =>
-      setError(inputValidation(name, inputValue, LoginForm), 1500)
-    ),
-    [inputValue]
-  );
+  React.useEffect(() => {
+    if (debouncedInput) {
+      const report = inputValidation(name, debouncedInput, LoginForm);
+      setError(report);
+    } else return;
+  }, [debouncedInput]);
 
   const handleInputValidation = () =>
     setError(inputValidation(name, inputValue, LoginForm));
@@ -185,8 +188,8 @@ export function InputField(props) {
   return (
     <InputContainer {...motionProps}>
       <Input
-        onKeyUp={handleDebouncedInputValidation}
         onBlur={handleInputValidation}
+        onFocus={() => name === 'confirmPassword' && error && setInputValue('')}
         onChange={e => setInputValue(e.target.value)}
         value={inputValue}
         type={type}
@@ -198,7 +201,7 @@ export function InputField(props) {
       <Bar error={error} />
       <InputLabel>{label}</InputLabel>
 
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence exitBeforeEnter={true}>
         {error && (
           <InputInfo
             key='Input-Info'

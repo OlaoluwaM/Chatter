@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
 import { IoIosChatbubbles } from 'react-icons/io';
-import { headerVariant, buttonVariant } from '../utils/motionObj';
+import { buttonVariant, headerVariant } from '../utils/motionObj';
 
 const HomePage = styled.div.attrs({
   className: 'wrapper',

@@ -22,14 +22,6 @@ export const strongRegex = new RegExp(
 //   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
 // );
 
-export function debounce(func, ms = 0) {
-  let timeoutId;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), ms);
-  };
-}
-
 export function getContrast(hexcolor) {
   if (hexcolor.slice(0, 1) === '#') {
     hexcolor = hexcolor.slice(1);
@@ -38,7 +30,7 @@ export function getContrast(hexcolor) {
   if (hexcolor.length === 3) {
     hexcolor = hexcolor
       .split('')
-      .map(function(hex) {
+      .map(function (hex) {
         return hex + hex;
       })
       .join('');
@@ -77,9 +69,7 @@ export function hexToRgb(hex, alpha = 1) {
 // }
 
 export function randomID() {
-  return `_${Math.random()
-    .toString(36)
-    .substr(2, 9)}`;
+  return `_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 export function filterObject(obj, properties) {
@@ -93,7 +83,7 @@ export function filterObject(obj, properties) {
   }, {});
 }
 
-function formatDate(date) {
+export function formatDate(date) {
   const dateOptions = {
     year: 'numeric',
     day: 'numeric',
@@ -106,7 +96,7 @@ function formatDate(date) {
   return new Intl.DateTimeFormat('default', dateOptions).format(new Date(date));
 }
 
-function prettyDateFormat(dateArr, removeYear = true) {
+export function prettyDateFormat(dateArr, removeYear = true) {
   if (removeYear) {
     dateArr.splice(3, 1, 'at');
   } else {
@@ -114,42 +104,6 @@ function prettyDateFormat(dateArr, removeYear = true) {
   }
 
   return `Last seen ${dateArr.join(' ')}`;
-}
-
-export function formatTimeString(timeString) {
-  const currentDateArr = formatDate(Date.now()).split(' ');
-  const {
-    '1': cMonth,
-    '2': cDay,
-    '3': cYear,
-    '4': cTime,
-    '5': cTimeOfDay,
-  } = currentDateArr;
-
-  const dateArr = formatDate(timeString).split(' ');
-  const {
-    '1': month,
-    '2': day,
-    '3': year,
-    '4': time,
-    '5': timeOfDay,
-  } = dateArr;
-
-  if (cYear !== year) return prettyDateFormat(dateArr, false);
-
-  if (cMonth === month) {
-    const diff = parseInt(cDay) - parseInt(day);
-
-    if (diff === 0) {
-      return `Last seen today at ${time}, ${timeOfDay}`;
-    } else if (diff >= 1 && diff <= 7) {
-      return `Last seen ${
-        diff === 1 ? `yesterday` : `${diff} days ago`
-      }, at ${time}, ${timeOfDay}`;
-    } else {
-      return prettyDateFormat(dateArr);
-    }
-  } else return prettyDateFormat(dateArr);
 }
 
 export function isColor(str) {
@@ -182,6 +136,7 @@ export function unloadEventListener(e) {
   document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
     8
   )};`;
+  sessionStorage.clear();
 }
 
 export function extractCurrentUserFromCookie() {
@@ -244,3 +199,34 @@ export function generateRandomColor() {
   const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
   return randomColor;
 }
+
+export function filterUser(list, username) {
+  return list.filter(user => {
+    const name = user?.userId ?? user;
+    return name !== username;
+  });
+}
+
+export function hashCode(str, seed = 0) {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+export const debounce = (func, ms = 0) => {
+  let timeoutId;
+  return function (...args) {
+    timeoutId = setTimeout(() => func.apply(this, args), ms);
+  };
+};

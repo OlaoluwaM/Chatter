@@ -3,7 +3,7 @@ import Form from './Form';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { hexToRgb } from '../utils/helper';
-import { spring, spring2 } from '../utils/motionObj';
+import { spring } from '../utils/motionObj';
 
 const AuthPage = styled.div.attrs({
   className: 'wrapper',
@@ -28,7 +28,6 @@ const SwitchText = styled(motion.p)`
   font-weight: bolder;
   position: fixed;
   bottom: 12px;
-  margin-bottom: 5px;
   transition: color 0.3s;
 
   &:hover {
@@ -51,7 +50,7 @@ export default function Auth({ location, setAuth }) {
         initial={{ opacity: 0, y: 90 }}
         animate={{ opacity: 1, y: -10 }}
         transition={{ ...spring, delay: 1.3 }}
-        layoutTransition={{ type: 'tween' }}
+        layoutTransition={{ type: 'spring', delay: 0 }}
         onClick={() => setState(s => (s === 'login' ? 'sign-up' : 'login'))}>
         {state === 'login' ? ' Create an account' : ' Log into your account'}
       </SwitchText>

@@ -4,7 +4,7 @@ import { TiTimes } from 'react-icons/ti';
 import { ChatContext } from '../context/Context';
 import { UserDisplay } from './DataDisplay';
 import { AnimatePresence } from 'framer-motion';
-import { formatTimeString, lightenDarkenColor } from '../utils/helper';
+import { formatTimeString } from '../utils/chatFunctions';
 import { CurrentUserDisplay } from './Sidebar';
 import { currentUserDisplayVariants } from '../utils/motionObj';
 
@@ -24,7 +24,7 @@ const svgStyle = {
 export default function ChatOverHead() {
   const [isChatting, setIsChatting] = React.useState({ chatting: false });
 
-  const { chatManager, dispatch } = React.useContext(ChatContext);
+  const { sb, chatManager, dispatch } = React.useContext(ChatContext);
 
   const newChat = typeof chatManager.userChannel !== 'string';
 
@@ -58,7 +58,10 @@ export default function ChatOverHead() {
             subData={subData}>
             <TiTimes
               style={svgStyle}
-              onClick={() => dispatch({ type: 'Exit Chat' })}
+              onClick={() => {
+                chatManager.userChannel.leave();
+                dispatch({ type: 'Exit Chat' });
+              }}
             />
           </UserDisplay>
         )}

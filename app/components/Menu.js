@@ -44,12 +44,9 @@ const AlertText = styled(motion.p).attrs({
 export default function Menu({ category, inviteUser }) {
   const { sb, dispatch } = React.useContext(ChatContext);
 
-  const [userList, setFilter] = useUserFilter(sb, dispatch);
-  const [friendList, friendNames, setFriendNames] = useFriendList(dispatch);
-  const [blockedUsersList, setBlockMessage] = useBlockedUsers(
-    category,
-    dispatch
-  );
+  const [userList, setFilter] = useUserFilter();
+  const [friendList, friendNames, setFriendNames] = useFriendList();
+  const [blockedUsersList, setBlockMessage] = useBlockedUsers();
 
   const [users, setUsers] = React.useState(null);
 

@@ -1,16 +1,17 @@
 import React from 'react';
-import Sidebar from './Sidebar';
-import ChatArea from './ChatArea';
 import * as SendBird from 'sendbird';
 import styled from 'styled-components';
-import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
 import {
-  createUserMetaData,
-  createGroupParamEntries,
   chatManagerReducer,
+  createGroupParamEntries,
+  createUserMetaData,
   extractNeededMessageData,
 } from '../utils/chatFunctions';
+import { SENDBIRD_APP_ID } from '../utils/file';
+import { hashCode } from '../utils/helper';
+import ChatArea from './ChatArea';
+import Sidebar from './Sidebar';
 
 const ChatRoomContainer = styled.div.attrs({
   className: 'wrapper',
@@ -22,8 +23,8 @@ const ChatRoomContainer = styled.div.attrs({
 `;
 
 export default function Chatroom() {
-  const { activeUserName: userId } = React.useContext(AuthContext);
-
+  const { activeUserName: username } = React.useContext(AuthContext);
+  const userId = hashCode(userId);
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
@@ -32,6 +33,7 @@ export default function Chatroom() {
       sb.connect(userId, (user, error) => {
         if (error) throw new Error(error.message);
 
+        sb.updateCurrentUserInfo(username);
         const friendArray = user.metaData.friends ?? JSON.stringify([]);
 
         createUserMetaData(user, {
@@ -52,23 +54,25 @@ export default function Chatroom() {
   }, []);
 
   const createOneToOneChannel = users => {
-    const { '0': currentUser, '1': invitee } = users;
+    const { '1': invitee } = users;
     const { userChannel } = chatManager;
 
     if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) {
       return;
     } else if (userChannel) {
+      dispatch({ type: 'Exit Chat' });
       dispatch({ type: 'New Chat' });
     }
 
     const gCParams = new sb.GroupChannelParams();
 
     gCParams.addUserId(invitee);
-    const obj = Object.fromEntries(createGroupParamEntries(currentUser));
+    const obj = Object.fromEntries(createGroupParamEntries(invitee));
     Object.assign(gCParams, obj);
 
     sb.GroupChannel.createChannel(gCParams, (channel, error) => {
       if (error) dispatch({ type: 'Error', error: error.message });
+      console.log(channel);
 
       const prevMessages = channel.createPreviousMessageListQuery();
       (prevMessages.Limit = 30), (prevMessages.reverse = false);

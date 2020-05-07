@@ -1,5 +1,5 @@
-import { strongRegex, sessionTimeout } from './helper';
 import store from 'store';
+import { strongRegex } from './helper';
 
 /**
  *

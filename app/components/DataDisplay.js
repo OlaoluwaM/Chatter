@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
-import { default as styled, css } from 'styled-components';
-import { isColor, generateRandomColor, hexToRgb } from '../utils/helper';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { css, default as styled } from 'styled-components';
+import { generateRandomColor, hexToRgb, isColor } from '../utils/helper';
 
 const DataContainer = styled(motion.div)`
   position: relative;
@@ -113,7 +113,7 @@ const ActionInfo = styled.div.attrs({
 
 export function UserDisplay(props) {
   const { isCurrentUser, data, subData, children, dir, motionProps } = props;
-  const { userId, connectionStatus, profileUrl } = data;
+  const { nickname, connectionStatus, profileUrl } = data;
 
   return (
     <DataContainer {...motionProps}>
@@ -124,7 +124,7 @@ export function UserDisplay(props) {
       </Avatar>
 
       <Content isCurrentUser={isCurrentUser}>
-        <p>{userId}</p>
+        <p>{nickname}</p>
         {subData && <p>{subData}</p>}
       </Content>
 

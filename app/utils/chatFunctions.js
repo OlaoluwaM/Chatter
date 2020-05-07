@@ -1,4 +1,4 @@
-import { filterObject } from './helper';
+import { filterObject, formatDate, prettyDateFormat } from './helper';
 
 /**
  *
@@ -143,4 +143,40 @@ export function handleUnBlock(blockedUser, sb) {
   });
   console.log(`${blockedUser.userId} has been unblocked`);
   return `${blockedUser.userId} has been unblocked`;
+}
+
+export function formatTimeString(timeString) {
+  const currentDateArr = formatDate(Date.now()).split(' ');
+  const {
+    '1': cMonth,
+    '2': cDay,
+    '3': cYear,
+    '4': cTime,
+    '5': cTimeOfDay,
+  } = currentDateArr;
+
+  const dateArr = formatDate(timeString).split(' ');
+  const {
+    '1': month,
+    '2': day,
+    '3': year,
+    '4': time,
+    '5': timeOfDay,
+  } = dateArr;
+
+  if (cYear !== year) return prettyDateFormat(dateArr, false);
+
+  if (cMonth === month) {
+    const diff = parseInt(cDay) - parseInt(day);
+
+    if (diff === 0) {
+      return `Last seen today at ${time}, ${timeOfDay}`;
+    } else if (diff >= 1 && diff <= 7) {
+      return `Last seen ${
+        diff === 1 ? `yesterday` : `${diff} days ago`
+      }, at ${time}, ${timeOfDay}`;
+    } else {
+      return prettyDateFormat(dateArr);
+    }
+  } else return prettyDateFormat(dateArr);
 }
