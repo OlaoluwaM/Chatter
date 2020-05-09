@@ -123,48 +123,47 @@ export default function Nav() {
             Home
           </CustomLink>
 
-          {/* <AnimatePresence> */}
-          {pathname !== '/authenticate' && (
-            // <>
-            <CustomLink
-              key='login'
-              motionProps={{
-                exit: { opacity: 0 },
-                variants: navItemVariant,
-                whileHover: 'hover',
-                positionTransition: true,
-              }}
-              to={{
-                pathname: '/authenticate',
-                state: {
-                  formType: 'login',
-                },
-              }}
-              exact={true}>
-              Login
-            </CustomLink>
-          )}
-          {pathname !== '/authenticate' && (
-            <CustomLink
-              key='sign-up'
-              motionProps={{
-                variants: navItemVariant,
-                whileHover: 'hover',
-                positionTransition: true,
-                exit: { opacity: 0 },
-              }}
-              exact={true}
-              to={{
-                pathname: '/authenticate',
-                state: {
-                  formType: 'sign-up',
-                },
-              }}>
-              Sign Up
-            </CustomLink>
-          )}
-          {/* </> */}
-          {/* </AnimatePresence> */}
+          <AnimatePresence>
+            {pathname !== '/authenticate' && (
+              <CustomLink
+                key='login'
+                motionProps={{
+                  exit: { opacity: 0 },
+                  variants: navItemVariant,
+                  whileHover: 'hover',
+                  positionTransition: true,
+                }}
+                to={{
+                  pathname: '/authenticate',
+                  state: {
+                    formType: 'login',
+                  },
+                }}
+                exact={true}>
+                Login
+              </CustomLink>
+            )}
+
+            {pathname !== '/authenticate' && (
+              <CustomLink
+                key='sign-up'
+                motionProps={{
+                  variants: navItemVariant,
+                  whileHover: 'hover',
+                  positionTransition: true,
+                  exit: { opacity: 0 },
+                }}
+                exact={true}
+                to={{
+                  pathname: '/authenticate',
+                  state: {
+                    formType: 'sign-up',
+                  },
+                }}>
+                Sign Up
+              </CustomLink>
+            )}
+          </AnimatePresence>
         </NavUl>
       </NavContainer>
     );

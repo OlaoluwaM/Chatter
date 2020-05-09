@@ -1,6 +1,9 @@
 import store from 'store';
 import { strongRegex } from './helper';
 
+const ERROR_COLOR = 'rgba(240, 20, 20, 0.9)';
+const SUCCESS_COLOR = 'rgba(40, 210, 40, .9)';
+
 /**
  *
  * @param {{}} data - Form data
@@ -27,17 +30,8 @@ export function handleSignUp(data) {
  *
  */
 
-export function handleLogin(data) {
-  const users = store.get('users') ?? [];
-  const { name, password } = data;
-
-  const userData = users.find(
-    ({ name: dbUsername, password: dbPassword }) =>
-      name === dbUsername && password === dbPassword
-  );
-
+export function handleLogin({ name }) {
   sessionStorage.setItem('CurrentUser', name);
-
   return { activeUserName: name, isAuthenticated: true };
 }
 
@@ -53,9 +47,13 @@ function duplicateUserValidation(name) {
   const users = store.get('users') ?? [];
 
   if (users.some(({ name: id }) => id === name)) {
-    return { text: 'User Already Exists', color: 'red' };
+    return { text: 'User Already Exists', color: ERROR_COLOR, type: 'error' };
   } else {
-    return { text: `${name} is available`, color: 'green' };
+    return {
+      text: `${name} is available`,
+      color: SUCCESS_COLOR,
+      type: 'success',
+    };
   }
 }
 
@@ -70,9 +68,13 @@ function passwordEqualityValidation(value) {
     pW2 = value;
 
   if (pW1 !== pW2) {
-    return { text: 'Your passwords do not match', color: 'red' };
+    return {
+      text: 'Your passwords do not match',
+      color: ERROR_COLOR,
+      type: 'error',
+    };
   } else {
-    return { text: 'Looking Good', color: 'green' };
+    return { text: 'Looking Good', color: SUCCESS_COLOR, type: 'success' };
   }
 }
 
@@ -84,8 +86,8 @@ function passwordEqualityValidation(value) {
 
 function passwordStrengthValidation(value) {
   if (!!value.match(strongRegex)) {
-    return { text: 'Strength 100% 🙌', color: 'green' };
-  } else return { text: 'Weak 😒', color: 'red' };
+    return { text: 'Strength 100% 🙌', color: SUCCESS_COLOR, type: 'success' };
+  } else return { text: 'Weak 😒', color: ERROR_COLOR, type: 'error' };
 }
 
 /**
@@ -98,9 +100,13 @@ function validateUserExists(name) {
   const users = store.get('users') ?? [];
 
   if (users.length > 0 && users.find(({ name: id }) => id === name)) {
-    return { text: `Welcome back ${name}`, color: 'green' };
+    return {
+      text: `Welcome back ${name}`,
+      color: SUCCESS_COLOR,
+      type: 'success',
+    };
   } else {
-    return { text: 'User does not exist', color: 'red' };
+    return { text: 'User does not exist', color: ERROR_COLOR, type: 'error' };
   }
 }
 
@@ -124,8 +130,8 @@ export function validateUserPasswordIntegrity(value) {
   const userDataCorrect = userData !== undefined;
 
   if (userDataCorrect) {
-    return { text: 'Correct 👍', color: 'green' };
-  } else return { text: 'Incorrect', color: 'red' };
+    return { text: 'Correct 👍', color: SUCCESS_COLOR, type: 'success' };
+  } else return { text: 'Incorrect', color: ERROR_COLOR, type: 'error' };
 }
 
 /**

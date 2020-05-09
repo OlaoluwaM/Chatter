@@ -6,7 +6,7 @@ import { AuthContext } from '../context/Context';
 import { extractFormData } from '../utils/helper';
 import { handleLogin, handleSignUp } from '../utils/authFunc';
 import { FormTitle, InputField, SubmitButton } from './Form-Components';
-import { motion, AnimatePresence, usePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
 
 const FormContainer = styled(motion.form)`
@@ -77,56 +77,58 @@ export default function Form({ setAuth, formType }) {
           initial='hidden'
           animate='visible'
           autoComplete='off'>
-          <InputField
-            key='name-field'
-            motionProps={{
-              variants: itemVariant,
-              positionTransition: true,
-              exit: 'hidden',
-            }}
-            name='name'
-            label='Username'
-            formState={{ formType, setInputFieldError }}
-          />
-
-          <InputField
-            key='password-field'
-            motionProps={{
-              variants: itemVariant,
-              positionTransition: true,
-              exit: 'hidden',
-            }}
-            formState={{ formType, setInputFieldError }}
-            name='password'
-            type='password'
-            label='Password'
-          />
-
-          {formType !== 'login' && (
+          <AnimatePresence>
             <InputField
-              key='confirmPassword-field'
+              key='name-field'
+              motionProps={{
+                variants: itemVariant,
+                positionTransition: true,
+                exit: 'hidden',
+              }}
+              name='name'
+              label='Username'
+              formState={{ formType, setInputFieldError }}
+            />
+
+            <InputField
+              key='password-field'
               motionProps={{
                 variants: itemVariant,
                 positionTransition: true,
                 exit: 'hidden',
               }}
               formState={{ formType, setInputFieldError }}
-              name='confirmPassword'
+              name='password'
               type='password'
-              label='Confirm Password'
+              label='Password'
             />
-          )}
 
-          <SubmitButton
-            key='submit-button'
-            exit='hidden'
-            type='submit'
-            name='btn'
-            variants={itemVariant}
-            positionTransition={true}
-            disabled={inputFieldError}
-            value={formType === 'login' ? 'Login' : 'Sign Up'}
-          />
+            {formType !== 'login' && (
+              <InputField
+                key='confirmPassword-field'
+                motionProps={{
+                  variants: itemVariant,
+                  positionTransition: true,
+                  exit: 'hidden',
+                }}
+                formState={{ formType, setInputFieldError }}
+                name='confirmPassword'
+                type='password'
+                label='Confirm Password'
+              />
+            )}
+
+            <SubmitButton
+              key='submit-button'
+              exit='hidden'
+              type='submit'
+              name='btn'
+              variants={itemVariant}
+              positionTransition={true}
+              disabled={inputFieldError}
+              value={formType === 'login' ? 'Login' : 'Sign Up'}
+            />
+          </AnimatePresence>
         </FormContainer>
       </>
     );

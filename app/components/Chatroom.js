@@ -1,6 +1,10 @@
 import React from 'react';
 import * as SendBird from 'sendbird';
 import styled from 'styled-components';
+import Sidebar from './Sidebar';
+import ChatArea from './ChatArea';
+import { hashCode } from '../utils/helper';
+import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
 import {
   chatManagerReducer,
@@ -8,10 +12,6 @@ import {
   createUserMetaData,
   extractNeededMessageData,
 } from '../utils/chatFunctions';
-import { SENDBIRD_APP_ID } from '../utils/file';
-import { hashCode } from '../utils/helper';
-import ChatArea from './ChatArea';
-import Sidebar from './Sidebar';
 
 const ChatRoomContainer = styled.div.attrs({
   className: 'wrapper',
@@ -24,17 +24,16 @@ const ChatRoomContainer = styled.div.attrs({
 
 export default function Chatroom() {
   const { activeUserName: username } = React.useContext(AuthContext);
-  const userId = hashCode(userId);
+  console.log(username);
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
   React.useEffect(() => {
     try {
-      sb.connect(userId, (user, error) => {
+      sb.connect(hashCode(username) + '', (user, error) => {
         if (error) throw new Error(error.message);
-
-        sb.updateCurrentUserInfo(username);
         const friendArray = user.metaData.friends ?? JSON.stringify([]);
+        user.nickname = username;
 
         createUserMetaData(user, {
           friends: friendArray,
@@ -46,7 +45,7 @@ export default function Chatroom() {
       console.error(e);
       dispatch({ type: 'Error', error: e });
     }
-
+    sb.updateCurrentUserInfo(username, '');
     return () => {
       dispatch({ type: 'Reset' });
       sb.disconnect();

@@ -207,7 +207,7 @@ export function filterUser(list, username) {
   });
 }
 
-export function hashCode(str, seed = 0) {
+export function hashCode(str, seed = 3) {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
   for (let i = 0, ch; i < str.length; i++) {

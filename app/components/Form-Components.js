@@ -1,11 +1,11 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 import useDebounce from '../custom-hooks/useDebounce';
 import { inputValidation } from '../utils/authFunc';
-import { InputInfoVariant } from '../utils/motionObj';
-import { AnimatePresence, motion } from 'framer-motion';
-import { colorMapping, hexToRgb } from '../utils/helper';
+import { hexToRgb } from '../utils/helper';
+import { inputSvgValidatorVariants, pathObj } from '../utils/motionObj';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
@@ -24,7 +24,7 @@ export const FormTitle = styled(motion.h1)`
   }
 `;
 
-export const Bar = styled.span`
+const Bar = styled.span`
   display: block;
   position: relative;
   width: 100%;
@@ -33,8 +33,8 @@ export const Bar = styled.span`
   flex-basis: 4px;
   border-radius: 50px;
   transition: 0.5s ease-out;
-  background: ${({ theme, error }) =>
-    error?.color ?? hexToRgb(theme.secondaryColor, 0.2)};
+  background: ${({ theme, messageColor }) =>
+    messageColor ?? hexToRgb(theme.secondaryColor, 0.2)};
 
   ::before {
     transition: inherit;
@@ -47,7 +47,8 @@ export const Bar = styled.span`
     transform: scaleX(0);
     height: 100%;
     border-radius: 50px;
-    background: ${({ theme, error }) => error?.color ?? theme.secondaryColor};
+    background: ${({ theme, messageColor }) =>
+      messageColor ?? theme.secondaryColor};
   }
 `;
 
@@ -97,7 +98,7 @@ export const InputContainer = styled(motion.div)`
     color: ${({ theme }) => theme.secondaryColor};
   }
 
-  &:focus-within ${Bar}::before, input:valid ~ ${Bar} {
+  &:focus-within ${Bar}::before, input:valid ~ ${Bar}::before {
     transform: scaleX(1);
   }
 `;
@@ -126,29 +127,47 @@ export const SubmitButton = styled(motion.input).attrs({
   }
 `;
 
-const MotionInputInfo = styled(motion.p)`
+const InputSvgValidatorContainer = styled.div`
   margin: 0;
-  font-family: var(--font2);
-  font-size: 1em;
-  font-weight: 300;
-  text-align: left;
-  width: 100%;
-  height: 21%;
-  padding-left: 0.5%;
+  width: 12%;
+  height: 35px;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  left: 1.9%;
+  justify-content: center;
+  right: 4%;
   position: absolute;
-  color: ${({ error }) => error.color};
-  background: ${({ error }) => hexToRgb(colorMapping(error.color), 0.2)};
-  top: 53%;
+  top: 18.5%;
+
+  svg {
+    path {
+      fill: inherit;
+      fill-rule: evenodd;
+    }
+  }
 `;
 
-export function InputInfo({ error, motionProps }) {
+export function ValidatorSVG({ state, color }) {
+  const isError = state === 'error';
+  console.log(state);
   return (
-    <MotionInputInfo error={error} {...motionProps}>
-      {error.text}
-    </MotionInputInfo>
+    <InputSvgValidatorContainer>
+      <AnimatePresence exitBeforeEnter={true}>
+        <motion.svg
+          key={state}
+          initial='initial'
+          animate='appear'
+          exit='hide'
+          custom={{ isError, color }}
+          variants={inputSvgValidatorVariants}
+          xmlns='http://www.w3.org/2000/svg'
+          width='20'
+          height='20'
+          viewBox='0 0 24 24'>
+          <motion.path d={pathObj[state]} />
+        </motion.svg>
+      </AnimatePresence>
+    </InputSvgValidatorContainer>
   );
 }
 
@@ -157,39 +176,41 @@ export function InputField(props) {
   const { formState } = rest;
   const { formType, setInputFieldError } = formState;
 
-  const [error, setError] = React.useState(null);
+  const [message, setMessage] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const LoginForm = formType === 'login';
-  const debouncedInput = useDebounce(inputValue, 500);
+  const debouncedInput = useDebounce(inputValue, 800);
 
   React.useEffect(() => {
     return () => {
-      setError(null);
+      setMessage(null);
       setInputValue('');
     };
   }, [formType]);
 
   React.useEffect(() => {
-    if (error && error.color === 'red') {
+    if (message?.type === 'error') {
       setInputFieldError(true);
     } else setInputFieldError(false);
-  }, [error?.text]);
+  }, [message?.text]);
 
   React.useEffect(() => {
     if (debouncedInput) {
       const report = inputValidation(name, debouncedInput, LoginForm);
-      setError(report);
+      setMessage(report);
     } else return;
   }, [debouncedInput]);
 
   const handleInputValidation = () =>
-    setError(inputValidation(name, inputValue, LoginForm));
+    setMessage(inputValidation(name, inputValue, LoginForm));
 
   return (
     <InputContainer {...motionProps}>
       <Input
         onBlur={handleInputValidation}
-        onFocus={() => name === 'confirmPassword' && error && setInputValue('')}
+        onFocus={() =>
+          name === 'confirmPassword' && message && setInputValue('')
+        }
         onChange={e => setInputValue(e.target.value)}
         value={inputValue}
         type={type}
@@ -198,23 +219,13 @@ export function InputField(props) {
         {...rest}
       />
 
-      <Bar error={error} />
+      <Bar messageColor={message?.color} />
       <InputLabel>{label}</InputLabel>
 
-      <AnimatePresence exitBeforeEnter={true}>
-        {error && (
-          <InputInfo
-            key='Input-Info'
-            motionProps={{
-              animate: error ? 'visible' : 'hidden',
-              exit: 'hidden',
-              variants: InputInfoVariant,
-              positionTransition: true,
-            }}
-            error={error}
-          />
-        )}
-      </AnimatePresence>
+      <ValidatorSVG
+        state={!message ? 'initial' : message.type}
+        color={message?.color}
+      />
     </InputContainer>
   );
 }
