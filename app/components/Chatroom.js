@@ -1,17 +1,16 @@
 import React from 'react';
 import * as SendBird from 'sendbird';
 import styled from 'styled-components';
-import Sidebar from './Sidebar';
-import ChatArea from './ChatArea';
-import { hashCode } from '../utils/helper';
-import { SENDBIRD_APP_ID } from '../utils/file';
 import { AuthContext, ChatProvider } from '../context/Context';
 import {
   chatManagerReducer,
-  createGroupParamEntries,
   createUserMetaData,
   extractNeededMessageData,
 } from '../utils/chatFunctions';
+import { SENDBIRD_APP_ID } from '../utils/file';
+import { hashCode } from '../utils/helper';
+import ChatArea from './ChatArea';
+import Sidebar from './Sidebar';
 
 const ChatRoomContainer = styled.div.attrs({
   className: 'wrapper',
@@ -22,9 +21,11 @@ const ChatRoomContainer = styled.div.attrs({
   background: ${({ theme }) => theme.primaryColorDark};
 `;
 
+// TODO add general error page
+// TODO redo the neumorphic design
+
 export default function Chatroom() {
   const { activeUserName: username } = React.useContext(AuthContext);
-  console.log(username);
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
@@ -41,11 +42,11 @@ export default function Chatroom() {
 
         dispatch({ type: 'Connect', isConnected: user !== null });
       });
+      sb.updateCurrentUserInfo(username, '');
     } catch (e) {
       console.error(e);
       dispatch({ type: 'Error', error: e });
     }
-    sb.updateCurrentUserInfo(username, '');
     return () => {
       dispatch({ type: 'Reset' });
       sb.disconnect();
@@ -54,40 +55,49 @@ export default function Chatroom() {
 
   const createOneToOneChannel = users => {
     const { '1': invitee } = users;
+    const inviteeHash = hashCode(invitee) + '';
     const { userChannel } = chatManager;
 
-    if (userChannel && userChannel.memberMap.hasOwnProperty(invitee)) {
+    if (userChannel && userChannel.memberMap.hasOwnProperty(inviteeHash)) {
       return;
-    } else if (userChannel) {
+    } else {
       dispatch({ type: 'Exit Chat' });
       dispatch({ type: 'New Chat' });
     }
 
-    const gCParams = new sb.GroupChannelParams();
+    // const gCParams = new sb.GroupChannelParams();
 
-    gCParams.addUserId(invitee);
-    const obj = Object.fromEntries(createGroupParamEntries(invitee));
-    Object.assign(gCParams, obj);
+    // gCParams.addUserIds([inviteeHash]);
+    // const obj = Object.fromEntries(createGroupParamEntries(invitee));
+    // Object.assign(gCParams, obj);
 
-    sb.GroupChannel.createChannel(gCParams, (channel, error) => {
-      if (error) dispatch({ type: 'Error', error: error.message });
-      console.log(channel);
-
-      const prevMessages = channel.createPreviousMessageListQuery();
-      (prevMessages.Limit = 30), (prevMessages.reverse = false);
-
-      prevMessages.load((messages, error) => {
+    sb.GroupChannel.createChannelWithUserIds(
+      [inviteeHash],
+      true,
+      invitee,
+      '',
+      ' ',
+      (channel, error) => {
         if (error) dispatch({ type: 'Error', error: error.message });
 
-        const filteredMessages = messages.map(extractNeededMessageData);
+        const prevMessages = channel.createPreviousMessageListQuery();
 
-        dispatch({
-          type: 'New channel and message',
-          channel,
-          messages: filteredMessages,
+        prevMessages.Limit = 30;
+        prevMessages.reverse = false;
+
+        prevMessages.load((messages, error) => {
+          if (error) dispatch({ type: 'Error', error: error.message });
+
+          const filteredMessages = messages.map(extractNeededMessageData);
+
+          dispatch({
+            type: 'New channel and message',
+            channel,
+            messages: filteredMessages,
+          });
         });
-      });
-    });
+      }
+    );
   };
 
   const chatManagerIsSetup = chatManager?.connected ?? false;

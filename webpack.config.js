@@ -36,8 +36,9 @@ module.exports = env => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.js',
+      filename: '[name].js',
       publicPath: '/',
+      devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
     devtool: 'inline-source-map',
     devServer: {

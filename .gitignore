@@ -4,3 +4,6 @@ node_modules
 
 # builds
 dist
+
+# others
+.vscode

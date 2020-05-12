@@ -29,7 +29,10 @@ export function useFriendList() {
 
     applicationUserListQuery.next(function (users, error) {
       if (error) dispatch({ type: 'Error', error: error.message });
-      setFriendList(users.filter(({ userId }) => friendNames.includes(userId)));
+
+      setFriendList(
+        users.filter(({ nickname }) => friendNames.includes(nickname))
+      );
     });
   }, [friendNames.length]);
 
@@ -37,46 +40,42 @@ export function useFriendList() {
 }
 
 export function useUserFilter() {
-  const { activeUserName: currentUser } = React.useContext(AuthContext);
+  const { activeUserName } = React.useContext(AuthContext);
   const { chatManager, sb, dispatch } = React.useContext(ChatContext);
   const prevUserList = usePrevUserList();
 
-  console.log(prevUserList, prevUserList.length);
   const [userList, setUserList] = React.useState(null);
-  const [filter, setFilter] = React.useState('');
+  const [filter, setFilter] = React.useState(null);
+
+  const currentUser = activeUserName.toLowerCase();
 
   React.useEffect(() => {
     setUserList(prevUserList);
   }, [prevUserList.length]);
 
   React.useEffect(() => {
-    if (filter === currentUser) {
-      setUserList("That's you!");
-    } else if (filter === '' || filter === null) {
-      setUserList(list =>
-        chatManager?.invitee
-          ? filterUser(list, chatManager?.invitee.userId)
-          : null
-      );
-    } else {
-      const applicationUserListQuery = sb.createApplicationUserListQuery();
+    const applicationUserListQuery = sb.createApplicationUserListQuery();
 
-      applicationUserListQuery.next(function (users, error) {
-        if (error) dispatch({ type: 'Error', error: error.message });
+    applicationUserListQuery.next(function (users, error) {
+      if (error) dispatch({ type: 'Error', error: error.message });
 
-        setUserList(() => {
-          const invitee = chatManager?.invitee;
-          const prevList = invitee ? [invitee] : [];
-          const newList = users.filter(
-            ({ userId }) =>
-              userId.includes(filter) &&
-              userId !== currentUser &&
-              userId !== invitee?.userId
+      setUserList(() => {
+        const invitee = chatManager?.invitee;
+        const prevList = invitee ? [invitee] : [];
+
+        const newList = users.filter(({ nickname }) => {
+          const nicknameLowerCase = nickname.toLowerCase();
+
+          return (
+            nicknameLowerCase.includes(filter) &&
+            nicknameLowerCase !== currentUser &&
+            nicknameLowerCase !== invitee?.nickname.toLowerCase()
           );
-          return [...prevList, ...newList];
         });
+        console.log([...prevList, ...newList]);
+        return [...prevList, ...newList];
       });
-    }
+    });
   }, [filter]);
 
   return [userList, setFilter];
@@ -96,15 +95,17 @@ function usePrevUserList() {
     if (channelListQuery.hasNext) {
       channelListQuery.next(function (channelList, error) {
         if (error) dispatch({ type: 'Error', error: error.message });
+
         const prevChats = channelList
           .map(
             channel =>
               channel.members.length > 1 &&
-              channel.members.filter(({ userId }) => userId !== currentUser)[0]
+              channel.members.filter(
+                ({ nickname }) => nickname !== currentUser
+              )[0]
           )
           .filter(Boolean);
 
-        console.log(prevChats, channelList);
         setPrevUserList(prevChats);
       });
     }
@@ -120,13 +121,12 @@ export function useBlockedUsers() {
   const [blockMessage, setBlockMessage] = React.useState('initial');
 
   React.useEffect(() => {
-    console.log('updated');
     const blockedUserlistQuery = sb.createBlockedUserListQuery();
 
     const t = setTimeout(() => {
       blockedUserlistQuery.next(function (blockedUsers, error) {
         if (error) dispatch({ type: 'Error', error: error.message });
-        console.log(blockedUsers);
+
         setBlockedList(blockedUsers);
       });
     }, 500);

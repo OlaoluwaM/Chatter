@@ -1,10 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
-import { default as styled, ThemeContext } from 'styled-components';
+import styled from 'styled-components';
 import { inputContainerVariant, inputItemVariant } from '../utils/motionObj';
-import { hexToRgb } from '../utils/helper';
 
 const InputContainer = styled(motion.form)`
   width: 91%;
@@ -13,10 +12,25 @@ const InputContainer = styled(motion.form)`
   padding: 10px;
   align-items: center;
   background: transparent;
-  opacity: 0.7;
-  border-top: 1px solid ${({ theme }) => theme.primaryColor};
   align-self: center;
-  overflow: hidden;
+  overflow-y: hidden;
+  position: absolute;
+  bottom: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 98%;
+    height: 5px;
+    border-radius: 50px;
+    background: ${({ theme }) => theme.primaryColor};
+  }
+
+  & > *,
+  &::after {
+    opacity: 'inherit';
+  }
 `;
 
 const InputArea = styled(motion.input)`
@@ -34,11 +48,7 @@ const InputArea = styled(motion.input)`
   align-self: flex-start;
   outline: none;
   background: transparent;
-  margin-left: 80px;
-
-  &:disabled {
-    opacity: 0.3;
-  }
+  margin-left: 65px;
 
   &:hover,
   &:focus {
@@ -50,34 +60,31 @@ const SendButton = styled(motion.button)`
   outline: none;
   border: none;
   background: transparent;
-  fill: ${({ fill }) => hexToRgb(fill, 0.4)};
   font-size: 1.3rem;
-  margin-left: 40px;
-  margin-right: 30px;
+  margin-right: 52px;
   display: flex;
+  fill: ${({ theme }) => theme.primaryColor};
   justify-content: center;
   align-items: center;
   cursor: pointer;
 
   & > svg {
-    transition: 0.3s linear;
+    transition: fill 0.3s linear;
     fill: inherit;
-  }
-  & > svg:hover {
-    fill: ${({ fill }) => fill};
-  }
-  &:disabled {
-    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 `;
 
-export default function Input({ onSendMessage }) {
-  const { primaryColor } = React.useContext(ThemeContext);
+export default function Input({ disabled, onSendMessage }) {
   const [message, setMessage] = React.useState({ text: '' });
 
   const handleSubmit = e => {
-    const { text } = message;
     e.preventDefault();
+    if (disabled) return;
+    const { text } = message;
     onSendMessage(text);
     setMessage({ text: '' });
   };
@@ -86,7 +93,7 @@ export default function Input({ onSendMessage }) {
     <InputContainer
       variants={inputContainerVariant}
       initial='hidden'
-      animate='visible'
+      animate={disabled ? 'visible' : 'enabled'}
       onSubmit={handleSubmit}>
       <InputArea
         variants={inputItemVariant}
@@ -95,9 +102,10 @@ export default function Input({ onSendMessage }) {
         value={message.text}
         placeholder='Say Hi!'
         autoFocus={true}
+        disabled={disabled}
       />
 
-      <SendButton fill={primaryColor} variants={inputItemVariant} type='submit'>
+      <SendButton variants={inputItemVariant} type='submit'>
         <FaPaperPlane />
       </SendButton>
     </InputContainer>

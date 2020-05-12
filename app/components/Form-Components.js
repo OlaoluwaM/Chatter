@@ -149,7 +149,6 @@ const InputSvgValidatorContainer = styled.div`
 
 export function ValidatorSVG({ state, color }) {
   const isError = state === 'error';
-  console.log(state);
   return (
     <InputSvgValidatorContainer>
       <AnimatePresence exitBeforeEnter={true}>

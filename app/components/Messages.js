@@ -1,11 +1,11 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import { spring2 } from '../utils/motionObj';
+import React from 'react';
+import { css, default as styled } from 'styled-components';
 import { AuthContext } from '../context/Context';
 import { hexToRgb, isColor } from '../utils/helper';
-import { default as styled, css } from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
-import { colorStyles, avatarStyles } from './DataDisplay';
+import { spring2 } from '../utils/motionObj';
+import { avatarStyles, colorStyles } from './DataDisplay';
 
 const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
@@ -17,7 +17,7 @@ const MessageAreaWrapper = styled.ul.attrs({
   overflow-y: auto;
   background: inherit;
   overflow-x: hidden;
-  flex-basis: 81%;
+  flex-basis: 75%;
   padding-bottom: 12px;
 
   * {
@@ -114,8 +114,8 @@ const MessageWrapper = styled(motion.li)`
 
 function Message({ message, sender, exit }) {
   const { activeUserName: username } = React.useContext(AuthContext);
-  const { profileUrl, userId } = sender;
-  const isMyMessage = userId === username;
+  const { profileUrl, nickname } = sender;
+  const isMyMessage = nickname === username;
 
   const messageVariant = {
     visible: {
@@ -141,18 +141,28 @@ function Message({ message, sender, exit }) {
       exit={exit}>
       <Avatar bg={profileUrl} />
       <MessageContent>
-        <Username>{userId ?? username}</Username>
+        <Username>{nickname}</Username>
         <MessageText>{message}</MessageText>
       </MessageContent>
     </MessageWrapper>
   );
 }
 
-export default function MessageArea(props) {
-  const { messages } = props;
+export default function MessageArea({ messages }) {
+  const containerElement = React.useRef();
+  const timeoutRef = React.useRef();
+
+  React.useEffect(() => {
+    const { current: ul } = containerElement;
+    timeoutRef.current = setTimeout(() => {
+      ul.scrollTop = ul.scrollHeight;
+    }, 400);
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [messages.length]);
 
   return (
-    <MessageAreaWrapper>
+    <MessageAreaWrapper ref={containerElement}>
       <AnimatePresence>
         {messages.map(({ messageId, sender, text }, ind) => (
           <Message

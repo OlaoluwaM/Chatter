@@ -129,7 +129,7 @@ export const buttonVariant = {
 
 export const inputContainerVariant = {
   visible: {
-    opacity: 1,
+    opacity: 0.5,
     transition: {
       when: 'beforeChildren',
       staggerChildren: 0.1,
@@ -144,11 +144,12 @@ export const inputContainerVariant = {
       when: 'afterChildren',
     },
   },
+  enabled: { opacity: 1 },
 };
 
 export const inputItemVariant = {
   visible: {
-    opacity: 1,
+    opacity: 0.5,
     x: 0,
     transition: { type: 'tween' },
   },
@@ -156,6 +157,7 @@ export const inputItemVariant = {
     opacity: 0,
     x: 30,
   },
+  enabled: { opacity: 1 },
 };
 
 // NAV
@@ -230,7 +232,8 @@ export const menuItemVariant = {
 
 export const currentUserDisplayVariants = {
   visible: { opacity: 1, y: 0 },
-  hidden: { opacity: 0, y: -50 },
+  hidden: { y: -50, opacity: 0 },
+  exit: { y: 80, opacity: 0 },
 };
 
 export const simpleVariant = {

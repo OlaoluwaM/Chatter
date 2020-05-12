@@ -1,25 +1,18 @@
 import React from 'react';
-import Nav from './NavBar';
-import Home from './Home';
-import Auth from './Auth';
-import Logout from './Logout';
-import Chatroom from './Chatroom';
-import DeleteAccount from './DeleteAccount';
-import { ThemeProvider } from 'styled-components';
-import { AuthProvider, themeObj } from '../context/Context';
 import {
   BrowserRouter as Router,
   Redirect,
   Route,
   Switch,
 } from 'react-router-dom';
-import {
-  debounce,
-  documentVisibility,
-  extractCurrentUserFromCookie,
-  sessionTimeout,
-  unloadEventListener,
-} from '../utils/helper';
+import { ThemeProvider } from 'styled-components';
+import { AuthProvider, themeObj } from '../context/Context';
+import Auth from './Auth';
+import Chatroom from './Chatroom';
+import DeleteAccount from './DeleteAccount';
+import Home from './Home';
+import Logout from './Logout';
+import Nav from './NavBar';
 
 export default function App() {
   const [currentUserName, setCurrentUserName] = React.useState(

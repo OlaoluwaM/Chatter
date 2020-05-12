@@ -1,13 +1,13 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { MdBlock } from 'react-icons/md';
-import { UserDisplay } from './DataDisplay';
-import { menuItemVariant } from '../utils/motionObj';
-import { hexToRgb, lightenDarkenColor } from '../utils/helper';
-import { AuthContext, ChatContext } from '../context/Context';
-import { handleUnBlock, handleBlock } from '../utils/chatFunctions';
 import { default as styled, ThemeContext } from 'styled-components';
+import { AuthContext, ChatContext } from '../context/Context';
+import { handleBlock, handleUnBlock } from '../utils/chatFunctions';
+import { hexToRgb } from '../utils/helper';
+import { menuItemVariant } from '../utils/motionObj';
+import { UserDisplay } from './DataDisplay';
 
 export const MenuItem = styled(motion.div).attrs({
   variants: menuItemVariant,
@@ -61,28 +61,24 @@ export default function User(props) {
   const { sb, dispatch, chatManager } = React.useContext(ChatContext);
   const { primaryColor } = React.useContext(ThemeContext);
 
-  console.log(chatManager);
-
   const { userData, ind, funcs, friends, blocked } = props;
   const { blockedUsersList, setBlockMessage } = blocked;
   const { beFriend, unFriend, inviteUser } = funcs;
 
   const [isBlocked, setBlocked] = React.useState(() =>
-    blockedUsersList.map(obj => obj.userId).includes(userData.userId)
+    blockedUsersList.map(obj => obj.nickname).includes(userData.nickname)
   );
 
   const [isFriend, setIsFriend] = React.useState(() =>
-    friends.includes(userData.userId)
+    friends.includes(userData.nickname)
   );
 
-  const [isActive, setIsActive] = React.useState(false);
-
   React.useEffect(() => {
-    console.log('change');
-    setIsActive(chatManager?.invitee?.userId === userData.userId);
-
-    return () => setIsActive(false);
-  }, [chatManager?.invitee?.userId]);
+    const prevActive = document.querySelector('.user.active');
+    if (prevActive && !chatManager?.userChannel) {
+      prevActive.classList.remove('active');
+    }
+  }, [chatManager?.userChannel]);
 
   const blockUser = targetUser => {
     try {
@@ -102,7 +98,7 @@ export default function User(props) {
     if (blocked) return;
     const actionArea = e.currentTarget.querySelector('.action-area');
     if (!actionArea.contains(e.target)) {
-      inviteUser([currentUserName, userData.userId]);
+      inviteUser([currentUserName, userData.nickname]);
     } else return;
   };
 
@@ -116,13 +112,21 @@ export default function User(props) {
     }
   };
 
+  const handleClick = e => {
+    const prevActive = document.querySelector('.user.active');
+    if (prevActive === e.currentTarget) return;
+    if (prevActive) prevActive.classList.remove('active');
+    e.currentTarget.classList.add('active');
+    handleInvite(e, userData, isBlocked);
+  };
+
   return (
     <MenuItem
       custom={ind}
       position={ind}
       status={userData.connectionStatus}
-      className={`user ${isActive ? 'active' : ''}`}
-      onClick={e => handleInvite(e, userData, isBlocked)}>
+      className={`user`}
+      onClick={handleClick}>
       <UserDisplay
         data={userData}
         subData={isBlocked ? 'Blocked' : userData.connectionStatus}>

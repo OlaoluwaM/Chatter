@@ -1,8 +1,8 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
 import { MdSearch } from 'react-icons/md';
+import { css, default as styled } from 'styled-components';
 import { hexToRgb } from '../utils/helper';
-import { default as styled, css } from 'styled-components';
 
 const SearchBarForm = styled(motion.form)`
   width: 75%;
@@ -66,17 +66,17 @@ const SearchBarForm = styled(motion.form)`
 export default function SearchUser({ category, searchForUser, motionProps }) {
   const [input, setInput] = React.useState('');
 
-  React.useEffect(() => {
-    setInput('');
-  }, [category]);
+  // React.useEffect(() => {
+  //   setInput(null);
+  // }, [category]);
 
   const handleSubmit = e => {
     e.preventDefault();
-    searchForUser(input);
+    searchForUser(!!input ? input : null);
   };
 
   const handleInputChange = e => {
-    if (e.target.value === '') searchForUser('');
+    if (e.target.value === '') searchForUser(null);
     setInput(e.target.value);
   };
 

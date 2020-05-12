@@ -1,12 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
 import { TiTimes } from 'react-icons/ti';
+import styled from 'styled-components';
 import { ChatContext } from '../context/Context';
-import { UserDisplay } from './DataDisplay';
-import { AnimatePresence } from 'framer-motion';
 import { formatTimeString } from '../utils/chatFunctions';
-import { CurrentUserDisplay } from './Sidebar';
 import { currentUserDisplayVariants } from '../utils/motionObj';
+import { UserDisplay } from './DataDisplay';
+import { CurrentUserDisplay } from './Sidebar';
 
 const Overhead = styled(CurrentUserDisplay)`
   height: 14%;
@@ -21,51 +20,34 @@ const svgStyle = {
   cursor: 'pointer',
 };
 
-export default function ChatOverHead() {
-  const [isChatting, setIsChatting] = React.useState({ chatting: false });
+export default function ChatOverHead({ invitee }) {
+  const { dispatch } = React.useContext(ChatContext);
 
-  const { sb, chatManager, dispatch } = React.useContext(ChatContext);
+  const subData = invitee
+    ? invitee.connectionStatus !== 'online'
+      ? formatTimeString(invitee.lastSeenAt)
+      : invitee.connectionStatus
+    : null;
 
-  const newChat = typeof chatManager.userChannel !== 'string';
-
-  React.useEffect(() => {
-    setIsChatting({ chatting: true, invitee: chatManager.invitee });
-
-    return () => setIsChatting(false);
-  }, [newChat]);
-
-  const invitee = isChatting?.invitee;
-
-  const subData =
-    isChatting.chatting && invitee
-      ? invitee.connectionStatus !== 'online'
-        ? formatTimeString(invitee.lastSeenAt)
-        : invitee.connectionStatus
-      : null;
-
-  console.log(isChatting.chatting, subData);
   return (
-    <Overhead key={invitee} initial='hidden' animate='visible'>
-      <AnimatePresence exitBeforeEnter>
-        {isChatting.chatting && subData && (
-          <UserDisplay
-            motionProps={{
-              variants: currentUserDisplayVariants,
-              exit: 'hidden',
-              layoutTransition: true,
+    <Overhead initial='hidden' animate='visible'>
+      {subData && (
+        <UserDisplay
+          key={invitee}
+          motionProps={{
+            variants: currentUserDisplayVariants,
+            layoutTransition: true,
+          }}
+          data={invitee}
+          subData={subData}>
+          <TiTimes
+            style={svgStyle}
+            onClick={() => {
+              dispatch({ type: 'Exit Chat' });
             }}
-            data={invitee}
-            subData={subData}>
-            <TiTimes
-              style={svgStyle}
-              onClick={() => {
-                chatManager.userChannel.leave();
-                dispatch({ type: 'Exit Chat' });
-              }}
-            />
-          </UserDisplay>
-        )}
-      </AnimatePresence>
+          />
+        </UserDisplay>
+      )}
     </Overhead>
   );
 }

@@ -1,16 +1,15 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
-import User from './User';
 import styled from 'styled-components';
-import SearchUser from './SearchBar';
-import { hexToRgb } from '../utils/helper';
-import { ChatContext } from '../context/Context';
-import { simpleVariant } from '../utils/motionObj';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  useUserFilter,
-  useFriendList,
   useBlockedUsers,
+  useFriendList,
+  useUserFilter,
 } from '../custom-hooks/chatHooks';
+import { hexToRgb } from '../utils/helper';
+import { simpleVariant } from '../utils/motionObj';
+import SearchUser from './SearchBar';
+import User from './User';
 
 const MenuContainer = styled(motion.menu)`
   height: 70%;
@@ -42,8 +41,6 @@ const AlertText = styled(motion.p).attrs({
 `;
 
 export default function Menu({ category, inviteUser }) {
-  const { sb, dispatch } = React.useContext(ChatContext);
-
   const [userList, setFilter] = useUserFilter();
   const [friendList, friendNames, setFriendNames] = useFriendList();
   const [blockedUsersList, setBlockMessage] = useBlockedUsers();
@@ -66,24 +63,26 @@ export default function Menu({ category, inviteUser }) {
     }
 
     return () => {
+      console.log('change');
       setUsers(null);
     };
   }, [category, userList]);
 
   const searchForUser = input => {
-    if (category !== 'friends') {
-      setFilter(input);
-    } else {
-      if (input === '') {
-        setUsers(friendList.length > 0 ? friendList : 'No one yet');
-      } else {
-        setUsers(
-          friendList.filter(
-            ({ userId }) => userId.includes(input) || input === userId
-          )
-        );
-      }
-    }
+    const filter = input?.toLowerCase() ?? null;
+
+    if (category === 'friends') {
+      setUsers(
+        friendList.filter(({ nickname }) => {
+          const lowerCaseNickname = nickname.toLowerCase();
+          if (filter) {
+            return (
+              lowerCaseNickname.includes(filter) || filter === lowerCaseNickname
+            );
+          } else return true;
+        })
+      );
+    } else setFilter(filter);
   };
 
   const { success, empty } = {
@@ -93,11 +92,11 @@ export default function Menu({ category, inviteUser }) {
 
   const funcs = {
     beFriend(friend) {
-      setFriendNames(arr => [...arr, friend.userId]);
+      setFriendNames(arr => [...arr, friend.nickname]);
     },
 
     unFriend(friend) {
-      const { userId: friendName } = friend;
+      const { nickname: friendName } = friend;
       setFriendNames(arr => arr.filter(Id => Id !== friendName));
     },
 
@@ -144,7 +143,7 @@ export default function Menu({ category, inviteUser }) {
               })}
           </AnimatePresence>
 
-          {empty && <AlertText key='error-m'>User does not exist</AlertText>}
+          {/* {empty && <AlertText key='error-m'>User does not exist</AlertText>} */}
         </MenuContainer>
       </AnimatePresence>
     </>

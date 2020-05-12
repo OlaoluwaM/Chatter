@@ -202,7 +202,7 @@ export function generateRandomColor() {
 
 export function filterUser(list, username) {
   return list.filter(user => {
-    const name = user?.userId ?? user;
+    const name = user?.nickname ?? user;
     return name !== username;
   });
 }
