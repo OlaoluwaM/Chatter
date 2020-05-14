@@ -15,7 +15,7 @@ const InputContainer = styled(motion.form)`
   align-self: center;
   overflow-y: hidden;
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
 
   &::after {
     content: '';

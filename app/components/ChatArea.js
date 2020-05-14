@@ -22,7 +22,7 @@ const ChatAreaWrapper = styled.div`
 
 export default function ChatArea() {
   const { sb, chatManager, dispatch } = React.useContext(ChatContext);
-  const condition = typeof chatManager?.userChannel === 'object';
+  const isInChat = typeof chatManager?.userChannel === 'object';
 
   React.useEffect(() => {
     const channelHandler = new sb.ChannelHandler();
@@ -56,7 +56,7 @@ export default function ChatArea() {
       sb.removeChannelHandler(HANDLER_ID1);
       sb.removeConnectionHandler(HANDLER_ID2);
     };
-  }, [condition]);
+  }, [isInChat]);
 
   const handleMessageReceived = (channel, message) => {
     const messages = [extractNeededMessageData(message)];
@@ -67,7 +67,6 @@ export default function ChatArea() {
         messages,
       });
     } else {
-      console.log('once');
       const prevMessageListQuery = channel.createPreviousMessageListQuery();
       prevMessageListQuery.limit = 50;
       prevMessageListQuery.reverse = false;

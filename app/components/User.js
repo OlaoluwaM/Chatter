@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { MdBlock } from 'react-icons/md';
@@ -53,13 +53,13 @@ const InitialSvgStyle = stroke => ({
   alignItems: 'center',
   padding: 0,
   rotate: 0,
-  y: 0,
 });
 
 export default function User(props) {
   const { activeUserName: currentUserName } = React.useContext(AuthContext);
   const { sb, dispatch, chatManager } = React.useContext(ChatContext);
   const { primaryColor } = React.useContext(ThemeContext);
+  const elementRef = React.useRef();
 
   const { userData, ind, funcs, friends, blocked } = props;
   const { blockedUsersList, setBlockMessage } = blocked;
@@ -72,13 +72,11 @@ export default function User(props) {
   const [isFriend, setIsFriend] = React.useState(() =>
     friends.includes(userData.nickname)
   );
-
-  React.useEffect(() => {
-    const prevActive = document.querySelector('.user.active');
-    if (prevActive && !chatManager?.userChannel) {
-      prevActive.classList.remove('active');
-    }
-  }, [chatManager?.userChannel]);
+  const isInChat = typeof chatManager?.userChannel === 'object';
+  const active =
+    isInChat && chatManager.invitee.nickname === userData.nickname
+      ? 'active'
+      : '';
 
   const blockUser = targetUser => {
     try {
@@ -96,10 +94,7 @@ export default function User(props) {
 
   const handleInvite = (e, userData, blocked) => {
     if (blocked) return;
-    const actionArea = e.currentTarget.querySelector('.action-area');
-    if (!actionArea.contains(e.target)) {
-      inviteUser([currentUserName, userData.nickname]);
-    } else return;
+    inviteUser([currentUserName, userData.nickname]);
   };
 
   const handleFriendLogic = () => {
@@ -113,47 +108,61 @@ export default function User(props) {
   };
 
   const handleClick = e => {
+    const actionArea = e.currentTarget.querySelector('.action-area');
+    if (actionArea.contains(e.target) || e.target === actionArea) return;
+
     const prevActive = document.querySelector('.user.active');
     if (prevActive === e.currentTarget) return;
     if (prevActive) prevActive.classList.remove('active');
+
     e.currentTarget.classList.add('active');
     handleInvite(e, userData, isBlocked);
   };
 
+  const animateForFriendIcon = isFriend
+    ? {
+        ...InitialSvgStyle(primaryColor),
+        rotate: 45,
+        stroke: 'rgba(245, 10, 10, .7)',
+      }
+    : InitialSvgStyle(primaryColor);
+
   return (
     <MenuItem
+      ref={elementRef}
       custom={ind}
       position={ind}
       status={userData.connectionStatus}
-      className={`user`}
+      className={`user ${active}`}
       onClick={handleClick}>
       <UserDisplay
         data={userData}
         subData={isBlocked ? 'Blocked' : userData.connectionStatus}>
-        {!isBlocked && (
-          <motion.div
-            style={InitialSvgStyle(primaryColor)}
-            animate={
-              isFriend
-                ? {
-                    ...InitialSvgStyle(primaryColor),
-                    y: 2,
-                    rotate: 45,
-                    stroke: 'rgba(245, 10, 10, .7)',
-                  }
-                : InitialSvgStyle(primaryColor)
-            }
-            onTap={handleFriendLogic}>
-            <FiPlus style={{ stroke: 'inherit' }} />
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {!isBlocked && (
+            <motion.div
+              key='friend'
+              positionTransition={true}
+              style={InitialSvgStyle(primaryColor)}
+              animate={animateForFriendIcon}
+              exit={{ opacity: 0 }}
+              onTap={handleFriendLogic}>
+              <FiPlus style={{ stroke: 'inherit' }} />
+            </motion.div>
+          )}
 
-        {!isFriend && (
-          <MdBlock
-            style={{ fill: isBlocked ? 'red' : 'inherit' }}
-            onClick={() => blockUser(userData)}
-          />
-        )}
+          {!isFriend && (
+            <motion.div
+              key='block'
+              positionTransition={true}
+              style={InitialSvgStyle(primaryColor)}
+              animate={{ ...animateForFriendIcon, rotate: 0 }}
+              exit={{ opacity: 0 }}
+              onTap={() => blockUser(userData)}>
+              <MdBlock style={{ fill: isBlocked ? 'red' : 'inherit' }} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </UserDisplay>
     </MenuItem>
   );

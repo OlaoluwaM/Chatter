@@ -149,7 +149,7 @@ export const inputContainerVariant = {
 
 export const inputItemVariant = {
   visible: {
-    opacity: 0.5,
+    opacity: 0.7,
     x: 0,
     transition: { type: 'tween' },
   },

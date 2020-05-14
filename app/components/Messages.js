@@ -156,7 +156,7 @@ export default function MessageArea({ messages }) {
     const { current: ul } = containerElement;
     timeoutRef.current = setTimeout(() => {
       ul.scrollTop = ul.scrollHeight;
-    }, 400);
+    }, 500);
 
     return () => clearTimeout(timeoutRef.current);
   }, [messages.length]);

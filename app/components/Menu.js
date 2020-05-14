@@ -23,7 +23,7 @@ const MenuContainer = styled(motion.menu)`
   padding-top: 0px;
 
   &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => hexToRgb(theme.primaryColor, 0.8)};
+    background: ${({ theme }) => hexToRgb(theme.primaryColor, 0.3)};
   }
 `;
 
@@ -45,7 +45,7 @@ export default function Menu({ category, inviteUser }) {
   const [friendList, friendNames, setFriendNames] = useFriendList();
   const [blockedUsersList, setBlockMessage] = useBlockedUsers();
 
-  const [users, setUsers] = React.useState(null);
+  const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
     switch (category) {
@@ -54,19 +54,24 @@ export default function Menu({ category, inviteUser }) {
         break;
 
       case 'friends':
-        setUsers(friendList.length > 0 ? friendList : 'No one yet');
+        setUsers(friendList);
         break;
 
       case 'blocked':
-        setUsers(blockedUsersList.length > 0 ? blockedUsersList : 'No one yet');
+        setUsers(blockedUsersList);
         break;
     }
 
     return () => {
       console.log('change');
-      setUsers(null);
+      // setUsers([]);
     };
-  }, [category, userList]);
+  }, [
+    category,
+    JSON.stringify(userList),
+    JSON.stringify(friendList),
+    JSON.stringify(blockedUsersList),
+  ]);
 
   const searchForUser = input => {
     const filter = input?.toLowerCase() ?? null;
@@ -86,8 +91,8 @@ export default function Menu({ category, inviteUser }) {
   };
 
   const { success, empty } = {
-    success: Array.isArray(users) && users.length > 0,
-    empty: Array.isArray(users) && users.length === 0,
+    success: users.length > 0,
+    empty: users.length === 0,
   };
 
   const funcs = {
@@ -143,7 +148,7 @@ export default function Menu({ category, inviteUser }) {
               })}
           </AnimatePresence>
 
-          {/* {empty && <AlertText key='error-m'>User does not exist</AlertText>} */}
+          {empty && <AlertText key='error-m'>User does not exist</AlertText>}
         </MenuContainer>
       </AnimatePresence>
     </>

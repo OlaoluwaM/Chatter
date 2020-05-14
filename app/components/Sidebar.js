@@ -1,12 +1,12 @@
 import React from 'react';
-import Menu from './Menu';
-import styled from 'styled-components';
-import { MenuItem } from './User';
-import { UserDisplay } from './DataDisplay';
-import { ChatContext } from '../context/Context';
 import { FiMoreVertical } from 'react-icons/fi';
-import { currentUserDisplayVariants } from '../utils/motionObj';
+import styled from 'styled-components';
+import { ChatContext } from '../context/Context';
 import { hexToRgb, lightenDarkenColor } from '../utils/helper';
+import { currentUserDisplayVariants } from '../utils/motionObj';
+import { UserDisplay } from './DataDisplay';
+import Menu from './Menu';
+import { MenuItem } from './User';
 
 const SidebarContainer = styled.nav`
   position: relative;

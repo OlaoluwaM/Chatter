@@ -137,7 +137,9 @@ export function handleUnBlock(blockedUser, sb) {
   sb.unblockUser(blockedUser, (user, error) => {
     if (error) throw new Error(error.message);
   });
-  console.log(`${blockedUser.userId}(${user.nickname}) has been unblocked`);
+  console.log(
+    `${blockedUser.userId}(${blockedUser.nickname}) has been unblocked`
+  );
   return `${blockedUser.userId} has been unblocked`;
 }
 

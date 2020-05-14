@@ -65,12 +65,6 @@ export default function Chatroom() {
       dispatch({ type: 'New Chat' });
     }
 
-    // const gCParams = new sb.GroupChannelParams();
-
-    // gCParams.addUserIds([inviteeHash]);
-    // const obj = Object.fromEntries(createGroupParamEntries(invitee));
-    // Object.assign(gCParams, obj);
-
     sb.GroupChannel.createChannelWithUserIds(
       [inviteeHash],
       true,

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { MdSearch } from 'react-icons/md';
 import { css, default as styled } from 'styled-components';
+import useDebounce from '../custom-hooks/useDebounce';
 import { hexToRgb } from '../utils/helper';
 
 const SearchBarForm = styled(motion.form)`
@@ -65,14 +66,18 @@ const SearchBarForm = styled(motion.form)`
 
 export default function SearchUser({ category, searchForUser, motionProps }) {
   const [input, setInput] = React.useState('');
+  const debouncedFilter = useDebounce(input, 700);
 
-  // React.useEffect(() => {
-  //   setInput(null);
-  // }, [category]);
+  React.useEffect(() => {
+    if (debouncedFilter) searchForUser(debouncedFilter);
+  }, [debouncedFilter]);
 
   const handleSubmit = e => {
     e.preventDefault();
     searchForUser(!!input ? input : null);
+    if (input.length <= 1) {
+      setInput('');
+    }
   };
 
   const handleInputChange = e => {
