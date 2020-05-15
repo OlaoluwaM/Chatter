@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiMoreVertical } from 'react-icons/fi';
+import { AiFillSetting } from 'react-icons/ai';
 import styled from 'styled-components';
 import { ChatContext } from '../context/Context';
 import { hexToRgb, lightenDarkenColor } from '../utils/helper';
@@ -7,6 +7,8 @@ import { currentUserDisplayVariants } from '../utils/motionObj';
 import { UserDisplay } from './DataDisplay';
 import Menu from './Menu';
 import { MenuItem } from './User';
+
+// TODO create settings for logout username edit and deletion of account
 
 const SidebarContainer = styled.nav`
   position: relative;
@@ -88,7 +90,7 @@ function CurrentUser({ user }) {
       initial='hidden'
       animate='visible'>
       <UserDisplay isCurrentUser={true} data={user}>
-        <FiMoreVertical style={{ cursor: 'pointer' }} />
+        <AiFillSetting style={{ cursor: 'pointer' }} />
       </UserDisplay>
     </CurrentUserDisplay>
   );

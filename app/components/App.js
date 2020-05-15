@@ -5,6 +5,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import { useCookie, useIdle } from 'react-use';
 import { ThemeProvider } from 'styled-components';
 import { AuthProvider, themeObj } from '../context/Context';
 import Auth from './Auth';
@@ -15,14 +16,33 @@ import Logout from './Logout';
 import Nav from './NavBar';
 
 export default function App() {
+  const isIdle = useIdle(1200e3);
+  const [cookieValue, updateCookie, deleteCookie] = useCookie('user-session');
+  console.log(cookieValue);
+
   const [currentUserName, setCurrentUserName] = React.useState(
-    sessionStorage.getItem('CurrentUser') ?? null
+    sessionStorage.getItem('CurrentUser') ?? cookieValue
   );
 
   const [isAuthed, setAuthed] = React.useState({
     activeUserName: currentUserName ?? null,
     isAuthenticated: !!currentUserName,
   });
+
+  React.useEffect(() => {
+    if (!currentUserName && cookieValue) {
+      setCurrentUserName(cookieValue);
+    } else return;
+  }, [cookieValue]);
+
+  React.useEffect(() => {
+    if (!isAuthed.isAuthenticated && !isIdle) {
+      if (value) deleteCookie();
+      return;
+    } else {
+      updateCookie(currentUserName);
+    }
+  }, [isAuthed.isAuthenticated, isIdle]);
 
   return (
     <Router>
@@ -31,6 +51,8 @@ export default function App() {
           {!isAuthed.isAuthenticated && <Nav />}
 
           {!isAuthed.isAuthenticated && <Redirect to='/' />}
+
+          {isIdle && isAuthed.isAuthenticated && <Redirect to='/logout' />}
 
           <Switch>
             <Route exact path='/' component={Home} />
