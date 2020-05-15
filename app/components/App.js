@@ -18,7 +18,6 @@ import Nav from './NavBar';
 export default function App() {
   const isIdle = useIdle(1200e3);
   const [cookieValue, updateCookie, deleteCookie] = useCookie('user-session');
-  console.log(cookieValue);
 
   const [currentUserName, setCurrentUserName] = React.useState(
     sessionStorage.getItem('CurrentUser') ?? cookieValue
@@ -31,6 +30,7 @@ export default function App() {
 
   React.useEffect(() => {
     if (!currentUserName && cookieValue) {
+      sessionStorage.setItem('CurrentUser', cookieValue);
       setCurrentUserName(cookieValue);
     } else return;
   }, [cookieValue]);
@@ -55,16 +55,24 @@ export default function App() {
           {isIdle && isAuthed.isAuthenticated && <Redirect to='/logout' />}
 
           <Switch>
-            <Route exact path='/' component={Home} />
-            <Route path='/chat' component={Chatroom} />
+            <Route exact path='/'>
+              <Home />
+            </Route>
+
+            <Route path='/chat'>
+              <Chatroom />
+            </Route>
+
             <Route
               path='/authenticate'
               render={props => <Auth {...props} setAuth={setAuthed} />}
             />
+
             <Route
               path='/logout'
               render={props => <Logout {...props} setAuth={setAuthed} />}
             />
+
             <Route
               path='/delete-account'
               render={props => <DeleteAccount {...props} setAuth={setAuthed} />}

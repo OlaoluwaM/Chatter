@@ -25,14 +25,17 @@ const ChatRoomContainer = styled.div.attrs({
 // TODO redo the neumorphic design
 
 export default function Chatroom() {
-  const { activeUserName: username } = React.useContext(AuthContext);
+  const { activeUserName: username, activeUserId: id } = React.useContext(
+    AuthContext
+  );
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
 
   React.useEffect(() => {
     try {
-      sb.connect(hashCode(username) + '', (user, error) => {
+      sb.connect(hashCode(id) + '', (user, error) => {
         if (error) throw new Error(error.message);
+
         const friendArray = user.metaData.friends ?? JSON.stringify([]);
         user.nickname = username;
 
@@ -40,7 +43,7 @@ export default function Chatroom() {
           friends: friendArray,
         });
 
-        dispatch({ type: 'Connect', isConnected: user !== null });
+        dispatch({ type: 'Connect', isConnected: true });
       });
       sb.updateCurrentUserInfo(username, '');
     } catch (e) {
@@ -53,9 +56,7 @@ export default function Chatroom() {
     };
   }, []);
 
-  const createOneToOneChannel = users => {
-    const { '1': invitee } = users;
-    const inviteeHash = hashCode(invitee) + '';
+  const createOneToOneChannel = ({ inviteeHash, inviteeName }) => {
     const { userChannel } = chatManager;
 
     if (userChannel && userChannel.memberMap.hasOwnProperty(inviteeHash)) {
@@ -68,7 +69,7 @@ export default function Chatroom() {
     sb.GroupChannel.createChannelWithUserIds(
       [inviteeHash],
       true,
-      invitee,
+      inviteeName,
       '',
       ' ',
       (channel, error) => {

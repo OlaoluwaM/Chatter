@@ -13,14 +13,15 @@ const SUCCESS_COLOR = 'rgba(40, 210, 40, .9)';
 export function handleSignUp(data) {
   const users = store.get('users') ?? [];
   const { name, password } = data;
+  const id = generateRandomId();
 
-  const newUser = { name, password };
+  const newUser = { name, password, id };
   users.push(newUser);
 
   store.set('users', users);
   sessionStorage.setItem('CurrentUser', name);
 
-  return { activeUserName: name, isAuthenticated: true };
+  return { activeUserName: name, isAuthenticated: true, activeUserId: id };
 }
 
 /**s
@@ -30,9 +31,9 @@ export function handleSignUp(data) {
  *
  */
 
-export function handleLogin({ name }) {
+export function handleLogin({ name, id }) {
   sessionStorage.setItem('CurrentUser', name);
-  return { activeUserName: name, isAuthenticated: true };
+  return { activeUserName: name, isAuthenticated: true, activeUserId: id };
 }
 
 // Validation Functions -------------------------------------

@@ -207,7 +207,7 @@ export function filterUser(list, username) {
   });
 }
 
-export function hashCode(str, seed = 3) {
+export function hashCode(str, seed = 0) {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
   for (let i = 0, ch; i < str.length; i++) {
@@ -230,3 +230,10 @@ export const debounce = (func, ms = 0) => {
     timeoutId = setTimeout(() => func.apply(this, args), ms);
   };
 };
+
+export function generateRandomId() {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+}

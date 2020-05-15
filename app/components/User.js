@@ -92,9 +92,10 @@ export default function User(props) {
     }
   };
 
-  const handleInvite = (e, userData, blocked) => {
+  const handleInvite = (userData, blocked) => {
     if (blocked) return;
-    inviteUser([currentUserName, userData.nickname]);
+    const { nickname, userId } = userData;
+    inviteUser({ inviteeHash: userId, inviteeName: nickname });
   };
 
   const handleFriendLogic = () => {
@@ -116,7 +117,7 @@ export default function User(props) {
     if (prevActive) prevActive.classList.remove('active');
 
     e.currentTarget.classList.add('active');
-    handleInvite(e, userData, isBlocked);
+    handleInvite(userData, isBlocked);
   };
 
   const animateForFriendIcon = isFriend
