@@ -1,5 +1,7 @@
 import React from 'react';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import * as SendBird from 'sendbird';
+import store from 'store';
 import styled from 'styled-components';
 import { AuthContext, ChatProvider } from '../context/Context';
 import {
@@ -10,6 +12,7 @@ import {
 import { SENDBIRD_APP_ID } from '../utils/file';
 import { hashCode } from '../utils/helper';
 import ChatArea from './ChatArea';
+import Settings from './Settings';
 import Sidebar from './Sidebar';
 
 const ChatRoomContainer = styled.div.attrs({
@@ -18,18 +21,21 @@ const ChatRoomContainer = styled.div.attrs({
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: ${({ theme }) => theme.primaryColorDark};
 `;
 
 // TODO add general error page
 // TODO redo the neumorphic design
 
-export default function Chatroom() {
-  const { activeUserName: username, activeUserId: id } = React.useContext(
-    AuthContext
-  );
+export default function Chatroom({ setAuth }) {
+  const { activeUserName: username } = React.useContext(AuthContext);
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
+  const match = useRouteMatch();
+
+  const activeUserData = store
+    .get('users')
+    .find(({ username: name }) => name === username);
+  const id = activeUserData.id;
 
   React.useEffect(() => {
     try {
@@ -114,7 +120,16 @@ export default function Chatroom() {
       {success && (
         <ChatProvider value={chatContextObj}>
           <Sidebar inviteUser={createOneToOneChannel} />
-          <ChatArea />
+
+          <Switch>
+            <Route path={`${match.path}/settings`}>
+              <Settings setAuth={setAuth} />
+            </Route>
+
+            <Route path={match.path}>
+              <ChatArea />
+            </Route>
+          </Switch>
         </ChatProvider>
       )}
 

@@ -237,3 +237,32 @@ export function generateRandomId() {
     Math.random().toString(36).substring(2, 15)
   );
 }
+
+function isValidImage(str) {
+  return new RegExp(/\.(jpe?g|png|gif)$/, 'i').test(str);
+}
+
+export function handleFileInputChange(e) {
+  const label = e.target.nextElementSibling;
+  const initialLabelValue = label.innerText;
+  const { '0': file, length } = e.target.files;
+
+  if (length >= 1) {
+    const { name } = file;
+    label.innerText = isValidImage(name) ? name : 'Not a valid image file';
+  } else label.innerText = initialLabelValue;
+}
+
+export function resetInputFileValue(e) {
+  const label = e.currentTarget.previousElementSibling;
+  const initialLabelText = 'New profile image file';
+
+  if (label.innerText !== initialLabelText) {
+    label.innerText = initialLabelText;
+  } else return;
+}
+
+export function handleSbResponse(res, err) {
+  if (err) throw error;
+  console.log(res);
+}

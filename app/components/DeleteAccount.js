@@ -16,10 +16,13 @@ const DeleteAccPage = styled.div.attrs({
 
   h1 {
     color: red;
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: 800;
+    width: 80%;
     text-transform: uppercase;
     font-family: var(--font1);
+    text-align: center;
+    margin-bottom: 10px;
   }
 `;
 

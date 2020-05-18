@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import { TiTimes } from 'react-icons/ti';
+import { default as styled } from 'styled-components';
 import useDebounce from '../custom-hooks/useDebounce';
 import { inputValidation } from '../utils/authFunc';
-import { hexToRgb } from '../utils/helper';
+import { hexToRgb, resetInputFileValue } from '../utils/helper';
 import { inputSvgValidatorVariants, pathObj } from '../utils/motionObj';
 
 export const FormTitle = styled(motion.h1)`
@@ -58,9 +59,9 @@ export const InputLabel = styled.label`
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
-  pointer-events: none;
   left: 2.1%;
-  top: 24%;
+  top: 27%;
+  cursor: text;
   transition: 0.2s ease all;
 `;
 
@@ -74,6 +75,7 @@ const Input = styled.input`
   font-family: var(--font1);
   font-size: 1.2em;
   font-weight: 100;
+  padding-bottom: 5px;
 
   &:not([type='button']) {
     flex-basis: 30%;
@@ -90,16 +92,49 @@ export const InputContainer = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
   overflow: hidden;
+  cursor: text;
 
-  &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: 2%;
-    color: ${({ theme }) => theme.secondaryColor};
+  &:not(.simple-input) {
+    & > input:valid ~ ${InputLabel} {
+      top: 2%;
+      color: ${({ theme }) => theme.secondaryColor};
+    }
+
+    & > input:valid ~ ${Bar}:before {
+      transform: scaleX(1);
+    }
+
+    &:focus-within,
+    &.active {
+      ${InputLabel} {
+        top: 2%;
+        color: ${({ theme }) => theme.secondaryColor};
+      }
+
+      ${Bar}:before {
+        transform: scaleX(1);
+      }
+    }
   }
 
-  &:focus-within ${Bar}::before, input:valid ~ ${Bar}::before {
-    transform: scaleX(1);
+  &.simple-input {
+    input[type='file']:hover ~ ${InputLabel} {
+      color: ${({ theme }) => theme.primaryColor};
+    }
+
+    &.active,
+    &:focus-within {
+      ${InputLabel}:not([for='profile-file']) {
+        top: 2%;
+        color: ${({ theme }) => theme.secondaryColor};
+      }
+
+      ${Bar}:before {
+        transform: scaleX(1);
+      }
+    }
   }
 `;
 
@@ -137,7 +172,7 @@ const InputSvgValidatorContainer = styled.div`
   justify-content: center;
   right: 4%;
   position: absolute;
-  top: 18.5%;
+  top: 27%;
 
   svg {
     path {
@@ -170,9 +205,54 @@ export function ValidatorSVG({ state, color }) {
   );
 }
 
+export function SimpleInputField(props) {
+  const { motionProps, label, addBar = true, ...rest } = props;
+  const { name, type, message } = rest;
+  const isFileInput = type === 'file';
+
+  const [inputValue, setInputValue] = React.useState('');
+
+  const handleFocus = e => {
+    const isFocused = e.currentTarget.classList.contains('focused');
+    e.currentTarget.classList.toggle('focused', !isFocused);
+  };
+
+  const handleBlur = e => {
+    const isFocusedElem = e.currentTarget.classList.contains('focused');
+    if (isFocusedElem) e.currentTarget.classList.remove('focused');
+  };
+
+  const handleChange = e => {
+    e.persist();
+    const container = e.currentTarget.parentElement;
+    container.classList.toggle('active', e.target.value.length >= 1);
+    setInputValue(() => e.target.value);
+  };
+
+  return (
+    <InputContainer
+      className='simple-input'
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      {...motionProps}>
+      <Input value={inputValue} onChange={handleChange} {...rest} id={name} />
+      {addBar && <Bar />}
+      {label && <InputLabel htmlFor={name}>{label}</InputLabel>}
+
+      {isFileInput && (
+        <TiTimes className='reset' onClick={resetInputFileValue} />
+      )}
+
+      <ValidatorSVG
+        state={!message ? 'initial' : message.type}
+        color={message?.color}
+      />
+    </InputContainer>
+  );
+}
 export function InputField(props) {
   const { name, required, type, label, motionProps, ...rest } = props;
-  const { formState } = rest;
+  const { formState, className } = rest;
   const { formType, setInputFieldError } = formState;
 
   const [message, setMessage] = React.useState(null);
@@ -203,23 +283,34 @@ export function InputField(props) {
   const handleInputValidation = () =>
     setMessage(inputValidation(name, inputValue, LoginForm));
 
+  const handleChange = e => {
+    e.persist();
+    if (!required) {
+      const container = e.currentTarget.parentElement;
+      container.classList.toggle('active', e.target.value.length >= 1);
+    }
+    setInputValue(() => e.target.value);
+  };
+
   return (
-    <InputContainer {...motionProps}>
+    <InputContainer {...motionProps} className={className}>
       <Input
         onBlur={handleInputValidation}
+        onFocus={handleInputValidation}
         onFocus={() =>
           name === 'confirmPassword' && message && setInputValue('')
         }
-        onChange={e => setInputValue(e.target.value)}
+        onChange={handleChange}
         value={inputValue}
         type={type}
         required={required}
         name={name}
+        id={name}
         {...rest}
       />
 
       <Bar messageColor={message?.color} />
-      <InputLabel>{label}</InputLabel>
+      <InputLabel htmlFor={name}>{label}</InputLabel>
 
       <ValidatorSVG
         state={!message ? 'initial' : message.type}

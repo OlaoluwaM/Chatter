@@ -1,5 +1,5 @@
 import store from 'store';
-import { strongRegex } from './helper';
+import { generateRandomId, strongRegex } from './helper';
 
 const ERROR_COLOR = 'rgba(240, 20, 20, 0.9)';
 const SUCCESS_COLOR = 'rgba(40, 210, 40, .9)';
@@ -12,16 +12,17 @@ const SUCCESS_COLOR = 'rgba(40, 210, 40, .9)';
 
 export function handleSignUp(data) {
   const users = store.get('users') ?? [];
-  const { name, password } = data;
+  const { username, password } = data;
   const id = generateRandomId();
 
-  const newUser = { name, password, id };
+  const newUser = { username, password, id };
   users.push(newUser);
 
   store.set('users', users);
-  sessionStorage.setItem('CurrentUser', name);
+  sessionStorage.setItem('CurrentUser', username);
 
-  return { activeUserName: name, isAuthenticated: true, activeUserId: id };
+  console.log(users);
+  return { activeUserName: username, isAuthenticated: true };
 }
 
 /**s
@@ -31,9 +32,9 @@ export function handleSignUp(data) {
  *
  */
 
-export function handleLogin({ name, id }) {
-  sessionStorage.setItem('CurrentUser', name);
-  return { activeUserName: name, isAuthenticated: true, activeUserId: id };
+export function handleLogin({ username }) {
+  sessionStorage.setItem('CurrentUser', username);
+  return { activeUserName: username, isAuthenticated: true };
 }
 
 // Validation Functions -------------------------------------
@@ -44,14 +45,14 @@ export function handleLogin({ name, id }) {
  * @returns {{}}
  */
 
-function duplicateUserValidation(name) {
+function duplicateUserValidation(username) {
   const users = store.get('users') ?? [];
 
-  if (users.some(({ name: id }) => id === name)) {
+  if (users.some(({ username: id }) => id === username)) {
     return { text: 'User Already Exists', color: ERROR_COLOR, type: 'error' };
   } else {
     return {
-      text: `${name} is available`,
+      text: `${username} is available`,
       color: SUCCESS_COLOR,
       type: 'success',
     };
@@ -97,12 +98,12 @@ function passwordStrengthValidation(value) {
  * @returns {{}}
  */
 
-function validateUserExists(name) {
+function validateUserExists(username) {
   const users = store.get('users') ?? [];
 
-  if (users.length > 0 && users.find(({ name: id }) => id === name)) {
+  if (users.length > 0 && users.find(({ username: id }) => id === username)) {
     return {
-      text: `Welcome back ${name}`,
+      text: `Welcome back ${username}`,
       color: SUCCESS_COLOR,
       type: 'success',
     };
@@ -136,6 +137,50 @@ export function validateUserPasswordIntegrity(value) {
 }
 
 /**
+ * Checks whether inputted url is valid and points to an image
+ * @param {string} value - url
+ * @returns {{}}
+ */
+
+function urlValidator(value) {
+  const regex = new RegExp(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/, 'i');
+  const isValid = regex.test(value);
+
+  if (isValid) {
+    return { text: 'Valid url', color: SUCCESS_COLOR, type: 'success' };
+  } else return { text: 'Invalid url', color: ERROR_COLOR, type: 'error' };
+}
+
+export function updateUserProfile(formData, sb) {
+  const { currentUser } = sb;
+  const { nickname } = currentUser;
+
+  const users = store.get('users');
+  const activeUser = users.find(({ username }) => username === nickname);
+
+  const { newPassword, newUsername, profileUrl, profileFile } = formData;
+  const { name: fileImage } = profileFile;
+
+  activeUser['password'] = newPassword ?? activeUser.password;
+  activeUser['username'] = newUsername ?? activeUser.username;
+
+  if (fileImage) {
+    console.log('updated with file');
+    sb.updateCurrentUserInfoWithProfileImage(
+      newUsername,
+      fileImage,
+      handleSbResponse
+    );
+  } else {
+    console.log('updated with url');
+    sb.updateCurrentUserInfo(newUsername, profileUrl, handleSbResponse);
+  }
+
+  console.log(activeUser);
+  store.set('users', users);
+}
+
+/**
  *
  * @param {string} name - Input field name
  * @param {string} inputValue
@@ -147,17 +192,22 @@ export function inputValidation(name, inputValue, isLoginForm) {
   if (!inputValue || inputValue === '' || inputValue.length < 2) return;
 
   switch (name) {
-    case 'name':
+    case 'username':
+    case 'newUsername':
       return isLoginForm
         ? validateUserExists(inputValue)
         : duplicateUserValidation(inputValue);
 
     case 'password':
+    case 'newPassword':
       return !isLoginForm
         ? passwordStrengthValidation(inputValue)
         : validateUserPasswordIntegrity(inputValue);
 
     case 'confirmPassword':
       return !isLoginForm && passwordEqualityValidation(inputValue);
+
+    case 'profileUrl':
+      return urlValidator(inputValue);
   }
 }

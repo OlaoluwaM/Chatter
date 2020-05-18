@@ -1,16 +1,13 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
-import store from 'store';
-import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
+import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
 import { regularTexVariant } from '../utils/motionObj';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const LogoutPage = styled.div.attrs({
   className: 'wrapper',
 })`
-  width: 100%;
-  height: calc(100% - 7%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,11 +24,11 @@ const LogoutPage = styled.div.attrs({
 export default function Logout({ setAuth }) {
   const { isAuthenticated } = React.useContext(AuthContext);
 
-  sessionStorage.removeItem('CurrentUser');
+  // sessionStorage.removeItem('CurrentUser');
 
-  setTimeout(() => {
-    setAuth({ activeUserName: null, isAuthenticated: false });
-  }, 2000);
+  // setTimeout(() => {
+  //   setAuth({ activeUserName: null, isAuthenticated: false });
+  // }, 2000);
 
   return !isAuthenticated ? (
     <Redirect to='/' />

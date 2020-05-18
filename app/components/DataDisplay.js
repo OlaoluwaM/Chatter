@@ -97,13 +97,18 @@ const ActionInfo = styled.div.attrs({
   flex-basis: 30%;
   font-size: 1.6rem;
 
+  & > a {
+    text-decoration: none;
+    color: inherit;
+  }
+
   ${({ theme }) =>
     css`
       color: ${hexToRgb(theme.primaryColor, 0.3)};
       fill: ${hexToRgb(theme.primaryColor, 0.3)};
       stroke: ${hexToRgb(theme.primaryColor, 0.3)};
 
-      & > svg:hover {
+      & a:hover {
         color: ${theme.primaryColor};
         fill: ${theme.primaryColor};
         stroke: ${theme.primaryColor};

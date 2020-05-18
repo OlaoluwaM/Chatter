@@ -5,44 +5,25 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import { useCookie, useIdle } from 'react-use';
+import { useIdle } from 'react-use';
 import { ThemeProvider } from 'styled-components';
 import { AuthProvider, themeObj } from '../context/Context';
 import Auth from './Auth';
 import Chatroom from './Chatroom';
-import DeleteAccount from './DeleteAccount';
 import Home from './Home';
-import Logout from './Logout';
 import Nav from './NavBar';
 
 export default function App() {
   const isIdle = useIdle(1200e3);
-  const [cookieValue, updateCookie, deleteCookie] = useCookie('user-session');
 
   const [currentUserName, setCurrentUserName] = React.useState(
-    sessionStorage.getItem('CurrentUser') ?? cookieValue
+    sessionStorage.getItem('CurrentUser')
   );
 
   const [isAuthed, setAuthed] = React.useState({
     activeUserName: currentUserName ?? null,
     isAuthenticated: !!currentUserName,
   });
-
-  React.useEffect(() => {
-    if (!currentUserName && cookieValue) {
-      sessionStorage.setItem('CurrentUser', cookieValue);
-      setCurrentUserName(cookieValue);
-    } else return;
-  }, [cookieValue]);
-
-  React.useEffect(() => {
-    if (!isAuthed.isAuthenticated && !isIdle) {
-      if (value) deleteCookie();
-      return;
-    } else {
-      updateCookie(currentUserName);
-    }
-  }, [isAuthed.isAuthenticated, isIdle]);
 
   return (
     <Router>
@@ -52,15 +33,13 @@ export default function App() {
 
           {!isAuthed.isAuthenticated && <Redirect to='/' />}
 
-          {isIdle && isAuthed.isAuthenticated && <Redirect to='/logout' />}
+          {isIdle && isAuthed.isAuthenticated && (
+            <Redirect exact to='/chat/settings/logout' />
+          )}
 
           <Switch>
-            <Route exact path='/'>
-              <Home />
-            </Route>
-
             <Route path='/chat'>
-              <Chatroom />
+              <Chatroom setAuth={setAuthed} />
             </Route>
 
             <Route
@@ -68,15 +47,9 @@ export default function App() {
               render={props => <Auth {...props} setAuth={setAuthed} />}
             />
 
-            <Route
-              path='/logout'
-              render={props => <Logout {...props} setAuth={setAuthed} />}
-            />
-
-            <Route
-              path='/delete-account'
-              render={props => <DeleteAccount {...props} setAuth={setAuthed} />}
-            />
+            <Route exact path='/'>
+              <Home />
+            </Route>
           </Switch>
         </AuthProvider>
       </ThemeProvider>

@@ -1,24 +1,24 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import React from 'react';
 import { Redirect } from 'react-router-dom';
+import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
-import { extractFormData } from '../utils/helper';
 import { handleLogin, handleSignUp } from '../utils/authFunc';
-import { FormTitle, InputField, SubmitButton } from './Form-Components';
-import { motion, AnimatePresence } from 'framer-motion';
+import { extractFormData } from '../utils/helper';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
+import { FormTitle, InputField, SubmitButton } from './Form-Components';
 
 const FormContainer = styled(motion.form)`
   display: flex;
   background: inherit;
   width: 50%;
   padding: 1%;
-  height: 52%;
+  height: 57%;
   justify-content: space-evenly;
   flex-direction: column;
   background: transparent;
-  margin-top: 22px;
+  margin-top: 27px;
   position: relative;
   padding-top: 0;
   padding-bottom: 0;
@@ -79,13 +79,13 @@ export default function Form({ setAuth, formType }) {
           autoComplete='off'>
           <AnimatePresence>
             <InputField
-              key='name-field'
+              key='username'
               motionProps={{
                 variants: itemVariant,
                 positionTransition: true,
                 exit: 'hidden',
               }}
-              name='name'
+              name='username'
               label='Username'
               formState={{ formType, setInputFieldError }}
             />

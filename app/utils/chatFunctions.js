@@ -143,17 +143,11 @@ export function handleUnBlock(blockedUser, sb) {
   return `${blockedUser.userId} has been unblocked`;
 }
 
-export function formatTimeString(timeString) {
+export function formatTimeString(timeNum) {
   const currentDateArr = formatDate(Date.now()).split(' ');
-  const {
-    '1': cMonth,
-    '2': cDay,
-    '3': cYear,
-    '4': cTime,
-    '5': cTimeOfDay,
-  } = currentDateArr;
+  const { '1': cMonth, '2': cDay, '3': cYear } = currentDateArr;
 
-  const dateArr = formatDate(timeString).split(' ');
+  const dateArr = formatDate(timeNum).split(' ');
   const {
     '1': month,
     '2': day,

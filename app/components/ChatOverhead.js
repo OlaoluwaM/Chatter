@@ -23,11 +23,17 @@ const svgStyle = {
 export default function ChatOverHead({ invitee }) {
   const { dispatch } = React.useContext(ChatContext);
 
-  const subData = invitee
-    ? invitee.connectionStatus !== 'online'
-      ? formatTimeString(invitee.lastSeenAt)
-      : invitee.connectionStatus
-    : null;
+  const notOnline =
+    invitee.connectionStatus !== 'online' ||
+    invitee.connectionStatus !== 'nonavailable';
+
+  let subData = null;
+
+  if (invitee) {
+    if (notOnline) {
+      subData = formatTimeString(invitee.lastSeenAt);
+    } else subData = invitee.connectionStatus;
+  }
 
   return (
     <Overhead initial='hidden' animate='visible'>
