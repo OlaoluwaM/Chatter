@@ -35,6 +35,7 @@ export default function Chatroom({ setAuth }) {
   const activeUserData = store
     .get('users')
     .find(({ username: name }) => name === username);
+  console.log(activeUserData, username);
   const id = activeUserData.id;
 
   React.useEffect(() => {

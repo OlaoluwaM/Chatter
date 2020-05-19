@@ -242,7 +242,7 @@ function isValidImage(str) {
   return new RegExp(/\.(jpe?g|png|gif)$/, 'i').test(str);
 }
 
-export function handleFileInputChange(e) {
+export function fileInputChangeHandler(e) {
   const label = e.target.nextElementSibling;
   const initialLabelValue = label.innerText;
   const { '0': file, length } = e.target.files;
@@ -263,6 +263,12 @@ export function resetInputFileValue(e) {
 }
 
 export function handleSbResponse(res, err) {
-  if (err) throw error;
-  console.log(res);
+  if (err) throw err;
+  console.log('sb response', res);
+}
+
+export function normalize(value) {
+  const replacer = (_, val) => (val === '' ? null : val);
+
+  return JSON.parse(JSON.stringify(value, replacer));
 }

@@ -1,5 +1,5 @@
 import store from 'store';
-import { generateRandomId, strongRegex } from './helper';
+import { generateRandomId, normalize, strongRegex } from './helper';
 
 const ERROR_COLOR = 'rgba(240, 20, 20, 0.9)';
 const SUCCESS_COLOR = 'rgba(40, 210, 40, .9)';
@@ -41,7 +41,7 @@ export function handleLogin({ username }) {
 
 /**
  *
- * @param {string} name - User's name, Sign Up
+ * @param {string} username - User's name, Sign Up
  * @returns {{}}
  */
 
@@ -61,13 +61,13 @@ function duplicateUserValidation(username) {
 
 /**
  *
- * @param {string} value - User's password, Sign Up
+ * @param {string} password - User's password, Sign Up
  * @returns {{}}
  */
 
-function passwordEqualityValidation(value) {
+function passwordEqualityValidation(password) {
   const pW1 = document.querySelector('input[name="password"]').value,
-    pW2 = value;
+    pW2 = password;
 
   if (pW1 !== pW2) {
     return {
@@ -94,7 +94,7 @@ function passwordStrengthValidation(value) {
 
 /**
  *
- * @param {string} name - User's name, Login
+ * @param {string} username - User's name, Login
  * @returns {{}}
  */
 
@@ -119,13 +119,13 @@ function validateUserExists(username) {
  */
 
 export function validateUserPasswordIntegrity(value) {
-  const username = document.querySelector('input[name="name"]').value;
+  const username = document.querySelector('input[name="username"]').value;
   const password = value;
 
   const users = store.get('users') ?? [];
 
   const userData = users.find(
-    ({ name: dbUsername, password: dbPassword }) =>
+    ({ username: dbUsername, password: dbPassword }) =>
       username === dbUsername && password === dbPassword
   );
 
@@ -151,33 +151,30 @@ function urlValidator(value) {
   } else return { text: 'Invalid url', color: ERROR_COLOR, type: 'error' };
 }
 
-export function updateUserProfile(formData, sb) {
-  const { currentUser } = sb;
-  const { nickname } = currentUser;
-
+export function updateUserProfile(formData, currentUserName) {
   const users = store.get('users');
-  const activeUser = users.find(({ username }) => username === nickname);
+  const activeUser = users.find(({ username }) => username === currentUserName);
 
   const { newPassword, newUsername, profileUrl, profileFile } = formData;
-  const { name: fileImage } = profileFile;
 
-  activeUser['password'] = newPassword ?? activeUser.password;
-  activeUser['username'] = newUsername ?? activeUser.username;
+  activeUser['password'] = normalize(newPassword) ?? activeUser.password;
+  activeUser['username'] = normalize(newUsername) ?? activeUser.username;
 
-  if (fileImage) {
-    console.log('updated with file');
-    sb.updateCurrentUserInfoWithProfileImage(
-      newUsername,
-      fileImage,
-      handleSbResponse
-    );
-  } else {
-    console.log('updated with url');
-    sb.updateCurrentUserInfo(newUsername, profileUrl, handleSbResponse);
-  }
+  const returnValues = [];
+
+  const condition = !!profileUrl ? 'url' : 'file';
+
+  returnValues.push(
+    normalize(profileUrl) ?? profileFile,
+    newUsername,
+    condition
+  );
+
+  sessionStorage.setItem('CurrentUser', activeUser.username);
 
   console.log(activeUser);
   store.set('users', users);
+  return returnValues;
 }
 
 /**

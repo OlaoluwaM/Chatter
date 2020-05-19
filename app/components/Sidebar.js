@@ -3,7 +3,7 @@ import React from 'react';
 import { AiFillSetting } from 'react-icons/ai';
 import { Link, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
-import { ChatContext } from '../context/Context';
+import { AuthContext, ChatContext } from '../context/Context';
 import { hexToRgb, lightenDarkenColor } from '../utils/helper';
 import { currentUserDisplayVariants } from '../utils/motionObj';
 import { UserDisplay } from './DataDisplay';
@@ -210,8 +210,9 @@ function ChatSideBar({ inviteUser, currentUser }) {
 
 function SettingsSidebar({ currentUser }) {
   const { url } = useRouteMatch();
-  const { profileUrl, nickname } = currentUser;
-  const altText = `${nickname}'s profile Image`;
+  const { activeUserName: username } = React.useContext(AuthContext);
+  const { profileUrl } = currentUser;
+  const altText = `${username}'s profile Image`;
 
   return (
     <>
@@ -219,7 +220,7 @@ function SettingsSidebar({ currentUser }) {
 
       <UserDataContainer>
         <img src={profileUrl} alt={altText} />
-        <p>{nickname}</p>
+        <p>{username}</p>
       </UserDataContainer>
 
       <SettingOptions>

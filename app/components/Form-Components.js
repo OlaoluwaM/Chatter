@@ -5,7 +5,11 @@ import { TiTimes } from 'react-icons/ti';
 import { default as styled } from 'styled-components';
 import useDebounce from '../custom-hooks/useDebounce';
 import { inputValidation } from '../utils/authFunc';
-import { hexToRgb, resetInputFileValue } from '../utils/helper';
+import {
+  fileInputChangeHandler,
+  hexToRgb,
+  resetInputFileValue,
+} from '../utils/helper';
 import { inputSvgValidatorVariants, pathObj } from '../utils/motionObj';
 
 export const FormTitle = styled(motion.h1)`
@@ -76,6 +80,7 @@ const Input = styled.input`
   font-size: 1.2em;
   font-weight: 100;
   padding-bottom: 5px;
+  padding-right: 18%;
 
   &:not([type='button']) {
     flex-basis: 30%;
@@ -96,7 +101,7 @@ export const InputContainer = styled(motion.div)`
   overflow: hidden;
   cursor: text;
 
-  &:not(.simple-input) {
+  &:not(.simple-input, .for-input-file) {
     & > input:valid ~ ${InputLabel} {
       top: 2%;
       color: ${({ theme }) => theme.secondaryColor};
@@ -119,14 +124,14 @@ export const InputContainer = styled(motion.div)`
     }
   }
 
-  &.simple-input {
-    input[type='file']:hover ~ ${InputLabel} {
-      color: ${({ theme }) => theme.primaryColor};
-    }
+  input[type='file']:hover ~ ${InputLabel} {
+    color: ${({ theme }) => theme.primaryColor};
+  }
 
+  &.simple-input {
     &.active,
     &:focus-within {
-      ${InputLabel}:not([for='profile-file']) {
+      ${InputLabel} {
         top: 2%;
         color: ${({ theme }) => theme.secondaryColor};
       }
@@ -207,7 +212,7 @@ export function ValidatorSVG({ state, color }) {
 
 export function SimpleInputField(props) {
   const { motionProps, label, addBar = true, ...rest } = props;
-  const { name, type, message } = rest;
+  const { name, type } = rest;
   const isFileInput = type === 'file';
 
   const [inputValue, setInputValue] = React.useState('');
@@ -226,12 +231,13 @@ export function SimpleInputField(props) {
     e.persist();
     const container = e.currentTarget.parentElement;
     container.classList.toggle('active', e.target.value.length >= 1);
+    if (isFileInput) fileInputChangeHandler(e);
     setInputValue(() => e.target.value);
   };
 
   return (
     <InputContainer
-      className='simple-input'
+      className={isFileInput ? 'for-input-file' : 'simple-input'}
       onFocus={handleFocus}
       onBlur={handleBlur}
       {...motionProps}>
@@ -242,11 +248,6 @@ export function SimpleInputField(props) {
       {isFileInput && (
         <TiTimes className='reset' onClick={resetInputFileValue} />
       )}
-
-      <ValidatorSVG
-        state={!message ? 'initial' : message.type}
-        color={message?.color}
-      />
     </InputContainer>
   );
 }

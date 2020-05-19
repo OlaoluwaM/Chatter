@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
-import { ChatContext } from '../context/Context';
+import { AuthContext, ChatContext } from '../context/Context';
 import { updateUserProfile } from '../utils/authFunc';
-import { extractFormData, handleFileInputChange } from '../utils/helper';
+import { extractFormData, handleSbResponse } from '../utils/helper';
 import DeleteAccount from './DeleteAccount';
 import { InputField, SimpleInputField, SubmitButton } from './Form-Components';
 import Logout from './Logout';
@@ -38,16 +38,33 @@ const Form = styled(motion.form)`
   margin-top: 3%;
 `;
 
-function UpdateProfile() {
+function UpdateProfile({ setAuth }) {
   const { sb } = React.useContext(ChatContext);
+  const { activeUserName } = React.useContext(AuthContext);
+
   const [inputFieldError, setInputFieldError] = React.useState(false);
 
   const handleSubmit = e => {
     e.preventDefault();
     if (inputFieldError) return;
     const formData = extractFormData(new FormData(e.target));
-    console.log(formData);
-    updateUserProfile;
+
+    const [profileData, newUsername, profileDataType] = updateUserProfile(
+      formData,
+      activeUserName
+    );
+
+    if (profileDataType === 'file') {
+      sb.updateCurrentUserInfoWithProfileImage(
+        '',
+        profileData,
+        handleSbResponse
+      );
+    } else sb.updateCurrentUserInfo(newUsername, profileData, handleSbResponse);
+
+    if (newUsername) {
+      setAuth(prevObj => ({ ...prevObj, activeUserName: newUsername }));
+    }
   };
 
   return (
@@ -59,6 +76,7 @@ function UpdateProfile() {
           key='newUsername'
           className='simple-input'
           required={false}
+          onSubmit={e => console.log(e)}
           formState={{
             formType: 'sign up',
             setInputFieldError,
@@ -97,7 +115,6 @@ function UpdateProfile() {
           name='profileFile'
           key='profileFile'
           addBar={false}
-          onChange={handleFileInputChange}
         />
 
         <SubmitButton
@@ -113,10 +130,6 @@ function UpdateProfile() {
 }
 
 export default function Settings({ setAuth }) {
-  const [inputValue, setInputValue] = React.useState('');
-  const [changesMade, setChangesMade] = React.useState(false);
-  const [error, setError] = React.useState(null);
-  // const { state } = useLocation();
   const { path } = useRouteMatch();
 
   return (
@@ -130,7 +143,7 @@ export default function Settings({ setAuth }) {
       </Route>
 
       <Route exact path={path}>
-        <UpdateProfile />
+        <UpdateProfile setAuth={setAuth} />
       </Route>
     </Switch>
   );
