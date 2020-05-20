@@ -4,7 +4,12 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { AuthContext, ChatContext } from '../context/Context';
 import { updateUserProfile } from '../utils/authFunc';
-import { extractFormData, handleSbResponse } from '../utils/helper';
+import {
+  extractFormData,
+  handleSbResponse,
+  normalize,
+  rawDataType,
+} from '../utils/helper';
 import DeleteAccount from './DeleteAccount';
 import { InputField, SimpleInputField, SubmitButton } from './Form-Components';
 import Logout from './Logout';
@@ -39,10 +44,15 @@ const Form = styled(motion.form)`
 `;
 
 function UpdateProfile({ setAuth }) {
+  const [reset, setReset] = React.useState(false);
   const { sb } = React.useContext(ChatContext);
   const { activeUserName } = React.useContext(AuthContext);
 
   const [inputFieldError, setInputFieldError] = React.useState(false);
+
+  React.useEffect(() => {
+    return () => (reset ? setReset(false) : void 0);
+  }, [reset]);
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -54,17 +64,40 @@ function UpdateProfile({ setAuth }) {
       activeUserName
     );
 
+
     if (profileDataType === 'file') {
       sb.updateCurrentUserInfoWithProfileImage(
-        '',
+        newUsername,
         profileData,
         handleSbResponse
       );
     } else sb.updateCurrentUserInfo(newUsername, profileData, handleSbResponse);
 
-    if (newUsername) {
-      setAuth(prevObj => ({ ...prevObj, activeUserName: newUsername }));
+    const hasNewProfilePic =
+      !!profileData?.name || rawDataType(normalize(profileData)) === 'string';
+
+    console.log(!(newUsername || hasNewProfilePic));
+    if (!(newUsername || hasNewProfilePic)) {
+      return;
+    } else {
+      let updatedDataObj = {};
+      if (newUsername && hasNewProfilePic) {
+        updatedDataObj = {
+          activeUserName: newUsername,
+          profilePic: profileData,
+        };
+      } else if (hasNewProfilePic) {
+        updatedDataObj = { profilePic: profileData };
+      } else {
+        updatedDataObj = { activeUserName: newUsername };
+      }
+      console.log(updatedDataObj);
+      setAuth(prevObj => ({ ...prevObj, ...updatedDataObj }));
     }
+    setReset(true);
+    e.currentTarget
+      .querySelectorAll('.active')
+      .forEach(elem => elem.classList.remove('active'));
   };
 
   return (
@@ -74,9 +107,9 @@ function UpdateProfile({ setAuth }) {
           name='newUsername'
           label='New username'
           key='newUsername'
+          shouldReset={reset}
           className='simple-input'
           required={false}
-          onSubmit={e => console.log(e)}
           formState={{
             formType: 'sign up',
             setInputFieldError,
@@ -89,6 +122,7 @@ function UpdateProfile({ setAuth }) {
           key='newPassword'
           className='simple-input'
           required={false}
+          shouldReset={reset}
           type='password'
           formState={{
             formType: 'sign up',
@@ -103,6 +137,7 @@ function UpdateProfile({ setAuth }) {
           name='profileUrl'
           className='simple-input'
           required={false}
+          shouldReset={reset}
           formState={{
             formType: 'sign up',
             setInputFieldError,
@@ -114,6 +149,7 @@ function UpdateProfile({ setAuth }) {
           label='New profile image file'
           name='profileFile'
           key='profileFile'
+          shouldReset={reset}
           addBar={false}
         />
 

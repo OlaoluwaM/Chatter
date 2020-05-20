@@ -20,7 +20,7 @@ const DataContainer = styled(motion.div)`
 export const colorStyles = bg => `background: ${bg}`;
 export const avatarStyles = img => `
             background: url(${img}) center no-repeat;
-            background-size: 100%;`;
+            background-size: cover`;
 
 const Avatar = styled.div`
   flex-basis: 20%;

@@ -101,26 +101,14 @@ export const InputContainer = styled(motion.div)`
   overflow: hidden;
   cursor: text;
 
-  &:not(.simple-input, .for-input-file) {
-    & > input:valid ~ ${InputLabel} {
+  &:not(.simple-input):not(.for-input-file) {
+    &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
       top: 2%;
       color: ${({ theme }) => theme.secondaryColor};
     }
 
-    & > input:valid ~ ${Bar}:before {
+    &:focus-within ${Bar}:before, input:valid ~ ${Bar}:before {
       transform: scaleX(1);
-    }
-
-    &:focus-within,
-    &.active {
-      ${InputLabel} {
-        top: 2%;
-        color: ${({ theme }) => theme.secondaryColor};
-      }
-
-      ${Bar}:before {
-        transform: scaleX(1);
-      }
     }
   }
 
@@ -284,6 +272,14 @@ export function InputField(props) {
   const handleInputValidation = () =>
     setMessage(inputValidation(name, inputValue, LoginForm));
 
+  React.useEffect(() => {
+    console.log(rest?.shouldReset);
+    if (rest?.shouldReset) {
+      setInputValue('');
+      setMessage(null);
+    }
+  }, [rest?.shouldReset]);
+
   const handleChange = e => {
     e.persist();
     if (!required) {
@@ -296,11 +292,8 @@ export function InputField(props) {
   return (
     <InputContainer {...motionProps} className={className}>
       <Input
-        onBlur={handleInputValidation}
-        onFocus={handleInputValidation}
-        onFocus={() =>
-          name === 'confirmPassword' && message && setInputValue('')
-        }
+        // onBlur={handleInputValidation}
+        onFocus={() => handleInputValidation}
         onChange={handleChange}
         value={inputValue}
         type={type}

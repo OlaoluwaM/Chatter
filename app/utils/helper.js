@@ -272,3 +272,8 @@ export function normalize(value) {
 
   return JSON.parse(JSON.stringify(value, replacer));
 }
+
+export function rawDataType(value) {
+  const _toString = Object.prototype.toString;
+  return _toString.call(value).slice(8, -1).toLowerCase();
+}

@@ -4,7 +4,12 @@ import { AiFillSetting } from 'react-icons/ai';
 import { Link, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { AuthContext, ChatContext } from '../context/Context';
-import { hexToRgb, lightenDarkenColor } from '../utils/helper';
+import {
+  hexToRgb,
+  lightenDarkenColor,
+  normalize,
+  rawDataType,
+} from '../utils/helper';
 import { currentUserDisplayVariants } from '../utils/motionObj';
 import { UserDisplay } from './DataDisplay';
 import Menu from './Menu';
@@ -101,10 +106,14 @@ const UserDataContainer = styled(motion.div)`
   font-size: 2em;
 
   & > img {
-    width: 40%;
+    width: 45%;
+    min-height: 45%;
     border-radius: 50%;
-    height: auto;
+    object-fit: cover;
+    object-position: 49%;
     margin-bottom: 10%;
+    color: ${({ theme }) => theme.primaryColor};
+    font-size: 0.9rem;
   }
 
   & > p {
@@ -209,17 +218,49 @@ function ChatSideBar({ inviteUser, currentUser }) {
 }
 
 function SettingsSidebar({ currentUser }) {
-  const { url } = useRouteMatch();
-  const { activeUserName: username } = React.useContext(AuthContext);
+  const isAuthed = React.useContext(AuthContext);
+
   const { profileUrl } = currentUser;
+  const { activeUserName: username } = isAuthed;
+
+  const [displayPic, setDisplayPic] = React.useState(() => profileUrl);
+
+  const { url } = useRouteMatch();
   const altText = `${username}'s profile Image`;
+  console.log(displayPic);
+
+  React.useEffect(() => {
+    if (!isAuthed?.profilePic) return;
+    console.log(rawDataType(isAuthed?.profilePic));
+    setDisplayPic('loading');
+
+    if (rawDataType(isAuthed.profilePic) === 'string') {
+      setDisplayPic(isAuthed.profilePic);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (() => {
+      return e => {
+        delete isAuthed.profilePic;
+        console.log(isAuthed);
+        setDisplayPic(e.target.result);
+      };
+    })();
+
+    reader.readAsDataURL(isAuthed.profilePic);
+  }, [JSON.stringify(isAuthed?.profilePic)]);
 
   return (
     <>
       <h3>Settings</h3>
 
       <UserDataContainer>
-        <img src={profileUrl} alt={altText} />
+        {displayPic === 'loading' ? (
+          <p>Loading</p>
+        ) : (
+          <img src={normalize(displayPic) ?? profileUrl} alt={altText} />
+        )}
         <p>{username}</p>
       </UserDataContainer>
 
