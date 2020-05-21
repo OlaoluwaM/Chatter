@@ -10,6 +10,11 @@ import {
   normalize,
   rawDataType,
 } from '../utils/helper';
+import {
+  buttonVariant,
+  containerVariant,
+  itemVariant2,
+} from '../utils/motionObj';
 import DeleteAccount from './DeleteAccount';
 import { InputField, SimpleInputField, SubmitButton } from './Form-Components';
 import Logout from './Logout';
@@ -43,6 +48,12 @@ const Form = styled(motion.form)`
   margin-top: 3%;
 `;
 
+const formElemMotionProps = {
+  variants: itemVariant2,
+  positionTransition: true,
+  exit: 'hidden',
+};
+
 function UpdateProfile({ setAuth }) {
   const [reset, setReset] = React.useState(false);
   const { sb } = React.useContext(ChatContext);
@@ -63,7 +74,6 @@ function UpdateProfile({ setAuth }) {
       formData,
       activeUserName
     );
-
 
     if (profileDataType === 'file') {
       sb.updateCurrentUserInfoWithProfileImage(
@@ -102,7 +112,13 @@ function UpdateProfile({ setAuth }) {
 
   return (
     <SettingContainer>
-      <Form onSubmit={handleSubmit} autoComplete='off'>
+      <Form
+        variants={containerVariant}
+        onSubmit={handleSubmit}
+        initial='hidden'
+        animate='visible'
+        exit='hidden'
+        autoComplete='off'>
         <InputField
           name='newUsername'
           label='New username'
@@ -110,6 +126,7 @@ function UpdateProfile({ setAuth }) {
           shouldReset={reset}
           className='simple-input'
           required={false}
+          motionProps={{ ...formElemMotionProps }}
           formState={{
             formType: 'sign up',
             setInputFieldError,
@@ -122,6 +139,7 @@ function UpdateProfile({ setAuth }) {
           key='newPassword'
           className='simple-input'
           required={false}
+          motionProps={{ ...formElemMotionProps }}
           shouldReset={reset}
           type='password'
           formState={{
@@ -138,6 +156,7 @@ function UpdateProfile({ setAuth }) {
           className='simple-input'
           required={false}
           shouldReset={reset}
+          motionProps={{ ...formElemMotionProps }}
           formState={{
             formType: 'sign up',
             setInputFieldError,
@@ -149,11 +168,16 @@ function UpdateProfile({ setAuth }) {
           label='New profile image file'
           name='profileFile'
           key='profileFile'
+          motionProps={{ ...formElemMotionProps }}
           shouldReset={reset}
           addBar={false}
         />
 
         <SubmitButton
+          variants={buttonVariant}
+          whileTap='tap'
+          positionTransition={true}
+          exit='hidden'
           disabled={inputFieldError}
           style={{ marginLeft: 0, width: '45%' }}
           value='Save Changes'

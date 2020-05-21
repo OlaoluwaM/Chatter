@@ -15,8 +15,6 @@ import { UserDisplay } from './DataDisplay';
 import Menu from './Menu';
 import { MenuItem } from './User';
 
-// TODO create settings for logout username edit and deletion of account
-
 const SidebarContainer = styled.nav`
   position: relative;
   height: 100%;

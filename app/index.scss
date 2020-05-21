@@ -78,6 +78,7 @@ input[type='file'] {
   left: 0;
   font-size: 15px;
   color: rgb(153, 153, 153);
+  display: none;
 
   & ~ label {
     display: inline-block;
@@ -85,7 +86,7 @@ input[type='file'] {
     cursor: pointer;
     border-radius: 14px;
     background-color: $secondaryColor;
-    width: 50%;
+    width: 40%;
     text-align: center;
     overflow-wrap: break-word;
     font-size: 1rem;
@@ -96,7 +97,7 @@ input[type='file'] {
 
 svg.reset {
   fill: rgba(240, 20, 20, 0.6);
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   cursor: pointer;
   margin-left: 0;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
 import * as SendBird from 'sendbird';
 import store from 'store';
 import styled from 'styled-components';
@@ -27,19 +27,20 @@ const ChatRoomContainer = styled.div.attrs({
 // TODO redo the neumorphic design
 
 export default function Chatroom({ setAuth }) {
-  const { activeUserName: username } = React.useContext(AuthContext);
+  const { activeUserName: username, isAuthenticated } = React.useContext(
+    AuthContext
+  );
   const [chatManager, dispatch] = React.useReducer(chatManagerReducer, null);
   const [sb] = React.useState(() => new SendBird({ appId: SENDBIRD_APP_ID }));
   const match = useRouteMatch();
 
-  const activeUserData = store
-    .get('users')
-    .find(({ username: name }) => name === username);
-  console.log(activeUserData, username);
-  const id = activeUserData.id;
-
   React.useEffect(() => {
     try {
+      const activeUserData = store
+        .get('users')
+        .find(({ username: name }) => name === username);
+      const id = activeUserData.id;
+
       sb.connect(hashCode(id) + '', (user, error) => {
         if (error) throw new Error(error.message);
 
@@ -59,7 +60,9 @@ export default function Chatroom({ setAuth }) {
     }
     return () => {
       dispatch({ type: 'Reset' });
-      sb.disconnect();
+      sb.disconnect(() => {
+        console.log('disconnected');
+      });
     };
   }, []);
 
@@ -116,27 +119,31 @@ export default function Chatroom({ setAuth }) {
     dispatch,
   };
 
-  return (
-    <ChatRoomContainer>
-      {success && (
-        <ChatProvider value={chatContextObj}>
-          <Sidebar inviteUser={createOneToOneChannel} />
+  if (!isAuthenticated) {
+    return <Redirect to='/' />;
+  } else {
+    return (
+      <ChatRoomContainer>
+        {success && (
+          <ChatProvider value={chatContextObj}>
+            <Sidebar inviteUser={createOneToOneChannel} />
 
-          <Switch>
-            <Route path={`${match.path}/settings`}>
-              <Settings setAuth={setAuth} />
-            </Route>
+            <Switch>
+              <Route path={`${match.path}/settings`}>
+                <Settings setAuth={setAuth} />
+              </Route>
 
-            <Route path={match.path}>
-              <ChatArea />
-            </Route>
-          </Switch>
-        </ChatProvider>
-      )}
+              <Route path={match.path}>
+                <ChatArea />
+              </Route>
+            </Switch>
+          </ChatProvider>
+        )}
 
-      {loading && !error && <p>Loading</p>}
+        {loading && !error && <p>Loading</p>}
 
-      {error && <p>{chatManager.error}</p>}
-    </ChatRoomContainer>
-  );
+        {error && <p>{chatManager.error}</p>}
+      </ChatRoomContainer>
+    );
+  }
 }

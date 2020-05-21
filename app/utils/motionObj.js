@@ -59,6 +59,19 @@ export const itemVariant = {
   },
 };
 
+export const itemVariant2 = {
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { ...spring2 },
+  },
+  hidden: {
+    opacity: 0,
+    x: 70,
+    transition: { ...tween },
+  },
+};
+
 // -----------------------------------------------------------------------------
 
 export const InputInfoVariant = {
@@ -114,7 +127,7 @@ export const buttonVariant = {
     opacity: 1,
     boxShadow: '20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff',
     transform: 'scale(1)',
-    transition: { ...spring, delay: 0.5 },
+    transition: { ...spring, delay: 0.7 },
   },
   hidden: {
     opacity: 0,
