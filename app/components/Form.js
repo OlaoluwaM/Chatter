@@ -28,6 +28,7 @@ const FormContainer = styled(motion.form)`
   }
 `;
 
+// TODO reconcile password field and confirm password field
 export default function Form({ setAuth, formType }) {
   const [inputFieldError, setInputFieldError] = React.useState(false);
   const { isAuthenticated } = React.useContext(AuthContext);
