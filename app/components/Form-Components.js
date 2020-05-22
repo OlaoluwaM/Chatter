@@ -1,25 +1,35 @@
-import React from 'react';
-import styled from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
+import React from 'react';
+import { TiTimes } from 'react-icons/ti';
+import { default as styled } from 'styled-components';
+import useDebounce from '../custom-hooks/useDebounce';
 import { inputValidation } from '../utils/authFunc';
-import { InputInfoVariant } from '../utils/motionObj';
-import { motion, AnimatePresence } from 'framer-motion';
-import { debounce, hexToRgb, colorMapping } from '../utils/helper';
+import {
+  fileInputChangeHandler,
+  hexToRgb,
+  resetInputFileValue,
+} from '../utils/helper';
+import { inputSvgValidatorVariants, pathObj } from '../utils/motionObj';
 
 export const FormTitle = styled(motion.h1)`
   margin: 0;
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   text-align: left;
-  padding-left: 1.4%;
+  padding-left: 1.6%;
   font-family: var(--font2);
   font-size: 4rem;
-  width: 45%;
+  width: 50%;
   letter-spacing: 0.2rem;
   font-weight: 800;
   margin-top: -60px;
+
+  @media screen and (max-width: 870px) {
+    width: 80%;
+  }
 `;
 
-export const Bar = styled.span`
+const Bar = styled.span`
   display: block;
   position: relative;
   width: 100%;
@@ -28,7 +38,8 @@ export const Bar = styled.span`
   flex-basis: 4px;
   border-radius: 50px;
   transition: 0.5s ease-out;
-  background: ${({ theme, error }) => error?.color ?? hexToRgb(theme.sub, 0.2)};
+  background: ${({ theme, messageColor }) =>
+    messageColor ?? hexToRgb(theme.secondaryColor, 0.2)};
 
   ::before {
     transition: inherit;
@@ -41,19 +52,20 @@ export const Bar = styled.span`
     transform: scaleX(0);
     height: 100%;
     border-radius: 50px;
-    background: ${({ theme, error }) => error?.color ?? theme.sub};
+    background: ${({ theme, messageColor }) =>
+      messageColor ?? theme.secondaryColor};
   }
 `;
 
 export const InputLabel = styled.label`
-  color: ${({ theme }) => hexToRgb(theme.sub, 0.4)};
-  font-size: 1rem;
+  color: ${({ theme }) => hexToRgb(theme.secondaryColor, 0.4)};
+  font-size: 1em;
   font-weight: 700;
   position: absolute;
   font-family: var(--font1);
-  pointer-events: none;
-  left: 2%;
-  top: 20px;
+  left: 2.1%;
+  top: 27%;
+  cursor: text;
   transition: 0.2s ease all;
 `;
 
@@ -63,19 +75,20 @@ const Input = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  padding-left: 2.2%;
+  padding-left: 2.1%;
   font-family: var(--font1);
-  font-size: 1.2rem;
+  font-size: 1.2em;
   font-weight: 100;
+  padding-bottom: 5px;
+  padding-right: 18%;
 
   &:not([type='button']) {
-    top: 0;
     flex-basis: 30%;
   }
 `;
 
 export const InputContainer = styled(motion.div)`
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   margin-bottom: 0px;
   position: relative;
   display: flex;
@@ -84,17 +97,37 @@ export const InputContainer = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
   overflow: hidden;
+  cursor: text;
 
-  &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
-    top: -2%;
-    font-size: 15px;
-    color: ${({ theme }) => theme.sub};
+  &:not(.simple-input):not(.for-input-file) {
+    &:focus-within ${InputLabel}, input:valid ~ ${InputLabel} {
+      top: 2%;
+      color: ${({ theme }) => theme.secondaryColor};
+    }
+
+    &:focus-within ${Bar}:before, input:valid ~ ${Bar}:before {
+      transform: scaleX(1);
+    }
   }
 
-  &:focus-within ${Bar}::before, input:valid ~ ${Bar} {
-    transform: scaleX(1);
+  input[type='file']:hover ~ ${InputLabel} {
+    color: ${({ theme }) => theme.primaryColor};
+  }
+
+  &.simple-input {
+    &.active,
+    &:focus-within {
+      ${InputLabel} {
+        top: 2%;
+        color: ${({ theme }) => theme.secondaryColor};
+      }
+
+      ${Bar}:before {
+        transform: scaleX(1);
+      }
+    }
   }
 `;
 
@@ -102,107 +135,181 @@ export const SubmitButton = styled(motion.input).attrs({
   className: 'button',
 })`
   border-radius: 50px;
+  width: 50%;
   border: none;
   margin-bottom: 0px;
   margin-top: 10px;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
   box-shadow: 20px 20px 60px #cfcfcf, -20px -20px 60px #ffffff;
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   font-family: var(--font1);
-  font-size: 1.3rem;
+  font-size: 1.3em;
   font-weight: 500;
   letter-spacing: 0.1rem;
   align-self: center;
   text-transform: lowercase;
 
   &:disabled {
-    background: ${({ theme }) => hexToRgb(theme.sub, 0.3)};
+    color: ${({ theme }) => hexToRgb(theme.black, 0.5)};
+    filter: opacity(0.5);
   }
 `;
 
-const MotionInputInfo = styled(motion.p)`
+const InputSvgValidatorContainer = styled.div`
   margin: 0;
-  font-family: var(--font2);
-  font-size: 0.9rem;
-  font-weight: 300;
-  text-align: left;
-  width: 98%;
-  padding-left: 0.5%;
-  left: 2%;
+  width: 12%;
+  height: 35px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 4%;
   position: absolute;
-  color: ${({ error }) => error.color};
-  background: ${({ error }) => hexToRgb(colorMapping(error.color), 0.2)};
-  bottom: 24px;
+  top: 27%;
+
+  svg {
+    path {
+      fill: inherit;
+      fill-rule: evenodd;
+    }
+  }
 `;
 
-export function InputInfo({ error, motionProps }) {
+export function ValidatorSVG({ state, color }) {
+  const isError = state === 'error';
   return (
-    <MotionInputInfo error={error} {...motionProps}>
-      {error.text}
-    </MotionInputInfo>
+    <InputSvgValidatorContainer>
+      <AnimatePresence exitBeforeEnter={true}>
+        <motion.svg
+          key={state}
+          initial='initial'
+          animate='appear'
+          exit='hide'
+          custom={{ isError, color }}
+          variants={inputSvgValidatorVariants}
+          xmlns='http://www.w3.org/2000/svg'
+          width='20'
+          height='20'
+          viewBox='0 0 24 24'>
+          <motion.path d={pathObj[state]} />
+        </motion.svg>
+      </AnimatePresence>
+    </InputSvgValidatorContainer>
   );
 }
 
+export function SimpleInputField(props) {
+  const { motionProps, label, addBar = true, ...rest } = props;
+  const { name, type } = rest;
+  const isFileInput = type === 'file';
+
+  const [inputValue, setInputValue] = React.useState('');
+
+  const handleFocus = e => {
+    const isFocused = e.currentTarget.classList.contains('focused');
+    e.currentTarget.classList.toggle('focused', !isFocused);
+  };
+
+  const handleBlur = e => {
+    const isFocusedElem = e.currentTarget.classList.contains('focused');
+    if (isFocusedElem) e.currentTarget.classList.remove('focused');
+  };
+
+  const handleChange = e => {
+    e.persist();
+    const container = e.currentTarget.parentElement;
+    container.classList.toggle('active', e.target.value.length >= 1);
+    if (isFileInput) fileInputChangeHandler(e);
+    setInputValue(() => e.target.value);
+  };
+
+  return (
+    <InputContainer
+      className={isFileInput ? 'for-input-file' : 'simple-input'}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      {...motionProps}>
+      <Input value={inputValue} onChange={handleChange} {...rest} id={name} />
+      {addBar && <Bar />}
+      {label && <InputLabel htmlFor={name}>{label}</InputLabel>}
+
+      {isFileInput && (
+        <TiTimes className='reset' onClick={resetInputFileValue} />
+      )}
+    </InputContainer>
+  );
+}
 export function InputField(props) {
   const { name, required, type, label, motionProps, ...rest } = props;
-  const { formState } = rest;
+  const { formState, className } = rest;
   const { formType, setInputFieldError } = formState;
-  const [error, setError] = React.useState(null);
+
+  const [message, setMessage] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const LoginForm = formType === 'login';
+  const debouncedInput = useDebounce(inputValue, 800);
 
   React.useEffect(() => {
     return () => {
-      setError(null);
+      setMessage(null);
       setInputValue('');
     };
   }, [formType]);
 
   React.useEffect(() => {
-    if (error && error.color === 'red') {
+    if (message?.type === 'error') {
       setInputFieldError(true);
     } else setInputFieldError(false);
-  }, [error]);
+  }, [message?.text]);
 
-  const handleDebouncedInputValidation = React.useCallback(
-    debounce(() => setError(inputValidation(name, inputValue, LoginForm)), 700),
-    [name, inputValue, LoginForm]
-  );
+  React.useEffect(() => {
+    if (debouncedInput) {
+      const report = inputValidation(name, debouncedInput, LoginForm);
+      setMessage(report);
+    } else return;
+  }, [debouncedInput]);
 
   const handleInputValidation = () =>
-    setError(inputValidation(name, inputValue, LoginForm));
+    setMessage(inputValidation(name, inputValue, LoginForm));
+
+  React.useEffect(() => {
+    console.log(rest?.shouldReset);
+    if (rest?.shouldReset) {
+      setInputValue('');
+      setMessage(null);
+    }
+  }, [rest?.shouldReset]);
+
+  const handleChange = e => {
+    e.persist();
+    if (!required) {
+      const container = e.currentTarget.parentElement;
+      container.classList.toggle('active', e.target.value.length >= 1);
+    }
+    setInputValue(() => e.target.value);
+  };
 
   return (
-    <InputContainer {...motionProps}>
+    <InputContainer {...motionProps} className={className}>
       <Input
-        onKeyUp={handleDebouncedInputValidation}
-        onFocus={handleInputValidation}
-        onChange={e => setInputValue(e.target.value)}
+        // onBlur={handleInputValidation}
+        onFocus={() => handleInputValidation}
+        onChange={handleChange}
         value={inputValue}
         type={type}
         required={required}
         name={name}
+        id={name}
         {...rest}
       />
 
-      <Bar error={error} />
-      <InputLabel>{label}</InputLabel>
+      <Bar messageColor={message?.color} />
+      <InputLabel htmlFor={name}>{label}</InputLabel>
 
-      <AnimatePresence exitBeforeEnter>
-        {error && (
-          <InputInfo
-            key='Input-Info'
-            motionProps={{
-              initial: 'hidden',
-              animate: 'visible',
-              exit: 'hidden',
-              variants: InputInfoVariant,
-              positionTransition: true,
-            }}
-            error={error}
-          />
-        )}
-      </AnimatePresence>
+      <ValidatorSVG
+        state={!message ? 'initial' : message.type}
+        color={message?.color}
+      />
     </InputContainer>
   );
 }

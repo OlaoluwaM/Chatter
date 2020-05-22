@@ -1,10 +1,11 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import { spring2 } from '../utils/motionObj';
+import React from 'react';
+import { css, default as styled } from 'styled-components';
 import { AuthContext } from '../context/Context';
 import { hexToRgb, isColor } from '../utils/helper';
-import { motion, AnimatePresence } from 'framer-motion';
-import { default as styled, css } from 'styled-components';
+import { spring2 } from '../utils/motionObj';
+import { avatarStyles, colorStyles } from './DataDisplay';
 
 const MessageAreaWrapper = styled.ul.attrs({
   className: 'message-area',
@@ -16,7 +17,7 @@ const MessageAreaWrapper = styled.ul.attrs({
   overflow-y: auto;
   background: inherit;
   overflow-x: hidden;
-  flex-basis: 81%;
+  flex-basis: 75%;
   padding-bottom: 12px;
 
   * {
@@ -40,7 +41,7 @@ const TextWrapper = styled(motion.div)`
     font-family: var(--font2);
     font-size: 3.5rem;
     font-weight: 100;
-    color: ${({ theme }) => theme.main};
+    color: ${({ theme }) => theme.primaryColor};
     width: 100%;
     text-align: center;
   }
@@ -52,16 +53,9 @@ const Avatar = styled.span`
   border-radius: 50%;
   display: inline-block;
   margin: 0 10px -10px;
-  border: 1.5px double ${({ theme }) => theme.main};
-  ${({ bg }) =>
-    isColor(bg)
-      ? css`
-          background: ${({ bg }) => bg};
-        `
-      : css`
-          background: url(${bg}) center no-repeat;
-          background-size: contain;
-        `}
+  border: 1.5px double ${({ theme }) => theme.primaryColor};
+
+  ${({ bg }) => (isColor(bg) ? colorStyles(bg) : avatarStyles(bg))}
 `;
 
 const MessageContent = styled.div`
@@ -71,7 +65,7 @@ const MessageContent = styled.div`
 
 const Username = styled.div`
   display: block;
-  color: ${({ theme }) => hexToRgb(theme.black, 0.6)};
+  color: ${({ theme }) => hexToRgb(theme.primaryColor, 0.9)};
   font-size: 15px;
   padding-bottom: 5px;
   font-weight: 100;
@@ -83,8 +77,8 @@ const MessageText = styled.div`
   overflow-wrap: break-word;
   margin: 0;
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.main};
-  color: var(--sub);
+  background-color: ${({ theme }) => theme.primaryColor};
+  color: var(--secondaryColor);
   display: inline-block;
 `;
 
@@ -103,14 +97,14 @@ const MessageWrapper = styled(motion.li)`
           }
 
           & ${MessageText} {
-            background: ${theme.sub};
-            color: ${theme.main};
+            background: ${theme.secondaryColor};
+            color: ${theme.primaryColor};
           }
         `
       : css`
           & ${MessageText} {
-            background: ${hexToRgb(theme.black, 0.5)};
-            color: ${theme.main};
+            background: ${hexToRgb(theme.primaryColorDark, 0.7)};
+            color: ${theme.primaryColor};
           }
         `}
   &:last-of-type {
@@ -120,10 +114,8 @@ const MessageWrapper = styled(motion.li)`
 
 function Message({ message, sender, exit }) {
   const { activeUserName: username } = React.useContext(AuthContext);
-
-  const { profileUrl, userId } = sender;
-
-  const isMyMessage = userId === username;
+  const { profileUrl, nickname } = sender;
+  const isMyMessage = nickname === username;
 
   const messageVariant = {
     visible: {
@@ -135,7 +127,7 @@ function Message({ message, sender, exit }) {
     hidden: isMyMessage => ({
       opacity: 0,
       x: isMyMessage ? 50 : -50,
-      transition: { ...spring2 },
+      transition: { ...spring2, delay: 1.4 },
     }),
   };
 
@@ -149,25 +141,35 @@ function Message({ message, sender, exit }) {
       exit={exit}>
       <Avatar bg={profileUrl} />
       <MessageContent>
-        <Username>{userId ?? username}</Username>
+        <Username>{nickname}</Username>
         <MessageText>{message}</MessageText>
       </MessageContent>
     </MessageWrapper>
   );
 }
 
-export default function MessageArea(props) {
-  const { messages } = props;
+export default function MessageArea({ messages }) {
+  const containerElement = React.useRef();
+  const timeoutRef = React.useRef();
+
+  React.useEffect(() => {
+    const { current: ul } = containerElement;
+    timeoutRef.current = setTimeout(() => {
+      ul.scrollTop = ul.scrollHeight;
+    }, 500);
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [messages.length]);
 
   return (
-    <MessageAreaWrapper>
+    <MessageAreaWrapper ref={containerElement}>
       <AnimatePresence>
         {messages.map(({ messageId, sender, text }, ind) => (
           <Message
             sender={sender}
             message={text}
             key={messageId + ind}
-            exit={{ y: -20, opacity: 0 }}
+            exit={{ opacity: 0 }}
           />
         ))}
       </AnimatePresence>

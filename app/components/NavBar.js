@@ -1,25 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
 import { hexToRgb } from '../utils/helper';
 import { AuthContext } from '../context/Context';
-import { Route, Link, useLocation } from 'react-router-dom';
-import { navUlVariant, navItemVariant } from '../utils/motionObj';
+import { Link, Route, useLocation } from 'react-router-dom';
+import { navItemVariant, navUlVariant } from '../utils/motionObj';
+import { AnimatePresence, motion, usePresence } from 'framer-motion';
 
 const NavContainer = styled.nav`
   position: relative;
   width: 100%;
   height: 7%;
   overflow: hidden;
-  display: grid;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
 `;
 
 const NavUl = styled(motion.ul)`
   width: auto;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 180px));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   grid-auto-flow: column;
   gap: 10px;
   justify-content: end;
@@ -31,7 +30,7 @@ const NavItem = styled(motion.li)`
   list-style-type: none;
   font-family: var(--font1);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   height: 100%;
   display: flex;
   text-align: center;
@@ -39,6 +38,13 @@ const NavItem = styled(motion.li)`
   justify-content: center;
   color: ${({ theme }) => hexToRgb(theme.black, 0.5)};
   letter-spacing: 0.1rem;
+
+  &:last-of-type {
+    grid-column: -3;
+  }
+  &:nth-of-type(2) {
+    grid-column: -2;
+  }
 
   a {
     color: inherit;
@@ -49,6 +55,8 @@ const NavItem = styled(motion.li)`
 
 function CustomLink({ to, exact, children, ...rest }) {
   const { motionProps } = rest;
+  const [isPresent, safeToRemove] = usePresence();
+
   return (
     <Route
       exact={exact}
@@ -66,6 +74,7 @@ function CustomLink({ to, exact, children, ...rest }) {
 export default function Nav() {
   const { isAuthenticated } = React.useContext(AuthContext);
   const { pathname } = useLocation();
+  console.log(isAuthenticated, pathname);
 
   if (isAuthenticated) {
     return (
@@ -116,43 +125,43 @@ export default function Nav() {
 
           <AnimatePresence>
             {pathname !== '/authenticate' && (
-              <>
-                <CustomLink
-                  key='login'
-                  motionProps={{
-                    exit: { opacity: 0 },
-                    variants: navItemVariant,
-                    whileHover: 'hover',
-                    positionTransition: true,
-                  }}
-                  to={{
-                    pathname: '/authenticate',
-                    state: {
-                      formType: 'login',
-                    },
-                  }}
-                  exact={true}>
-                  Login
-                </CustomLink>
+              <CustomLink
+                key='login'
+                motionProps={{
+                  exit: { opacity: 0 },
+                  variants: navItemVariant,
+                  whileHover: 'hover',
+                  positionTransition: true,
+                }}
+                to={{
+                  pathname: '/authenticate',
+                  state: {
+                    formType: 'login',
+                  },
+                }}
+                exact={true}>
+                Login
+              </CustomLink>
+            )}
 
-                <CustomLink
-                  key='sign-up'
-                  motionProps={{
-                    variants: navItemVariant,
-                    whileHover: 'hover',
-                    positionTransition: true,
-                    exit: { opacity: 0 },
-                  }}
-                  exact={true}
-                  to={{
-                    pathname: '/authenticate',
-                    state: {
-                      formType: 'sign-up',
-                    },
-                  }}>
-                  Sign Up
-                </CustomLink>
-              </>
+            {pathname !== '/authenticate' && (
+              <CustomLink
+                key='sign-up'
+                motionProps={{
+                  variants: navItemVariant,
+                  whileHover: 'hover',
+                  positionTransition: true,
+                  exit: { opacity: 0 },
+                }}
+                exact={true}
+                to={{
+                  pathname: '/authenticate',
+                  state: {
+                    formType: 'sign-up',
+                  },
+                }}>
+                Sign Up
+              </CustomLink>
             )}
           </AnimatePresence>
         </NavUl>

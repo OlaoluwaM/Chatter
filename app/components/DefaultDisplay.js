@@ -17,7 +17,7 @@ const DefaultContainer = styled(motion.div)`
   & > p {
     position: absolute;
     bottom: 11%;
-    color: ${({ theme }) => theme.darkSub};
+    color: ${({ theme }) => theme.primaryColor};
     font-family: var(--font1);
     font-size: 1.1rem;
     font-weight: 500;

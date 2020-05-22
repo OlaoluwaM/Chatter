@@ -22,14 +22,6 @@ export const strongRegex = new RegExp(
 //   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
 // );
 
-export const debounce = (func, ms = 0) => {
-  let timeoutId;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), ms);
-  };
-};
-
 export function getContrast(hexcolor) {
   if (hexcolor.slice(0, 1) === '#') {
     hexcolor = hexcolor.slice(1);
@@ -38,7 +30,7 @@ export function getContrast(hexcolor) {
   if (hexcolor.length === 3) {
     hexcolor = hexcolor
       .split('')
-      .map(function(hex) {
+      .map(function (hex) {
         return hex + hex;
       })
       .join('');
@@ -77,9 +69,7 @@ export function hexToRgb(hex, alpha = 1) {
 // }
 
 export function randomID() {
-  return `_${Math.random()
-    .toString(36)
-    .substr(2, 9)}`;
+  return `_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 export function filterObject(obj, properties) {
@@ -93,7 +83,7 @@ export function filterObject(obj, properties) {
   }, {});
 }
 
-function formatDate(date) {
+export function formatDate(date) {
   const dateOptions = {
     year: 'numeric',
     day: 'numeric',
@@ -106,7 +96,7 @@ function formatDate(date) {
   return new Intl.DateTimeFormat('default', dateOptions).format(new Date(date));
 }
 
-function prettyDateFormat(dateArr, removeYear = true) {
+export function prettyDateFormat(dateArr, removeYear = true) {
   if (removeYear) {
     dateArr.splice(3, 1, 'at');
   } else {
@@ -114,42 +104,6 @@ function prettyDateFormat(dateArr, removeYear = true) {
   }
 
   return `Last seen ${dateArr.join(' ')}`;
-}
-
-export function formatTimeString(timeString) {
-  const currentDateArr = formatDate(Date.now()).split(' ');
-  const {
-    '1': cMonth,
-    '2': cDay,
-    '3': cYear,
-    '4': cTime,
-    '5': cTimeOfDay,
-  } = currentDateArr;
-
-  const dateArr = formatDate(timeString).split(' ');
-  const {
-    '1': month,
-    '2': day,
-    '3': year,
-    '4': time,
-    '5': timeOfDay,
-  } = dateArr;
-
-  if (cYear !== year) return prettyDateFormat(dateArr, false);
-
-  if (cMonth === month) {
-    const diff = Number(cDay) - Number(day);
-
-    if (diff === 0) {
-      return `Last seen today at ${time}, ${timeOfDay}`;
-    } else if (diff >= 1 && diff <= 7) {
-      return `Last seen ${
-        diff === 1 ? `yesterday` : `${diff} days ago`
-      }, at ${time}, ${timeOfDay}`;
-    } else {
-      return prettyDateFormat(dateArr);
-    }
-  } else return prettyDateFormat(dateArr);
 }
 
 export function isColor(str) {
@@ -182,6 +136,7 @@ export function unloadEventListener(e) {
   document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
     8
   )};`;
+  sessionStorage.clear();
 }
 
 export function extractCurrentUserFromCookie() {
@@ -196,4 +151,129 @@ export function extractCurrentUserFromCookie() {
 export function colorMapping(colorName) {
   const map = { red: '#ff0000', green: '#008000' };
   return map[colorName];
+}
+
+export function removeHashTag(hex) {
+  return hex.replace('#', '');
+}
+
+/**
+ *
+ * @param {string} colorCode - color code in hex format
+ * @param {number} amt - positive integer to lighten; negative integer to darken
+ */
+
+export function lightenDarkenColor(colorCode, amt) {
+  let usePound = false;
+
+  if (colorCode[0] == '#') {
+    colorCode = colorCode.slice(1);
+    usePound = true;
+  }
+
+  let R = parseInt(colorCode.substring(0, 2), 16);
+  let G = parseInt(colorCode.substring(2, 4), 16);
+  let B = parseInt(colorCode.substring(4, 6), 16);
+
+  R = R + amt;
+  G = G + amt;
+  B = B + amt;
+
+  if (R > 255) R = 255;
+  else if (R < 0) R = 0;
+
+  if (G > 255) G = 255;
+  else if (G < 0) G = 0;
+
+  if (B > 255) B = 255;
+  else if (B < 0) B = 0;
+
+  var RR = R.toString(16).length == 1 ? '0' + R.toString(16) : R.toString(16);
+  var GG = G.toString(16).length == 1 ? '0' + G.toString(16) : G.toString(16);
+  var BB = B.toString(16).length == 1 ? '0' + B.toString(16) : B.toString(16);
+
+  return (usePound ? '#' : '') + RR + GG + BB;
+}
+
+export function generateRandomColor() {
+  const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+  return randomColor;
+}
+
+export function filterUser(list, username) {
+  return list.filter(user => {
+    const name = user?.nickname ?? user;
+    return name !== username;
+  });
+}
+
+export function hashCode(str, seed = 0) {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+export const debounce = (func, ms = 0) => {
+  let timeoutId;
+  return function (...args) {
+    timeoutId = setTimeout(() => func.apply(this, args), ms);
+  };
+};
+
+export function generateRandomId() {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+}
+
+function isValidImage(str) {
+  return new RegExp(/\.(jpe?g|png|gif)$/, 'i').test(str);
+}
+
+export function fileInputChangeHandler(e) {
+  const label = e.target.nextElementSibling;
+  const initialLabelValue = label.innerText;
+  const { '0': file, length } = e.target.files;
+
+  if (length >= 1) {
+    const { name } = file;
+    label.innerText = isValidImage(name) ? name : 'Not a valid image file';
+  } else label.innerText = initialLabelValue;
+}
+
+export function resetInputFileValue(e) {
+  const label = e.currentTarget.previousElementSibling;
+  const initialLabelText = 'New profile image file';
+
+  if (label.innerText !== initialLabelText) {
+    label.innerText = initialLabelText;
+  } else return;
+}
+
+export function handleSbResponse(res, err) {
+  if (err) throw err;
+  console.log('sb response', res);
+}
+
+export function normalize(value) {
+  const replacer = (_, val) => (val === '' ? null : val);
+
+  return JSON.parse(JSON.stringify(value, replacer));
+}
+
+export function rawDataType(value) {
+  const _toString = Object.prototype.toString;
+  return _toString.call(value).slice(8, -1).toLowerCase();
 }

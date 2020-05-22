@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
-import { isColor } from '../utils/helper';
-import { default as styled, css } from 'styled-components';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { css, default as styled } from 'styled-components';
+import { generateRandomColor, hexToRgb, isColor } from '../utils/helper';
 
 const DataContainer = styled(motion.div)`
   position: relative;
@@ -17,8 +17,13 @@ const DataContainer = styled(motion.div)`
   }
 `;
 
+export const colorStyles = bg => `background: ${bg}`;
+export const avatarStyles = img => `
+            background: url(${img}) center no-repeat;
+            background-size: cover`;
+
 const Avatar = styled.div`
-  flex-basis: 25%;
+  flex-basis: 20%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,15 +33,8 @@ const Avatar = styled.div`
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    ${({ bg }) =>
-      isColor(bg)
-        ? css`
-            background: ${bg};
-          `
-        : css`
-            background: url(${bg}) center no-repeat;
-            background-size: contain;
-          `}
+    border: 2px solid;
+    ${({ bg }) => (isColor(bg) ? colorStyles(bg) : avatarStyles(bg))};
   }
 
   div:after {
@@ -45,9 +43,9 @@ const Avatar = styled.div`
     border-radius: 50%;
     height: 10px;
     width: 10px;
-    bottom: 0px;
-    right: 4px;
-    border: 1px solid ${({ theme }) => theme.black};
+    bottom: -2px;
+    right: 0px;
+    border: 3px solid ${({ theme }) => theme.primaryColor};
     background: ${({ status }) => (status === 'online' ? 'lightgreen' : 'red')};
   }
 `;
@@ -61,24 +59,29 @@ const Content = styled.div`
 
   p {
     margin: 0;
-    text-transform: capitalize;
+    /* text-transform: capitalize; */
+    color: inherit;
   }
 
   p:first-of-type {
     margin-bottom: 5px;
+    font-size: 1.2em;
   }
 
   p:last-of-type {
-    font-size: small;
+    font-size: 0.7em;
     font-weight: 200;
-    font-family: var(--font2);
+    font-family: var(--font1);
+    letter-spacing: 0.1em;
+    filter: opacity(0.7);
 
     ${({ isCurrentUser }) =>
       isCurrentUser &&
       css`
+        filter: opacity(1);
         font-size: 1.2rem;
         margin-bottom: 0;
-      `}
+      `};
   }
 `;
 
@@ -93,23 +96,40 @@ const ActionInfo = styled.div.attrs({
   height: 100%;
   flex-basis: 30%;
   font-size: 1.6rem;
+
+  & > a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  ${({ theme }) =>
+    css`
+      color: ${hexToRgb(theme.primaryColor, 0.3)};
+      fill: ${hexToRgb(theme.primaryColor, 0.3)};
+      stroke: ${hexToRgb(theme.primaryColor, 0.3)};
+
+      & a:hover {
+        color: ${theme.primaryColor};
+        fill: ${theme.primaryColor};
+        stroke: ${theme.primaryColor};
+      }
+    `}
 `;
 
 export function UserDisplay(props) {
   const { isCurrentUser, data, subData, children, dir, motionProps } = props;
-
-  const { userId, profileUrl, connectionStatus } = data;
+  const { nickname, connectionStatus, profileUrl } = data;
 
   return (
     <DataContainer {...motionProps}>
       <Avatar
         status={isCurrentUser ? 'online' : connectionStatus}
-        bg={profileUrl ?? '#000'}>
+        bg={profileUrl ?? generateRandomColor()}>
         <div></div>
       </Avatar>
 
       <Content isCurrentUser={isCurrentUser}>
-        <p>{userId}</p>
+        <p>{nickname}</p>
         {subData && <p>{subData}</p>}
       </Content>
 

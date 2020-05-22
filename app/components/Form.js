@@ -1,33 +1,38 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import React from 'react';
 import { Redirect } from 'react-router-dom';
+import styled from 'styled-components';
 import { AuthContext } from '../context/Context';
-import { extractFormData } from '../utils/helper';
-import { motion, AnimatePresence } from 'framer-motion';
 import { handleLogin, handleSignUp } from '../utils/authFunc';
-import { FormTitle, InputField, SubmitButton } from './Form-Components';
+import { extractFormData } from '../utils/helper';
 import { containerVariant, itemVariant, spring } from '../utils/motionObj';
+import { FormTitle, InputField, SubmitButton } from './Form-Components';
 
 const FormContainer = styled(motion.form)`
   display: flex;
   background: inherit;
-  width: 45%;
+  width: 50%;
   padding: 1%;
-  height: 51%;
+  height: 57%;
   justify-content: space-evenly;
   flex-direction: column;
   background: transparent;
-  margin-top: 22px;
+  margin-top: 27px;
   position: relative;
   padding-top: 0;
   padding-bottom: 0;
+
+  @media screen and (max-width: 870px) {
+    width: 80%;
+  }
 `;
 
 export default function Form({ setAuth, formType }) {
   const [inputFieldError, setInputFieldError] = React.useState(false);
-  const formRef = React.useRef();
   const { isAuthenticated } = React.useContext(AuthContext);
+  const [authenticating, setAuthenticating] = React.useState(false);
+  const formRef = React.useRef();
 
   React.useEffect(() => {
     return () => setInputFieldError(false);
@@ -39,7 +44,7 @@ export default function Form({ setAuth, formType }) {
 
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
-    formRef.current.style.opacity = 0.4;
+    setAuthenticating(true);
 
     if (formType === 'login') {
       setTimeout(() => setAuth(handleLogin(extractedFormData)), 1500);
@@ -49,8 +54,10 @@ export default function Form({ setAuth, formType }) {
   };
 
   if (isAuthenticated) {
-    return <Redirect to='/' />;
-  } else
+    return <Redirect to='/chat' />;
+  } else if (authenticating) {
+    return <p>Authenticating</p>;
+  } else {
     return (
       <>
         <FormTitle
@@ -72,13 +79,13 @@ export default function Form({ setAuth, formType }) {
           autoComplete='off'>
           <AnimatePresence>
             <InputField
-              key='name-field'
+              key='username'
               motionProps={{
                 variants: itemVariant,
                 positionTransition: true,
                 exit: 'hidden',
               }}
-              name='name'
+              name='username'
               label='Username'
               formState={{ formType, setInputFieldError }}
             />
@@ -125,6 +132,7 @@ export default function Form({ setAuth, formType }) {
         </FormContainer>
       </>
     );
+  }
 }
 
 Form.propTypes = {

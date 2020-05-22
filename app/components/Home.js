@@ -1,22 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/Context';
 import { IoIosChatbubbles } from 'react-icons/io';
-import { headerVariant, buttonVariant } from '../utils/motionObj';
+import { buttonVariant, headerVariant } from '../utils/motionObj';
 
 const HomePage = styled.div.attrs({
   className: 'wrapper',
 })`
   position: relative;
-  background: ${({ theme }) => theme.main};
+  background: ${({ theme }) => theme.primaryColor};
 
   & > svg {
     position: absolute;
   }
 
-  & > div:first-of-type {
+  & > div {
     z-index: 10;
     position: absolute;
     top: 50%;
@@ -25,15 +25,17 @@ const HomePage = styled.div.attrs({
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    width: 70%;
-    height: 27%;
+    justify-content: space-around;
+    width: 100%;
+    height: 32%;
     background: transparent;
-    color: ${({ theme }) => theme.sub};
+    color: ${({ theme }) => theme.secondaryColor};
+    font-size: 1rem;
 
     h1 {
       text-align: center;
-      font-size: 5rem;
+      font-size: 4.2em;
+      padding: 10px;
       font-family: var(--font1);
       font-weight: lighter;
       margin-bottom: 0;
@@ -41,22 +43,29 @@ const HomePage = styled.div.attrs({
       letter-spacing: 0.1rem;
       word-spacing: 0.2rem;
     }
+
+    a {
+      font-size: 1.2rem;
+      width: 100%;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+    }
   }
 `;
 
 const ChatButton = styled(motion.button).attrs({
   className: 'button',
 })`
-  color: ${({ theme }) => theme.sub};
+  color: ${({ theme }) => theme.secondaryColor};
   font-family: var(--font1);
   font-weight: 100;
-  font-size: 1.3rem;
-  text-transform: uppercase;
-  fill: ${({ theme }) => theme.sub};
-  border-radius: 50px;
-
+  width: 250px;
+  max-width: 43%;
   border: none;
-  background: ${({ theme }) => theme.main};
+  padding: 1.4rem 1.2rem;
+  fill: ${({ theme }) => theme.secondaryColor};
+  background: ${({ theme }) => theme.primaryColor};
 
   & > svg {
     fill: inherit;

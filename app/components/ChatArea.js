@@ -1,15 +1,16 @@
+import { AnimatePresence } from 'framer-motion';
 import React from 'react';
-import Input from './Input';
 import styled from 'styled-components';
-import MessageArea from './Messages';
-import DefaultDisplay from './DefaultDisplay';
-import ChatOverHead from './ChatOverhead';
-import { randomID } from '../utils/helper';
 import { ChatContext } from '../context/Context';
 import { extractNeededMessageData } from '../utils/chatFunctions';
+import { lightenDarkenColor, randomID } from '../utils/helper';
+import ChatOverHead from './ChatOverhead';
+import Input from './Input';
+import MessageArea from './Messages';
 
 const ChatAreaWrapper = styled.div`
-  background: ${({ theme }) => theme.darkMain};
+  background: ${({ theme }) =>
+    lightenDarkenColor(theme.secondaryColorDark, -15)};
   height: 100%;
   flex-grow: 1;
   overflow: hidden;
@@ -21,49 +22,26 @@ const ChatAreaWrapper = styled.div`
 
 export default function ChatArea() {
   const { sb, chatManager, dispatch } = React.useContext(ChatContext);
+  const isInChat = typeof chatManager?.userChannel === 'object';
 
   React.useEffect(() => {
     const channelHandler = new sb.ChannelHandler();
     const connectionHandler = new sb.ConnectionHandler();
+    console.log(2, chatManager);
 
     const HANDLER_ID1 = randomID();
     const HANDLER_ID2 = randomID();
 
     try {
-      channelHandler.onMessageReceived = (channel, message) => {
-        const messages = [extractNeededMessageData(message)];
+      channelHandler.onMessageReceived = handleMessageReceived;
 
-        if (chatManager?.hasOwnProperty('userChannel')) {
-          dispatch({
-            type: 'New message',
-            messages,
-          });
-        } else {
-          console.log('once');
-          const prevMessageListQuery = channel.createPreviousMessageListQuery();
-          prevMessageListQuery.limit = 50;
-          prevMessageListQuery.reverse = false;
-
-          prevMessageListQuery.load(function(prevMessages, error) {
-            if (error) throw new Error(error.message);
-            const ms = prevMessages.map(extractNeededMessageData);
-
-            dispatch({
-              type: 'New channel and message',
-              channel,
-              messages: [...ms, ...messages],
-            });
-          });
-        }
-      };
-
-      connectionHandler.onReconnectStarted = function() {
+      connectionHandler.onReconnectStarted = function () {
         console.log('reconnecting');
       };
-      connectionHandler.onReconnectSucceeded = function() {
+      connectionHandler.onReconnectSucceeded = function () {
         console.log('reconnected');
       };
-      connectionHandler.onReconnectFailed = function() {
+      connectionHandler.onReconnectFailed = function () {
         console.log('reload');
       };
 
@@ -78,7 +56,33 @@ export default function ChatArea() {
       sb.removeChannelHandler(HANDLER_ID1);
       sb.removeConnectionHandler(HANDLER_ID2);
     };
-  }, []);
+  }, [isInChat]);
+
+  const handleMessageReceived = (channel, message) => {
+    const messages = [extractNeededMessageData(message)];
+
+    if (chatManager?.hasOwnProperty('userChannel')) {
+      dispatch({
+        type: 'New message',
+        messages,
+      });
+    } else {
+      const prevMessageListQuery = channel.createPreviousMessageListQuery();
+      prevMessageListQuery.limit = 50;
+      prevMessageListQuery.reverse = false;
+
+      prevMessageListQuery.load(function (prevMessages, error) {
+        if (error) throw new Error(error.message);
+        const ms = prevMessages.map(extractNeededMessageData);
+
+        dispatch({
+          type: 'New channel and message',
+          channel,
+          messages: ms,
+        });
+      });
+    }
+  };
 
   const onSendMessage = message => {
     const { userChannel } = chatManager;
@@ -89,7 +93,6 @@ export default function ChatArea() {
 
       groupChannel.sendUserMessage(message, '', '', (message, error) => {
         if (error) dispatch({ type: 'Error', error: error.message });
-        console.log(groupChannel);
         dispatch({
           type: 'New message',
           messages: [extractNeededMessageData(message)],
@@ -98,19 +101,25 @@ export default function ChatArea() {
     });
   };
 
+  const isChatting = chatManager?.userChannel && chatManager.invitee;
+
   return (
     <ChatAreaWrapper>
-      {!chatManager.userChannel && (
+      {/* {!chatManager.userChannel && (
         <DefaultDisplay text='Select a user or a channel to start chatting' />
-      )}
+      )} */}
 
-      {chatManager.userChannel && (
-        <>
-          <ChatOverHead />
-          <MessageArea messages={chatManager.messages || []} />
-          <Input onSendMessage={onSendMessage} />
-        </>
-      )}
+      <AnimatePresence exitBeforeEnter={true}>
+        {isChatting && (
+          <ChatOverHead
+            key={chatManager.invitee.userId}
+            invitee={chatManager.invitee}
+          />
+        )}
+      </AnimatePresence>
+
+      <MessageArea messages={chatManager.messages || []} />
+      <Input disabled={!isChatting} onSendMessage={onSendMessage} />
     </ChatAreaWrapper>
   );
 }

@@ -1,4 +1,4 @@
-import { filterObject } from './helper';
+import { filterObject, formatDate, prettyDateFormat } from './helper';
 
 /**
  *
@@ -49,12 +49,17 @@ export function extractNeededMessageData(messageObj) {
   ]);
 }
 
+function getInvitee(channel, activeUserName) {
+  const user = channel?.members?.find(
+    ({ nickname }) => nickname !== activeUserName
+  );
+
+  return user;
+}
+
 export function chatManagerReducer(state, action) {
-  const messages = !state
-    ? ''
-    : state.messages === undefined
-    ? []
-    : state.messages;
+  const messages = state?.messages ?? [];
+  const activeUser = sessionStorage.getItem('CurrentUser');
 
   switch (action.type) {
     case 'New message':
@@ -78,6 +83,7 @@ export function chatManagerReducer(state, action) {
       return {
         ...state,
         userChannel: action.channel,
+        invitee: getInvitee(action.channel, activeUser),
         messages,
       };
 
@@ -122,7 +128,7 @@ export function getFriendList(user) {
 export function handleBlock(targetUser, sb) {
   sb.blockUser(targetUser, (user, error) => {
     if (error) throw new Error(error.message);
-    console.log(`${user.userId} has been blocked`);
+    console.log(`${user.userId}(${user.nickname}) has been blocked`);
   });
   return `${targetUser.userId} has been blocked`;
 }
@@ -131,6 +137,38 @@ export function handleUnBlock(blockedUser, sb) {
   sb.unblockUser(blockedUser, (user, error) => {
     if (error) throw new Error(error.message);
   });
-  console.log(`${blockedUser.userId} has been unblocked`);
+  console.log(
+    `${blockedUser.userId}(${blockedUser.nickname}) has been unblocked`
+  );
   return `${blockedUser.userId} has been unblocked`;
+}
+
+export function formatTimeString(timeNum) {
+  const currentDateArr = formatDate(Date.now()).split(' ');
+  const { '1': cMonth, '2': cDay, '3': cYear } = currentDateArr;
+
+  const dateArr = formatDate(timeNum).split(' ');
+  const {
+    '1': month,
+    '2': day,
+    '3': year,
+    '4': time,
+    '5': timeOfDay,
+  } = dateArr;
+
+  if (cYear !== year) return prettyDateFormat(dateArr, false);
+
+  if (cMonth === month) {
+    const diff = parseInt(cDay) - parseInt(day);
+
+    if (diff === 0) {
+      return `Last seen today at ${time}, ${timeOfDay}`;
+    } else if (diff >= 1 && diff <= 7) {
+      return `Last seen ${
+        diff === 1 ? `yesterday` : `${diff} days ago`
+      }, at ${time}, ${timeOfDay}`;
+    } else {
+      return prettyDateFormat(dateArr);
+    }
+  } else return prettyDateFormat(dateArr);
 }
