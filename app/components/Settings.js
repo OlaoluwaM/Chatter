@@ -16,7 +16,7 @@ import {
   itemVariant2,
 } from '../utils/motionObj';
 import DeleteAccount from './DeleteAccount';
-import { InputField, SimpleInputField, SubmitButton } from './Form-Components';
+import { InputField, SubmitButton } from './Form-Components';
 import Logout from './Logout';
 
 const SettingContainer = styled.div.attrs({
@@ -59,10 +59,16 @@ function UpdateProfile({ setAuth }) {
   const { sb } = React.useContext(ChatContext);
   const { activeUserName } = React.useContext(AuthContext);
 
-  const [inputFieldError, setInputFieldError] = React.useState(false);
-
+  const [inputFieldError, setInputFieldError] = React.useState(() => {
+    return JSON.stringify(new Array(4).fill(true));
+  });
+  console.count('re-rendered');
+  console.log(inputFieldError);
   React.useEffect(() => {
-    return () => (reset ? setReset(false) : void 0);
+    if (reset) {
+      setInputFieldError(JSON.stringify(new Array(4).fill(true)));
+      setReset(false);
+    }
   }, [reset]);
 
   const handleSubmit = e => {
@@ -86,7 +92,6 @@ function UpdateProfile({ setAuth }) {
     const hasNewProfilePic =
       !!profileData?.name || rawDataType(normalize(profileData)) === 'string';
 
-    console.log(!(newUsername || hasNewProfilePic));
     if (!(newUsername || hasNewProfilePic)) {
       return;
     } else {
@@ -101,10 +106,11 @@ function UpdateProfile({ setAuth }) {
       } else {
         updatedDataObj = { activeUserName: newUsername };
       }
-      console.log(updatedDataObj);
+
       setAuth(prevObj => ({ ...prevObj, ...updatedDataObj }));
     }
     setReset(true);
+
     e.currentTarget
       .querySelectorAll('.active')
       .forEach(elem => elem.classList.remove('active'));
@@ -123,6 +129,7 @@ function UpdateProfile({ setAuth }) {
           name='newUsername'
           label='New username'
           key='newUsername'
+          index={0}
           shouldReset={reset}
           className='simple-input'
           required={false}
@@ -139,6 +146,7 @@ function UpdateProfile({ setAuth }) {
           key='newPassword'
           className='simple-input'
           required={false}
+          index={1}
           motionProps={{ ...formElemMotionProps }}
           shouldReset={reset}
           type='password'
@@ -155,6 +163,7 @@ function UpdateProfile({ setAuth }) {
           name='profileUrl'
           className='simple-input'
           required={false}
+          index={2}
           shouldReset={reset}
           motionProps={{ ...formElemMotionProps }}
           formState={{
@@ -163,14 +172,21 @@ function UpdateProfile({ setAuth }) {
           }}
         />
 
-        <SimpleInputField
+        <InputField
           type='file'
           label='New profile image file'
           name='profileFile'
           key='profileFile'
+          className='for-input-file'
+          index={3}
+          required={false}
           motionProps={{ ...formElemMotionProps }}
           shouldReset={reset}
           addBar={false}
+          formState={{
+            formType: 'sign up',
+            setInputFieldError,
+          }}
         />
 
         <SubmitButton
@@ -178,7 +194,7 @@ function UpdateProfile({ setAuth }) {
           whileTap='tap'
           positionTransition={true}
           exit='hidden'
-          disabled={inputFieldError}
+          disabled={JSON.parse(inputFieldError).every(v => v === true)}
           style={{ marginLeft: 0, width: '45%' }}
           value='Save Changes'
           type='submit'

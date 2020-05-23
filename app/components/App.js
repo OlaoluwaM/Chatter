@@ -16,11 +16,10 @@ export default function App() {
     activeUserName: currentUserName ?? null,
     isAuthenticated: !!currentUserName,
   });
-  console.log(currentUserName, isAuthed);
 
   React.useEffect(() => {
     if (isIdle && isAuthed.isAuthenticated) {
-      console.log('logging you out bitch');
+      console.log('logging you out');
       sessionStorage.removeItem('CurrentUser');
       setCurrentUserName(null);
       setAuthed({ activeUserName: null, isAuthenticated: false });

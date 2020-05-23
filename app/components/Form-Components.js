@@ -198,55 +198,15 @@ export function ValidatorSVG({ state, color }) {
   );
 }
 
-export function SimpleInputField(props) {
-  const { motionProps, label, addBar = true, ...rest } = props;
-  const { name, type } = rest;
-  const isFileInput = type === 'file';
-
-  const [inputValue, setInputValue] = React.useState('');
-
-  const handleFocus = e => {
-    const isFocused = e.currentTarget.classList.contains('focused');
-    e.currentTarget.classList.toggle('focused', !isFocused);
-  };
-
-  const handleBlur = e => {
-    const isFocusedElem = e.currentTarget.classList.contains('focused');
-    if (isFocusedElem) e.currentTarget.classList.remove('focused');
-  };
-
-  const handleChange = e => {
-    e.persist();
-    const container = e.currentTarget.parentElement;
-    container.classList.toggle('active', e.target.value.length >= 1);
-    if (isFileInput) fileInputChangeHandler(e);
-    setInputValue(() => e.target.value);
-  };
-
-  return (
-    <InputContainer
-      className={isFileInput ? 'for-input-file' : 'simple-input'}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      {...motionProps}>
-      <Input value={inputValue} onChange={handleChange} {...rest} id={name} />
-      {addBar && <Bar />}
-      {label && <InputLabel htmlFor={name}>{label}</InputLabel>}
-
-      {isFileInput && (
-        <TiTimes className='reset' onClick={resetInputFileValue} />
-      )}
-    </InputContainer>
-  );
-}
 export function InputField(props) {
   const { name, required, type, label, motionProps, ...rest } = props;
-  const { formState, className } = rest;
+  const { formState, className, index, addBar = true } = rest;
   const { formType, setInputFieldError } = formState;
 
   const [message, setMessage] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const LoginForm = formType === 'login';
+  const isFileInput = type === 'file';
   const debouncedInput = useDebounce(inputValue, 800);
 
   React.useEffect(() => {
@@ -257,10 +217,14 @@ export function InputField(props) {
   }, [formType]);
 
   React.useEffect(() => {
-    if (message?.type === 'error') {
-      setInputFieldError(true);
-    } else setInputFieldError(false);
-  }, [message?.text]);
+    if (!message?.type) return;
+    const hasError = message?.type === 'error';
+    setInputFieldError(str => {
+      const arr = JSON.parse(str);
+      arr[index] = hasError ? true : false;
+      return JSON.stringify(arr);
+    });
+  }, [message?.type]);
 
   React.useEffect(() => {
     if (debouncedInput) {
@@ -269,11 +233,19 @@ export function InputField(props) {
     } else return;
   }, [debouncedInput]);
 
+  const handleReset = e => {
+    resetInputFileValue(e);
+    setInputFieldError(str => {
+      const arr = JSON.parse(str);
+      arr[index] = true;
+      return JSON.stringify(arr);
+    });
+  };
+
   const handleInputValidation = () =>
     setMessage(inputValidation(name, inputValue, LoginForm));
 
   React.useEffect(() => {
-    console.log(rest?.shouldReset);
     if (rest?.shouldReset) {
       setInputValue('');
       setMessage(null);
@@ -286,14 +258,24 @@ export function InputField(props) {
       const container = e.currentTarget.parentElement;
       container.classList.toggle('active', e.target.value.length >= 1);
     }
-    setInputValue(() => e.target.value);
+    const value = e.target.value;
+    console.log(value);
+
+    setInputFieldError(str => {
+      const arr = JSON.parse(str);
+      arr[index] = value.length <= 1 ? true : false;
+      return JSON.stringify(arr);
+    });
+
+    if (isFileInput) fileInputChangeHandler(e);
+    setInputValue(value);
   };
 
   return (
     <InputContainer {...motionProps} className={className}>
       <Input
-        // onBlur={handleInputValidation}
-        onFocus={() => handleInputValidation}
+        onBlur={!isFileInput ? handleInputValidation : null}
+        onFocus={!isFileInput ? handleInputValidation : null}
         onChange={handleChange}
         value={inputValue}
         type={type}
@@ -303,13 +285,17 @@ export function InputField(props) {
         {...rest}
       />
 
-      <Bar messageColor={message?.color} />
+      {addBar && <Bar messageColor={message?.color} />}
       <InputLabel htmlFor={name}>{label}</InputLabel>
 
-      <ValidatorSVG
-        state={!message ? 'initial' : message.type}
-        color={message?.color}
-      />
+      {isFileInput ? (
+        <TiTimes className='reset' onClick={handleReset} />
+      ) : (
+        <ValidatorSVG
+          state={!message ? 'initial' : message.type}
+          color={message?.color}
+        />
+      )}
     </InputContainer>
   );
 }

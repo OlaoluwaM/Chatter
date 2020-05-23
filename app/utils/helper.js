@@ -251,6 +251,8 @@ export function fileInputChangeHandler(e) {
     const { name } = file;
     label.innerText = isValidImage(name) ? name : 'Not a valid image file';
   } else label.innerText = initialLabelValue;
+
+  return length >= 1;
 }
 
 export function resetInputFileValue(e) {

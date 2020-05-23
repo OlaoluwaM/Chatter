@@ -21,7 +21,6 @@ export function handleSignUp(data) {
   store.set('users', users);
   sessionStorage.setItem('CurrentUser', username);
 
-  console.log(users);
   return { activeUserName: username, isAuthenticated: true };
 }
 
@@ -66,10 +65,11 @@ function duplicateUserValidation(username) {
  */
 
 function passwordEqualityValidation(password) {
-  const pW1 = document.querySelector('input[name="password"]').value,
-    pW2 = password;
+  const pW1 = document.querySelector('input[name="password"]').value;
+  const pW2 = password;
+  const { type } = passwordStrengthValidation(pW2);
 
-  if (pW1 !== pW2) {
+  if (pW1 !== pW2 || type === 'error') {
     return {
       text: 'Your passwords do not match',
       color: ERROR_COLOR,

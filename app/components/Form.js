@@ -28,20 +28,20 @@ const FormContainer = styled(motion.form)`
   }
 `;
 
-// TODO reconcile password field and confirm password field
 export default function Form({ setAuth, formType }) {
-  const [inputFieldError, setInputFieldError] = React.useState(false);
+  const [inputFieldError, setInputFieldError] = React.useState('[]');
   const { isAuthenticated } = React.useContext(AuthContext);
   const [authenticating, setAuthenticating] = React.useState(false);
-  const formRef = React.useRef();
 
   React.useEffect(() => {
-    return () => setInputFieldError(false);
+    const initialLength = formType === 'login' ? 2 : 3;
+    const initialArray = JSON.stringify(new Array(initialLength).fill(true));
+    setInputFieldError(initialArray);
   }, [formType]);
 
   const handleSubmit = e => {
     e.preventDefault();
-    if (inputFieldError) return;
+    if (inputFieldError.includes(true)) return;
 
     const formData = new FormData(e.target);
     const extractedFormData = extractFormData(formData);
@@ -73,7 +73,6 @@ export default function Form({ setAuth, formType }) {
 
         <FormContainer
           variants={containerVariant}
-          ref={formRef}
           onSubmit={handleSubmit}
           initial='hidden'
           animate='visible'
@@ -81,6 +80,7 @@ export default function Form({ setAuth, formType }) {
           <AnimatePresence>
             <InputField
               key='username'
+              index={0}
               motionProps={{
                 variants: itemVariant,
                 positionTransition: true,
@@ -93,6 +93,7 @@ export default function Form({ setAuth, formType }) {
 
             <InputField
               key='password-field'
+              index={1}
               motionProps={{
                 variants: itemVariant,
                 positionTransition: true,
@@ -106,7 +107,8 @@ export default function Form({ setAuth, formType }) {
 
             {formType !== 'login' && (
               <InputField
-                key='confirmPassword-field'
+                key='confirmPassword-field-2'
+                index={2}
                 motionProps={{
                   variants: itemVariant,
                   positionTransition: true,
@@ -126,7 +128,7 @@ export default function Form({ setAuth, formType }) {
               name='btn'
               variants={itemVariant}
               positionTransition={true}
-              disabled={inputFieldError}
+              disabled={inputFieldError.includes(true)}
               value={formType === 'login' ? 'Login' : 'Sign Up'}
             />
           </AnimatePresence>
