@@ -200,13 +200,13 @@ export function ValidatorSVG({ state, color }) {
 
 export function InputField(props) {
   const { name, required, type, label, motionProps, ...rest } = props;
-  const { formState, className, index, addBar = true } = rest;
+  const { formState, className, index, addBar = true, shouldreset } = rest;
   const { formType, setInputFieldError } = formState;
+
+  const LoginForm = formType === 'login';
 
   const [message, setMessage] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
-  const LoginForm = formType === 'login';
-  const isFileInput = type === 'file';
   const debouncedInput = useDebounce(inputValue, 800);
 
   React.useEffect(() => {
@@ -233,49 +233,31 @@ export function InputField(props) {
     } else return;
   }, [debouncedInput]);
 
-  const handleReset = e => {
-    resetInputFileValue(e);
-    setInputFieldError(str => {
-      const arr = JSON.parse(str);
-      arr[index] = true;
-      return JSON.stringify(arr);
-    });
-  };
-
   const handleInputValidation = () =>
     setMessage(inputValidation(name, inputValue, LoginForm));
 
   React.useEffect(() => {
-    if (rest?.shouldReset) {
+    if (shouldreset) {
       setInputValue('');
       setMessage(null);
     }
-  }, [rest?.shouldReset]);
+  }, [shouldreset]);
 
   const handleChange = e => {
     e.persist();
+    const value = e.target.value;
     if (!required) {
       const container = e.currentTarget.parentElement;
-      container.classList.toggle('active', e.target.value.length >= 1);
+      container.classList.toggle('active', value.length >= 1);
     }
-    const value = e.target.value;
-    console.log(value);
-
-    setInputFieldError(str => {
-      const arr = JSON.parse(str);
-      arr[index] = value.length <= 1 ? true : false;
-      return JSON.stringify(arr);
-    });
-
-    if (isFileInput) fileInputChangeHandler(e);
     setInputValue(value);
   };
 
   return (
     <InputContainer {...motionProps} className={className}>
       <Input
-        onBlur={!isFileInput ? handleInputValidation : null}
-        onFocus={!isFileInput ? handleInputValidation : null}
+        onBlur={handleInputValidation}
+        onFocus={handleInputValidation}
         onChange={handleChange}
         value={inputValue}
         type={type}
@@ -288,14 +270,77 @@ export function InputField(props) {
       {addBar && <Bar messageColor={message?.color} />}
       <InputLabel htmlFor={name}>{label}</InputLabel>
 
-      {isFileInput ? (
-        <TiTimes className='reset' onClick={handleReset} />
-      ) : (
-        <ValidatorSVG
-          state={!message ? 'initial' : message.type}
-          color={message?.color}
-        />
-      )}
+      <ValidatorSVG
+        state={!message ? 'initial' : message.type}
+        color={message?.color}
+      />
+    </InputContainer>
+  );
+}
+
+export function FileInputField(props) {
+  const { name, type, motionProps, formState, className, ...rest } = props;
+  const { setInputFieldError } = formState;
+  const { index, shouldreset, label } = rest;
+
+  const [inputValue, setInputValue] = React.useState('');
+  const [labelText, setLabelText] = React.useState(label);
+
+  React.useEffect(() => {
+    if (shouldreset) {
+      setInputValue('');
+      setLabelText(label);
+      setInputFieldError(str => {
+        const arr = JSON.parse(str);
+        arr[index] = true;
+        return JSON.stringify(arr);
+      });
+    }
+  }, [shouldreset]);
+
+  const required = false;
+
+  const handleReset = e => {
+    resetInputFileValue(e);
+    setInputFieldError(str => {
+      const arr = JSON.parse(str);
+      arr[index] = true;
+      return JSON.stringify(arr);
+    });
+  };
+
+  const handleChange = e => {
+    e.persist();
+    const value = e.target.value;
+
+    if (!required) {
+      const container = e.currentTarget.parentElement;
+      container.classList.toggle('active', value.length >= 1);
+    }
+
+    setInputFieldError(str => {
+      const arr = JSON.parse(str);
+      arr[index] = value.length <= 1 ? true : false;
+      return JSON.stringify(arr);
+    });
+
+    setLabelText(fileInputChangeHandler(e, label));
+    setInputValue(value);
+  };
+
+  return (
+    <InputContainer {...motionProps} className={className}>
+      <input
+        onChange={handleChange}
+        value={inputValue}
+        type={type}
+        required={required}
+        name={name}
+        id={name}
+        {...rest}
+      />
+      <InputLabel htmlFor={name}>{labelText}</InputLabel>
+      <TiTimes className='reset' onClick={handleReset} />
     </InputContainer>
   );
 }

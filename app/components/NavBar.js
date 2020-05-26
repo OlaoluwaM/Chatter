@@ -1,10 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-import { hexToRgb } from '../utils/helper';
-import { AuthContext } from '../context/Context';
-import { Link, Route, useLocation } from 'react-router-dom';
-import { navItemVariant, navUlVariant } from '../utils/motionObj';
 import { AnimatePresence, motion, usePresence } from 'framer-motion';
+import React from 'react';
+import { Link, Route, useLocation } from 'react-router-dom';
+import styled from 'styled-components';
+import { AuthContext } from '../context/Context';
+import { hexToRgb } from '../utils/helper';
+import { navItemVariant, navUlVariant } from '../utils/motionObj';
+
+// TODO make navBar responsive
 
 const NavContainer = styled.nav`
   position: relative;
@@ -69,7 +71,6 @@ function CustomLink({ to, exact, children, ...rest }) {
     />
   );
 }
-// TODO fix the look of the navbar when login and sign up links disappear
 
 export default function Nav() {
   const { isAuthenticated } = React.useContext(AuthContext);

@@ -8,6 +8,9 @@ import Chatroom from './Chatroom';
 import Home from './Home';
 import Nav from './NavBar';
 
+// TODO Let application color scheme match color scheme of chatArea
+// TODO Refactor
+
 export default function App() {
   const isIdle = useIdle(1200e3);
   const currentUserName = sessionStorage.getItem('CurrentUser');

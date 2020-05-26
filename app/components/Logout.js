@@ -63,7 +63,7 @@ export default function Logout({ setAuth }) {
             key='logout-btn'
             positionTransition={true}
             onClick={logoutHandler}>
-            Sign out
+            Leave
           </LogoutBtn>
         )}
       </AnimatePresence>

@@ -1,9 +1,11 @@
-import React from 'react';
-import Form from './Form';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import React from 'react';
+import styled from 'styled-components';
 import { hexToRgb } from '../utils/helper';
 import { spring } from '../utils/motionObj';
+import Form from './Form';
+
+// TODO use loader instead of 'Authenticating text'
 
 const AuthPage = styled.div.attrs({
   className: 'wrapper',

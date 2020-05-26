@@ -33,6 +33,8 @@ export default function Form({ setAuth, formType }) {
   const { isAuthenticated } = React.useContext(AuthContext);
   const [authenticating, setAuthenticating] = React.useState(false);
 
+  
+
   React.useEffect(() => {
     const initialLength = formType === 'login' ? 2 : 3;
     const initialArray = JSON.stringify(new Array(initialLength).fill(true));

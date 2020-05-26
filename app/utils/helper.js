@@ -242,17 +242,12 @@ function isValidImage(str) {
   return new RegExp(/\.(jpe?g|png|gif)$/, 'i').test(str);
 }
 
-export function fileInputChangeHandler(e) {
-  const label = e.target.nextElementSibling;
-  const initialLabelValue = label.innerText;
+export function fileInputChangeHandler(e, defaultLabel) {
   const { '0': file, length } = e.target.files;
+  const { name } = file;
+  const output = isValidImage(name) ? name : 'Not a valid image file';
 
-  if (length >= 1) {
-    const { name } = file;
-    label.innerText = isValidImage(name) ? name : 'Not a valid image file';
-  } else label.innerText = initialLabelValue;
-
-  return length >= 1;
+  return length >= 1 ? output : defaultLabel;
 }
 
 export function resetInputFileValue(e) {

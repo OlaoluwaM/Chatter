@@ -155,26 +155,15 @@ export function updateUserProfile(formData, currentUserName) {
   const users = store.get('users');
   const activeUser = users.find(({ username }) => username === currentUserName);
 
-  const { newPassword, newUsername, profileUrl, profileFile } = formData;
+  const { newPassword, newUsername } = formData;
 
   activeUser['password'] = normalize(newPassword) ?? activeUser.password;
   activeUser['username'] = normalize(newUsername) ?? activeUser.username;
 
-  const returnValues = [];
-
-  const condition = !!profileUrl ? 'url' : 'file';
-
-  returnValues.push(
-    normalize(profileUrl) ?? profileFile,
-    newUsername,
-    condition
-  );
-
   sessionStorage.setItem('CurrentUser', activeUser.username);
 
-  console.log(activeUser);
   store.set('users', users);
-  return returnValues;
+  return activeUser.username;
 }
 
 /**

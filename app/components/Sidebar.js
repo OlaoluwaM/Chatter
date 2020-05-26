@@ -15,6 +15,8 @@ import { UserDisplay } from './DataDisplay';
 import Menu from './Menu';
 import { MenuItem } from './User';
 
+// TODO Add sidebar toggle
+
 const SidebarContainer = styled.nav`
   position: relative;
   height: 100%;
@@ -225,11 +227,9 @@ function SettingsSidebar({ currentUser }) {
 
   const { url } = useRouteMatch();
   const altText = `${username}'s profile Image`;
-  console.log(displayPic);
 
   React.useEffect(() => {
     if (!isAuthed?.profilePic) return;
-    console.log(rawDataType(isAuthed?.profilePic));
     setDisplayPic('loading');
 
     if (rawDataType(isAuthed.profilePic) === 'string') {

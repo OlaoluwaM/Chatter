@@ -24,7 +24,9 @@ const ChatRoomContainer = styled.div.attrs({
 `;
 
 // TODO add general error page
-// TODO redo the neumorphic design
+// TODO add loading features
+// TODO add date data to ChatArea
+// TODO Make chatArea and settings area responsive
 
 export default function Chatroom({ setAuth }) {
   const { activeUserName: username, isAuthenticated } = React.useContext(
@@ -35,6 +37,7 @@ export default function Chatroom({ setAuth }) {
   const match = useRouteMatch();
 
   React.useEffect(() => {
+    if (!isAuthenticated) return;
     try {
       const activeUserData = store
         .get('users')

@@ -4,19 +4,14 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { AuthContext, ChatContext } from '../context/Context';
 import { updateUserProfile } from '../utils/authFunc';
-import {
-  extractFormData,
-  handleSbResponse,
-  normalize,
-  rawDataType,
-} from '../utils/helper';
+import { extractFormData, handleSbResponse, normalize } from '../utils/helper';
 import {
   buttonVariant,
   containerVariant,
   itemVariant2,
 } from '../utils/motionObj';
 import DeleteAccount from './DeleteAccount';
-import { InputField, SubmitButton } from './Form-Components';
+import { FileInputField, InputField, SubmitButton } from './Form-Components';
 import Logout from './Logout';
 
 const SettingContainer = styled.div.attrs({
@@ -62,8 +57,10 @@ function UpdateProfile({ setAuth }) {
   const [inputFieldError, setInputFieldError] = React.useState(() => {
     return JSON.stringify(new Array(4).fill(true));
   });
+
   console.count('re-rendered');
   console.log(inputFieldError);
+
   React.useEffect(() => {
     if (reset) {
       setInputFieldError(JSON.stringify(new Array(4).fill(true)));
@@ -73,42 +70,40 @@ function UpdateProfile({ setAuth }) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    if (inputFieldError) return;
-    const formData = extractFormData(new FormData(e.target));
 
-    const [profileData, newUsername, profileDataType] = updateUserProfile(
-      formData,
+    if (JSON.parse(inputFieldError).every(v => v === true)) return;
+
+    const {
+      newUsername,
+      newPassword,
+      profileUrl,
+      profileFile,
+    } = extractFormData(new FormData(e.target));
+
+    const newActiveUsername = updateUserProfile(
+      { newUsername, newPassword },
       activeUserName
     );
 
-    if (profileDataType === 'file') {
+    let updatedDataObj = { activeUserName: newActiveUsername };
+
+    if (!!normalize(profileFile.name)) {
       sb.updateCurrentUserInfoWithProfileImage(
-        newUsername,
-        profileData,
+        newActiveUsername,
+        profileFile,
         handleSbResponse
       );
-    } else sb.updateCurrentUserInfo(newUsername, profileData, handleSbResponse);
+      updatedDataObj['profilePic'] = profileFile;
+    } else if (!!normalize(profileUrl)) {
+      sb.updateCurrentUserInfo(newActiveUsername, profileUrl, handleSbResponse);
+      updatedDataObj['profilePic'] = profileUrl;
+    }
 
-    const hasNewProfilePic =
-      !!profileData?.name || rawDataType(normalize(profileData)) === 'string';
-
-    if (!(newUsername || hasNewProfilePic)) {
-      return;
-    } else {
-      let updatedDataObj = {};
-      if (newUsername && hasNewProfilePic) {
-        updatedDataObj = {
-          activeUserName: newUsername,
-          profilePic: profileData,
-        };
-      } else if (hasNewProfilePic) {
-        updatedDataObj = { profilePic: profileData };
-      } else {
-        updatedDataObj = { activeUserName: newUsername };
-      }
-
+    if (activeUserName !== newActiveUsername || updatedDataObj?.profilePic) {
+      console.log('updating');
       setAuth(prevObj => ({ ...prevObj, ...updatedDataObj }));
     }
+
     setReset(true);
 
     e.currentTarget
@@ -130,7 +125,7 @@ function UpdateProfile({ setAuth }) {
           label='New username'
           key='newUsername'
           index={0}
-          shouldReset={reset}
+          shouldreset={reset ? 'true' : void 0}
           className='simple-input'
           required={false}
           motionProps={{ ...formElemMotionProps }}
@@ -148,7 +143,7 @@ function UpdateProfile({ setAuth }) {
           required={false}
           index={1}
           motionProps={{ ...formElemMotionProps }}
-          shouldReset={reset}
+          shouldreset={reset ? 'true' : void 0}
           type='password'
           formState={{
             formType: 'sign up',
@@ -164,7 +159,7 @@ function UpdateProfile({ setAuth }) {
           className='simple-input'
           required={false}
           index={2}
-          shouldReset={reset}
+          shouldreset={reset ? 'true' : void 0}
           motionProps={{ ...formElemMotionProps }}
           formState={{
             formType: 'sign up',
@@ -172,19 +167,16 @@ function UpdateProfile({ setAuth }) {
           }}
         />
 
-        <InputField
+        <FileInputField
           type='file'
           label='New profile image file'
           name='profileFile'
           key='profileFile'
           className='for-input-file'
           index={3}
-          required={false}
           motionProps={{ ...formElemMotionProps }}
-          shouldReset={reset}
-          addBar={false}
+          shouldreset={reset ? 'true' : void 0}
           formState={{
-            formType: 'sign up',
             setInputFieldError,
           }}
         />
