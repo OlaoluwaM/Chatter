@@ -1,3 +1,3 @@
-# Chatter Messaging App
+# Currently under construction
 
-Here is the link to the project [Chatter](https://chattc.netlify.app/)
+<!-- Here is the link to the project [Chatter](https://chattc.netlify.app/) -->
