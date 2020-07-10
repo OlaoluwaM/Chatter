@@ -1,36 +1,23 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway|Roboto+Slab&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&family=Raleway:wght@100;700&display=swap');
 
-// TODO change fonts
+$fontWeight: (
+  'thin': 100,
+  'bold': 700,
+  'medium': 400,
+  'light': 300,
+);
 
-$font1: Raleway, sans-serif;
-$font2: 'Roboto Slab', sans-serif;
-$primaryColor: #ffffff;
-$dark-primaryColor: #eeefef;
-$secondaryColor: #5e0bdc;
-$dark-secondaryColor: #260458;
-$black: #222222;
+// Note accent font is Raleway thin (font-weight: 100)
+$primaryFont: 'Raleway' sans-serif;
+$secondaryFont: 'Open Sans' sans-serif;
 
 :root {
-  --font1: Raleway, sans-serif;
-  --font2: 'Roboto Slab', sans-serif;
-  --bouncy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-* {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-}
-
-::-webkit-scrollbar {
-  background: transparent;
-  width: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  width: 5px;
-  border-radius: 30px;
-  background: rgba(0, 0, 0, 0.3);
+  --primaryFont: 'Raleway' sans-serif;
+  --secondaryFont: 'Open Sans' sans-serif;
+  --thin: 100;
+  --bold: 700;
+  --medium: 400;
+  --light: 300;
 }
 
 html,
@@ -40,84 +27,50 @@ body,
   height: 100vh;
 }
 
-#root {
-  display: flex;
-  flex-direction: column;
-}
-
 body {
   margin: 0;
   padding: 0;
+  font-kerning: normal;
+  font-display: swap;
+  font-family: $primaryFont;
 }
 
-.button {
-  font-size: 1.1em;
-  color: inherit;
-  padding: 1.5rem 1.3rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  font-family: $font2;
-  border-radius: 50px;
-  background: transparent;
-  outline: none;
+.gradient-first-arc {
+  background: hsla(238, 100%, 71%, 1);
+  background: linear-gradient(
+    90deg,
+    hsla(238, 100%, 71%, 1) 0%,
+    hsla(295, 100%, 84%, 1) 100%
+  );
+  background: -moz-linear-gradient(
+    90deg,
+    hsla(238, 100%, 71%, 1) 0%,
+    hsla(295, 100%, 84%, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    90deg,
+    hsla(238, 100%, 71%, 1) 0%,
+    hsla(295, 100%, 84%, 1) 100%
+  );
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#696EFF", endColorstr="#F8ACFF", GradientType=1 );
 }
 
-.wrapper {
-  flex-grow: 1;
-  height: 100%;
-}
-
-ul > a.active {
-  color: $primaryColor;
-}
-
-input[type='file'] {
-  position: absolute;
-  z-index: -1;
-  top: 6px;
-  left: 0;
-  font-size: 15px;
-  color: rgb(153, 153, 153);
-  display: none;
-
-  & ~ label {
-    display: inline-block;
-    padding: 3%;
-    cursor: pointer;
-    border-radius: 14px;
-    background-color: $secondaryColor;
-    width: 40%;
-    text-align: center;
-    overflow-wrap: break-word;
-    font-size: 1rem;
-    color: darken($dark-primaryColor, 5);
-    top: 10%;
-  }
-}
-
-svg.reset {
-  fill: rgba(240, 20, 20, 0.6);
-  top: 40%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  margin-left: 0;
-  position: absolute;
-  font-size: 2.2rem;
-  left: 360px;
-  transition: fill 0.3s ease;
-
-  &:hover {
-    fill: rgba(240, 20, 20, 0.9);
-  }
-}
-
-@media screen and (max-width: 820px) {
-  html {
-    font-size: 13px;
-  }
-}
-@media screen and (max-width: 420px) {
-  html {
-    font-size: 11px;
-  }
+.gradient-sec-arc {
+  background: hsla(197, 100%, 63%, 1);
+  background: linear-gradient(
+    90deg,
+    hsla(197, 100%, 63%, 1) 0%,
+    hsla(294, 100%, 55%, 1) 100%
+  );
+  background: -moz-linear-gradient(
+    90deg,
+    hsla(197, 100%, 63%, 1) 0%,
+    hsla(294, 100%, 55%, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    90deg,
+    hsla(197, 100%, 63%, 1) 0%,
+    hsla(294, 100%, 55%, 1) 100%
+  );
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#40C9FF", endColorstr="#E81CFF", GradientType=1 );
 }

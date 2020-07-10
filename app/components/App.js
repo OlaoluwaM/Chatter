@@ -1,17 +1,17 @@
 import React from 'react';
+import Home from './Home';
 
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Auth } from 'aws-amplify';
+import { Route, Switch } from 'react-router-dom';
 
 export default function App() {
   return (
-    <Router>
-      <div>
-        <Switch>
-          <Route exact path='/'>
-            <Home />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
+    <div>
+      <Switch>
+        <Route exact path='/'>
+          <Home />
+        </Route>
+      </Switch>
+    </div>
   );
 }

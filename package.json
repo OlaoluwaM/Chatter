@@ -16,6 +16,8 @@
   "author": "Olaoluwa Mustapha <jomeemustapha@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "aws-amplify": "^3.0.20",
+    "aws-amplify-react": "^4.1.19",
     "framer-motion": "^1.11.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
