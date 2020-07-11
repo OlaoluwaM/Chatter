@@ -22,9 +22,11 @@ $secondaryFont: 'Open Sans' sans-serif;
 
 html,
 body,
-#root {
+#root,
+.container {
   width: 100%;
   height: 100vh;
+  position: relative;
 }
 
 body {
@@ -52,7 +54,6 @@ body {
     hsla(238, 100%, 71%, 1) 0%,
     hsla(295, 100%, 84%, 1) 100%
   );
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#696EFF", endColorstr="#F8ACFF", GradientType=1 );
 }
 
 .gradient-sec-arc {
@@ -72,5 +73,4 @@ body {
     hsla(197, 100%, 63%, 1) 0%,
     hsla(294, 100%, 55%, 1) 100%
   );
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#40C9FF", endColorstr="#E81CFF", GradientType=1 );
 }

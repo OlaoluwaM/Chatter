@@ -24,9 +24,9 @@ const pluginsObj = {
       minRatio: 0.7,
     }),
   ],
-  dev: [new webpack.HotModuleReplacementPlugin(), new BundleAnalyzerPlugin()],
+  dev: [new BundleAnalyzerPlugin()],
 };
-
+new webpack.HotModuleReplacementPlugin();
 const config = {
   context: __dirname + '/app',
   entry: {
@@ -59,8 +59,8 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: `[name].bundle.[${hashType}].js`,
-    chunkFilename: `[name].[${hashType}].js`,
-    publicPath: '/',
+    chunkFilename: `[name].bundle.js`,
+    // publicPath: '/',
     devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
   },
   devtool: isDev ? 'inline-source-map' : '',
