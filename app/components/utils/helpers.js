@@ -1,26 +1,8 @@
 'use strict';
 
-export function extractFormData(data) {
-  const FormDataObj = Array.from(data).reduce((total, curr) => {
-    const key = curr[0];
-    const value = curr[1];
-    total[key] = value;
-    return total;
-  }, {});
-  return FormDataObj;
-}
-
 export function capitalize(str) {
   return str.replace(str[0], str[0].toUpperCase());
 }
-
-export const strongRegex = new RegExp(
-  '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})'
-);
-
-// export const mediumRegex = new RegExp(
-//   '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})'
-// );
 
 export function getContrast(hexcolor) {
   if (hexcolor.slice(0, 1) === '#') {
@@ -64,14 +46,6 @@ export function hexToRgb(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// export function percentageOf(value1, value2) {
-//   return (value1 / value2) * 100;
-// }
-
-export function randomID() {
-  return `_${Math.random().toString(36).substr(2, 9)}`;
-}
-
 export function filterObject(obj, properties) {
   return properties.reduce((acc, curr) => {
     if (Array.isArray(curr)) {
@@ -106,51 +80,9 @@ export function prettyDateFormat(dateArr, removeYear = true) {
   return `Last seen ${dateArr.join(' ')}`;
 }
 
-export function isColor(str) {
+export function isHexColor(str) {
   const regexp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'igm');
   return !!str.match(regexp);
-}
-
-export function documentVisibility() {
-  let visibilityChange;
-  if (typeof document.hidden !== undefined) {
-    visibilityChange = 'visibilitychange';
-  } else if (typeof document.msHidden !== undefined) {
-    visibilityChange = 'msvisibilitychange';
-  } else {
-    visibilityChange = 'webkitvisibilitychange';
-  }
-  return visibilityChange;
-}
-
-/**
- *
- * Converts specified number in minutes to milliseconds equivalent
- * @param {number} num - number in minutes
- */
-export const sessionTimeout = (num = 20) => num * 60000;
-
-export function unloadEventListener(e) {
-  const activeUserName = sessionStorage.getItem('CurrentUser');
-  if (!activeUserName) return;
-  document.cookie = `CurrentUserName=${activeUserName}; max-age=${sessionTimeout(
-    8
-  )};`;
-  sessionStorage.clear();
-}
-
-export function extractCurrentUserFromCookie() {
-  const cookie = document.cookie;
-  if (!cookie) return null;
-
-  const cookieArray = cookie.split('; ');
-  const currentUserPair = cookieArray[0].split('=');
-  return currentUserPair[1];
-}
-
-export function colorMapping(colorName) {
-  const map = { red: '#ff0000', green: '#008000' };
-  return map[colorName];
 }
 
 export function removeHashTag(hex) {
@@ -200,13 +132,6 @@ export function generateRandomColor() {
   return randomColor;
 }
 
-export function filterUser(list, username) {
-  return list.filter(user => {
-    const name = user?.nickname ?? user;
-    return name !== username;
-  });
-}
-
 export function hashCode(str, seed = 0) {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
@@ -242,35 +167,16 @@ function isValidImage(str) {
   return new RegExp(/\.(jpe?g|png|gif)$/, 'i').test(str);
 }
 
-export function fileInputChangeHandler(e, defaultLabel) {
-  const { '0': file, length } = e.target.files;
-  const { name } = file;
-  const output = isValidImage(name) ? name : 'Not a valid image file';
-
-  return length >= 1 ? output : defaultLabel;
-}
-
-export function resetInputFileValue(e) {
-  const label = e.currentTarget.previousElementSibling;
-  const initialLabelText = 'New profile image file';
-
-  if (label.innerText !== initialLabelText) {
-    label.innerText = initialLabelText;
-  } else return;
-}
-
-export function handleSbResponse(res, err) {
-  if (err) throw err;
-  console.log('sb response', res);
-}
-
 export function normalize(value) {
   const replacer = (_, val) => (val === '' ? null : val);
-
   return JSON.parse(JSON.stringify(value, replacer));
 }
 
 export function rawDataType(value) {
   const _toString = Object.prototype.toString;
   return _toString.call(value).slice(8, -1).toLowerCase();
+}
+
+export function responseWrapper(type, data) {
+  return { type, data };
 }

@@ -2,23 +2,32 @@ import React from 'react';
 import Home from './Home';
 import NavBar from './NavBar';
 
-import { Auth } from 'aws-amplify';
-import { themeObj } from './context/context';
-import { ThemeProvider } from 'styled-components';
 import { Route, Switch } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import { themeObj, CurrentUserContext } from './context/context';
+
+const Authenticate = React.lazy(() => import('./Auth'));
 
 export default function App() {
   return (
     <ThemeProvider theme={themeObj}>
-      <div>
-        <NavBar />
+      <CurrentUserContext.Provider value={{}}>
+        <div>
+          <NavBar />
 
-        <Switch>
-          <Route exact path='/'>
-            <Home />
-          </Route>
-        </Switch>
-      </div>
+          <React.Suspense fallback={<p>Loading</p>}>
+            <Switch>
+              <Route exact path='/'>
+                <Home />
+              </Route>
+
+              <Route path='/authenticate'>
+                <Authenticate />
+              </Route>
+            </Switch>
+          </React.Suspense>
+        </div>
+      </CurrentUserContext.Provider>
     </ThemeProvider>
   );
 }

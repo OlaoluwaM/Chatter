@@ -15,6 +15,7 @@ const generalPlugins = [
   new MiniCssExtractPlugin({ filename: `[name].bundle.[${hashType}].css` }),
   new CopyWebpackPlugin([{ from: '../_redirects' }]),
 ];
+
 const pluginsObj = {
   prod: [
     new BrotliPlugin({
@@ -26,7 +27,7 @@ const pluginsObj = {
   ],
   dev: [new BundleAnalyzerPlugin()],
 };
-new webpack.HotModuleReplacementPlugin();
+
 const config = {
   context: __dirname + '/app',
   entry: {
@@ -59,8 +60,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: `[name].bundle.[${hashType}].js`,
-    chunkFilename: `[name].bundle.js`,
-    // publicPath: '/',
+    chunkFilename: `[name].${isDev ? 'bundle' : `[${hashType}]`}.js`,
     devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
   },
   devtool: isDev ? 'inline-source-map' : '',

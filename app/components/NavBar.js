@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
+import { navVariants, navItemVariants } from './utils/framerVariants';
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
   height: auto;
   position: absolute;
   top: 0;
@@ -24,15 +26,14 @@ const Nav = styled.nav`
 
     & a {
       text-decoration: none;
-      color: rgba(255, 255, 255, 0.4);
+      color: ${({ theme }) => theme.baseColorDark};
       font-size: 1.3em;
-      /* flex-grow: 1; */
       padding: 10px;
     }
   }
 `;
 
-const NavItem = styled.li`
+const NavItem = styled(motion.li)`
   text-transform: lowercase;
   font-family: var(--primaryFont);
   font-weight: var(--bold);
@@ -40,13 +41,13 @@ const NavItem = styled.li`
 
 export default function NavBar() {
   return (
-    <Nav>
+    <Nav variants={navVariants} initial='hidden' animate='visible'>
       <ul>
         <NavLink to='/'>
-          <NavItem>Home</NavItem>
+          <NavItem variants={navItemVariants}>Home</NavItem>
         </NavLink>
         <NavLink to='/about'>
-          <NavItem>About</NavItem>
+          <NavItem variants={navItemVariants}>About</NavItem>
         </NavLink>
       </ul>
     </Nav>
