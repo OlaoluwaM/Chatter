@@ -7,6 +7,20 @@ $fontWeight: (
   'light': 300,
 );
 
+$colorPalette: (
+  black: #16161a,
+  white: #fffffe,
+  grayLight: #e9ecef,
+  grayDark: #94a1b2,
+  baseColorDarkest: #240046,
+  baseColorDark: #3c096c,
+  baseColor: #5a189a,
+  baseColorLight: #7319af,
+  baseColorLightest: #7f5af0,
+);
+// baseColorLighter: #9d4edd,
+// baseColorDarkest: #10002b,
+
 // Note accent font is Raleway thin (font-weight: 100)
 $primaryFont: 'Raleway' sans-serif;
 $secondaryFont: 'Open Sans' sans-serif;
@@ -34,43 +48,19 @@ body {
   padding: 0;
   font-kerning: normal;
   font-display: swap;
-  font-family: $primaryFont;
+  font-family: $secondaryFont;
 }
 
-.gradient-first-arc {
-  background: hsla(238, 100%, 71%, 1);
-  background: linear-gradient(
-    90deg,
-    hsla(238, 100%, 71%, 1) 0%,
-    hsla(295, 100%, 84%, 1) 100%
-  );
-  background: -moz-linear-gradient(
-    90deg,
-    hsla(238, 100%, 71%, 1) 0%,
-    hsla(295, 100%, 84%, 1) 100%
-  );
-  background: -webkit-linear-gradient(
-    90deg,
-    hsla(238, 100%, 71%, 1) 0%,
-    hsla(295, 100%, 84%, 1) 100%
-  );
+.error {
+  color: red;
+  margin: 0;
 }
-
-.gradient-sec-arc {
-  background: hsla(197, 100%, 63%, 1);
-  background: linear-gradient(
-    90deg,
-    hsla(197, 100%, 63%, 1) 0%,
-    hsla(294, 100%, 55%, 1) 100%
-  );
-  background: -moz-linear-gradient(
-    90deg,
-    hsla(197, 100%, 63%, 1) 0%,
-    hsla(294, 100%, 55%, 1) 100%
-  );
-  background: -webkit-linear-gradient(
-    90deg,
-    hsla(197, 100%, 63%, 1) 0%,
-    hsla(294, 100%, 55%, 1) 100%
-  );
+.nav-item {
+  transition: color 0.3s ease;
+  color: change-color($color: map-get($colorPalette, grayDark), $alpha: 0.6);
+}
+.nav-item:hover,
+.nav-item:active,
+.active-page {
+  color: map-get($colorPalette, white);
 }

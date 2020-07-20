@@ -1,6 +1,11 @@
+const isTest = process.env.NODE_ENV === 'test';
+
 module.exports = {
   presets: [
-    ['@babel/preset-env', { targets: { node: 'current' }, modules: false }],
+    [
+      '@babel/preset-env',
+      { targets: { node: 'current' }, modules: isTest ? 'cjs' : false },
+    ],
     '@babel/preset-react',
   ],
   plugins: [

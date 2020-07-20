@@ -5,15 +5,20 @@ import signUpImage from '../assets/happy-bunch-sign-up.png';
 
 import { hexToRgb } from './utils/helpers';
 import { ErrorMessage } from '@hookform/error-message';
+import { authPageVariants } from './utils/framerVariants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { signIn, signUp, signOut, validationObj } from './utils/authFunctions';
-import {
-  authFormHeader,
-  authFormVariants,
-  authErrorMessage,
-  authInputVariants,
-} from './utils/framerVariants';
+
+const {
+  formVariants,
+  inputVariants,
+  imageVariants,
+  sectionVariants,
+  formHeaderVariants,
+  switchTextVariants,
+  errorMessageVariants,
+} = authPageVariants;
 
 const SectionAuth = styled(motion.section)`
   display: flex;
@@ -31,7 +36,7 @@ const ImageContainer = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${({ theme }) => theme.baseColorLighter};
+  background: ${({ theme }) => theme.baseColorDarker};
   position: relative;
 
   & > img {
@@ -144,24 +149,29 @@ const Input = props => {
 
   return (
     <FormItemContainer
-      variants={authInputVariants}
-      exit='hidden'
-      key={name}
+      variants={inputVariants}
       positionTransition={true}
+      exit='hidden'
       {...motionProps}>
-      <label htmlFor={name}>{labelName}</label>
-      <input name={name} type={type} ref={register(validationOptions)} />
+      <label htmlFor={`${name}-id`}>{labelName}</label>
+      <input
+        id={`${name}-id`}
+        name={name}
+        type={type}
+        ref={register(validationOptions)}
+      />
       <ErrorMessage
         name={name}
         errors={errors}
         render={({ message }) => (
           <motion.p
-            variants={authErrorMessage}
+            variants={errorMessageVariants}
             initial='hidden'
             animate='visible'
             exit='hidden'
             positionTransition={true}
-            style={{ color: 'red', margin: 0 }}>
+            data-testid={`${name}-id`}
+            className='error'>
             {message}
           </motion.p>
         )}
@@ -170,11 +180,13 @@ const Input = props => {
   );
 };
 
-export default function Authenticate() {
+export default function Authenticate({ onSubmit = onSubmitForm }) {
   const formStates = ['Log in', 'Sign up'];
 
   const [formState, setFormState] = React.useState(0);
-  const { register, handleSubmit, errors, watch, clearErrors } = useForm();
+  const { register, handleSubmit, errors, watch, clearErrors } = useForm({
+    reValidateMode: 'onBlur',
+  });
 
   const changeFormState = () => {
     setFormState(prevInd => (prevInd >= 1 ? 0 : prevInd + 1));
@@ -185,22 +197,22 @@ export default function Authenticate() {
   const passwordValue = !isLogin ? watch('password', false) : '';
 
   return (
-    <SectionAuth className='container'>
+    <SectionAuth className='container' variants={sectionVariants}>
       <ImageContainer>
         <AnimatePresence>
           <motion.img
             key={isLogin ? logInImage : signUpImage}
             src={isLogin ? logInImage : signUpImage}
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
-            transition={{ delay: 0.3, duration: 0.2 }}
+            variants={imageVariants}
+            animate='visible'
+            initial='hidden'
+            exit='hidden'
           />
         </AnimatePresence>
       </ImageContainer>
       <FormContainer>
         <motion.h2
-          variants={authFormHeader}
+          variants={formHeaderVariants}
           initial='hidden'
           animate='visible'
           layoutTransition={{ type: 'tween' }}>
@@ -208,12 +220,13 @@ export default function Authenticate() {
         </motion.h2>
         <FormProvider register={register} errors={errors}>
           <Form
-            variants={authFormVariants}
+            data-testid='authForm'
+            variants={formVariants}
             initial='hidden'
             animate='up'
             exit='hidden'
             autoComplete='off'
-            onSubmit={handleSubmit(onSubmitForm.bind(null, isLogin))}>
+            onSubmit={handleSubmit(onSubmit.bind(null, isLogin))}>
             <Input
               name='username'
               type='text'
@@ -239,18 +252,17 @@ export default function Authenticate() {
               />
             )}
 
-            <SubmitButton
-              variants={authInputVariants}
-              positionTransition={true}>
+            <SubmitButton variants={inputVariants} positionTransition={true}>
               {formStates[formState]}
             </SubmitButton>
           </Form>
         </FormProvider>
         <motion.p
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={switchTextVariants}
+          initial='hidden'
+          animate='visible'
           positionTransition={true}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.4 }}
           onClick={changeFormState}>
           {isLogin ? 'Not a member? ' : 'Already a member? '}Click here
         </motion.p>

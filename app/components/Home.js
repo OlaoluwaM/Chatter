@@ -4,45 +4,65 @@ import homeImage from '../assets/croods.png';
 
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { homeH1Variants } from './utils/framerVariants';
+import { hexToRgb } from './utils/helpers';
+import { homePageVariants } from './utils/framerVariants';
+
+const {
+  sectionVariants,
+  homeH1Variants,
+  buttonVariants,
+  imageVariants,
+} = homePageVariants;
 
 const SectionHome = styled(motion.section).attrs({
   className: 'container',
 })`
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.black};
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
-  & > a {
-    text-decoration: none;
+  & > button {
     position: absolute;
     bottom: 17%;
+    color: ${({ theme }) => theme.white};
     left: 10%;
-    color: ${({ theme }) => theme.baseColorDark};
-    display: inline-block;
-    padding: 1.7em 5em;
+    display: block;
+    text-align: center;
+    min-width: 9%;
+    width: 11%;
+    max-width: 12%;
+    min-height: 7%;
+    height: 8%;
+    max-height: 9%;
     border: none;
-    border-radius: 10px;
-    border-radius: 50px;
-    background: #f8f9fa;
-    box-shadow: 20px 20px 60px #d3d4d5, -20px -20px 60px #ffffff;
+    border-radius: 15px;
+    background: ${({ theme }) => theme.baseColorLightest};
     font-family: var(--secondaryFont);
     font-weight: var(--light);
-    font-size: 0.9em;
+    font-size: 1.1em;
     font-variant: small-caps;
+    a {
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 `;
 
 const ForeFrontH1 = styled(motion.h1)`
   font-family: var(--primaryFont);
   font-weight: var(--bold);
-  color: ${({ theme }) => theme.baseColor};
+  color: ${({ theme }) => theme.white};
   text-align: left;
   overflow-wrap: break-word;
   margin: 0;
   font-size: 7em;
-  font-variant: small-caps;
   width: 55%;
   margin-left: 5%;
 `;
@@ -58,19 +78,17 @@ const Image = styled(motion.img)`
 
 export default function Home() {
   return (
-    <SectionHome>
-      <ForeFrontH1
-        variants={homeH1Variants}
-        initial='hidden'
-        animate='popOut'
-        exit='hidden'>
-        Welcome To Chatter
-      </ForeFrontH1>
-      <NavLink to='/authenticate'>Sign Up</NavLink>
+    <SectionHome
+      variants={sectionVariants}
+      initial='hidden'
+      animate='popOut'
+      exit='hidden'>
+      <ForeFrontH1 variants={homeH1Variants}>Welcome To Chatter</ForeFrontH1>
+      <motion.button type='button' variants={buttonVariants}>
+        <NavLink to='/authenticate'>Sign Up</NavLink>
+      </motion.button>
       <Image
-        animate={{ opacity: 1, x: 0 }}
-        initial={{ opacity: 0, x: 180 }}
-        transition={{ type: 'tween', delay: 0.5 }}
+        variants={imageVariants}
         alt='Image of people chatting'
         src={homeImage}
       />
