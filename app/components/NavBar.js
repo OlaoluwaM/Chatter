@@ -11,11 +11,11 @@ const { navVariants, navItemVariants } = navBarVariants;
 const activeNavAnimation = keyframes`
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
-  opacity: 1;
-  transform: translateY(0)
+    opacity: 1;
+    transform: translateY(0)
   }
 `;
 
@@ -47,7 +47,7 @@ const Nav = styled(motion.nav)`
       &.nav-item::after {
         content: '';
         position: absolute;
-        background: ${({ theme }) => theme.baseColorLightest};
+        background: ${({ theme }) => theme.baseColor};
         width: 100%;
         height: 0.2em;
         bottom: 0;
@@ -58,7 +58,7 @@ const Nav = styled(motion.nav)`
         transform: translateY(10px);
       }
       &.nav-item.active-page::after {
-        animation: ${activeNavAnimation} 0.2s 0.5s ease forwards;
+        animation: ${activeNavAnimation} 0.3s 0.8s ease forwards;
       }
     }
   }
@@ -81,8 +81,11 @@ export default function NavBar() {
           className='nav-item'>
           <NavItem variants={navItemVariants}>Home</NavItem>
         </NavLink>
-        <NavLink to='/about' activeClassName='active-page' className='nav-item'>
-          <NavItem variants={navItemVariants}>About</NavItem>
+        <NavLink
+          to='/authenticate'
+          activeClassName='active-page'
+          className='nav-item'>
+          <NavItem variants={navItemVariants}>Join Us</NavItem>
         </NavLink>
       </ul>
     </Nav>

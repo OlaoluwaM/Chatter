@@ -1,14 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
+import Loading from './Loading';
 import logInImage from '../assets/happy-bunch-log-in.png';
 import signUpImage from '../assets/happy-bunch-sign-up.png';
 
 import { hexToRgb } from './utils/helpers';
+import { Redirect } from 'react-router-dom';
 import { ErrorMessage } from '@hookform/error-message';
 import { authPageVariants } from './utils/framerVariants';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
-import { signIn, signUp, signOut, validationObj } from './utils/authFunctions';
+import { CurrentUserContext, NotificationContext } from './context/context';
+import { motion, AnimatePresence, AnimateSharedLayout } from 'framer-motion';
+import {
+  signIn,
+  signUp,
+  confirmSignUp,
+  validationObj,
+  resendConfirmationCode,
+} from './utils/authFunctions';
 
 const {
   formVariants,
@@ -36,7 +45,7 @@ const ImageContainer = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${({ theme }) => theme.baseColorDarker};
+  background: ${({ theme }) => theme.blackLighter};
   position: relative;
 
   & > img {
@@ -54,26 +63,33 @@ const FormContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: ${({ theme }) => theme.baseColorLight};
+  color: ${({ theme }) => theme.black};
 
   & > h2 {
     font-family: var(--primaryFont);
-    font-weight: var(--thin);
+    font-weight: var(--bold);
     margin: 0;
     font-size: 3.6em;
-    width: 69%;
-    color: inherit;
+    width: 68%;
+    color: ${({ theme }) => theme.black};
+    text-transform: capitalize;
     margin: -0.6em 0 0.2em 0.1em;
   }
 
   & > p {
+    color: ${({ theme }) => theme.gray};
     font-family: var(--primaryFont);
     font-weight: var(--thin);
     font-size: 1.1em;
-    color: inherit;
     cursor: pointer;
     position: absolute;
     bottom: 0;
+    transition: color 0.3s ease;
+
+    &:hover,
+    &:active {
+      color: ${({ theme }) => theme.black};
+    }
   }
 `;
 
@@ -97,38 +113,51 @@ const FormItemContainer = styled(motion.div)`
 
   & > input {
     border: none;
-    background: ${({ theme }) => hexToRgb(theme.baseColorLight, 0.3)};
+    background: transparent;
     margin: 10px 0 10px 0;
     border-radius: 7px;
-    color: ${({ theme }) => theme.baseColor};
+    border: ${({ theme }) => hexToRgb(theme.blackLighter, 0.4)} 3px solid;
     padding: 0.9em;
     text-indent: 0.5em;
     font-size: 1em;
     font-family: var(--secondaryFont);
     font-weight: var(--medium);
     outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  & > input:disabled {
+    border-color: ${({ theme }) => theme.gray};
+    background: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => hexToRgb(theme.white, 0.4)};
   }
 
   & > label {
     font-size: 1em;
-    color: ${({ theme }) => hexToRgb(theme.baseColorLight, 0.5)};
+    color: ${({ theme }) => hexToRgb(theme.blackLighter, 0.4)};
     font-family: var(--secondaryFont);
     font-weight: var(--medium);
     transition: color 0.3s ease;
   }
 
-  &:focus-within > label {
-    color: ${({ theme }) => theme.baseColorLight};
+  &:focus-within {
+    label {
+      color: ${({ theme }) => hexToRgb(theme.blackLighter, 0.9)};
+    }
+    input {
+      border-color: ${({ theme }) => hexToRgb(theme.blackLighter, 0.9)};
+    }
   }
 `;
 
 const SubmitButton = styled(motion.button).attrs({
   type: 'submit',
 })`
-  width: 40%;
-  padding: 1em 0;
-  margin: 1em auto 0 auto;
-  background: ${({ theme }) => theme.baseColorLight};
+  width: 12em;
+  padding: 1em;
+  margin: 1em 1em 0 1em;
+  margin: 0 auto;
+  background: ${({ theme }) => theme.baseColor};
   color: ${({ theme }) => theme.white};
   border: none;
   border-radius: 8px;
@@ -139,26 +168,60 @@ const SubmitButton = styled(motion.button).attrs({
   cursor: pointer;
 `;
 
-function onSubmitForm(isLogin, formData) {
-  console.log({ isLogin, formData });
-}
+const ResendButton = styled(motion.button)`
+  display: inline;
+  border: none;
+  background: transparent;
+  margin: 4px 0 2.3rem 1rem;
+  padding: 0;
+  text-decoration: underline;
+  font-family: var(--secondaryFont);
+  font-weight: var(--thin);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  color: ${({ theme }) => theme.gray};
+  transition: color 0.3s ease;
+
+  &:hover,
+  &:active {
+    color: ${({ theme }) => theme.black};
+  }
+
+  &:disabled {
+    color: ${({ theme }) => theme.grayLight};
+    &:hover,
+    &:active {
+      color: ${({ theme }) => theme.grayLight};
+    }
+  }
+`;
 
 const Input = props => {
-  const { motionProps, name, type, labelName, validationOptions } = props;
+  const {
+    motionProps,
+    name,
+    type,
+    labelName,
+    validationOptions,
+    ...rest
+  } = props;
   const { register, errors } = useFormContext();
 
   return (
     <FormItemContainer
       variants={inputVariants}
-      positionTransition={true}
+      // positionTransition={true}
       exit='hidden'
-      {...motionProps}>
+      {...motionProps}
+      layout>
       <label htmlFor={`${name}-id`}>{labelName}</label>
       <input
         id={`${name}-id`}
         name={name}
         type={type}
         ref={register(validationOptions)}
+        {...rest}
       />
       <ErrorMessage
         name={name}
@@ -180,11 +243,90 @@ const Input = props => {
   );
 };
 
-export default function Authenticate({ onSubmit = onSubmitForm }) {
-  const formStates = ['Log in', 'Sign up'];
+function ConfirmationForm() {
+  let timerId = React.useRef();
+  const [canResend, setCanResend] = React.useState(true);
+
+  React.useEffect(() => {
+    if (canResend) return;
+    timerId = setTimeout(() => {
+      console.info('Can resend code');
+      setCanResend(true);
+    }, 240000);
+
+    return () => clearTimeout(timerId);
+  }, [canResend]);
+
+  const resendConfirmationEmail = () => {
+    // TODO Resend Logic
+    setCanResend(false);
+  };
+
+  return (
+    <>
+      <Input
+        name='code'
+        type='text'
+        labelName='Confirmation Code'
+        validationOptions={validationObj['confirmCode']()}
+      />
+      <ResendButton onClick={resendConfirmationEmail} disabled={!canResend}>
+        Resend Code
+      </ResendButton>
+    </>
+  );
+}
+
+function RegularForm({ isLogin = true }) {
+  const { getValues } = useFormContext();
+  const passwordValue = !isLogin && getValues('password');
+
+  return (
+    <>
+      {!isLogin && (
+        <Input
+          name='email'
+          type='email'
+          labelName='Email'
+          validationOptions={validationObj['email'](passwordValue)}
+        />
+      )}
+
+      <Input
+        name='password'
+        type='password'
+        labelName='Password'
+        validationOptions={validationObj['password'](isLogin)}
+      />
+
+      {!isLogin && (
+        <Input
+          name='confirmPassword'
+          type='password'
+          labelName='Confirm Password'
+          validationOptions={validationObj['confirmPassword'](passwordValue)}
+        />
+      )}
+    </>
+  );
+}
+
+export default function Authenticate({ onSubmit, authUser }) {
+  const { authenticated } = React.useContext(CurrentUserContext);
+  const { createNotification } = React.useContext(NotificationContext);
+  const formStates = ['Log in', 'Sign up', 'Confirm Sign Up'];
 
   const [formState, setFormState] = React.useState(0);
-  const { register, handleSubmit, errors, watch, clearErrors } = useForm({
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    errors,
+    clearErrors,
+    getValues,
+    reset,
+  } = useForm({
     reValidateMode: 'onBlur',
   });
 
@@ -194,7 +336,43 @@ export default function Authenticate({ onSubmit = onSubmitForm }) {
   };
 
   const isLogin = formState === 0;
-  const passwordValue = !isLogin ? watch('password', false) : '';
+  const shouldConfirmUser = formState === 2;
+
+  const submitLogicObj = {
+    [formStates[0]]: async formData => {
+      return signIn(formData);
+    },
+    [formStates[1]]: async formData => {
+      await signUp(formData);
+      setFormState(2);
+      reset({ username: formData.username });
+    },
+    [formStates[2]]: async formData => {
+      await confirmSignUp(formData);
+    },
+  };
+
+  const submitForm = async formData => {
+    setIsLoading(true);
+    const currentFormState = formStates[formState];
+    try {
+      await submitLogicObj[currentFormState](formData);
+    } catch (error) {
+      if (error.errorData.message.search(/not confirmed/i) > -1) {
+        setFormState(2);
+        createNotification('Please confirm your account', 'warning', 4000);
+        reset({ username: formData.username });
+      }
+      console.error(error);
+      createNotification(error.message, 'error', 4000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (authenticated) {
+    return <Redirect to='/' />;
+  }
 
   return (
     <SectionAuth className='container' variants={sectionVariants}>
@@ -210,62 +388,70 @@ export default function Authenticate({ onSubmit = onSubmitForm }) {
           />
         </AnimatePresence>
       </ImageContainer>
+
       <FormContainer>
-        <motion.h2
-          variants={formHeaderVariants}
-          initial='hidden'
-          animate='visible'
-          layoutTransition={{ type: 'tween' }}>
-          {formStates[formState]}
-        </motion.h2>
-        <FormProvider register={register} errors={errors}>
-          <Form
-            data-testid='authForm'
-            variants={formVariants}
-            initial='hidden'
-            animate='up'
-            exit='hidden'
-            autoComplete='off'
-            onSubmit={handleSubmit(onSubmit.bind(null, isLogin))}>
-            <Input
-              name='username'
-              type='text'
-              labelName='Username'
-              validationOptions={validationObj['username'](isLogin)}
-            />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <>
+            <AnimateSharedLayout>
+              <motion.h2
+                key='FormHeader'
+                variants={formHeaderVariants}
+                initial='hidden'
+                animate='visible'
+                layout>
+                {formStates[formState]}
+              </motion.h2>
 
-            <Input
-              name='password'
-              type='password'
-              labelName='Password'
-              validationOptions={validationObj['password'](isLogin)}
-            />
+              <FormProvider
+                register={register}
+                errors={errors}
+                getValues={getValues}>
+                <Form
+                  key='Form'
+                  data-testid='authForm'
+                  variants={formVariants}
+                  initial='hidden'
+                  animate='up'
+                  exit='hidden'
+                  autoComplete='off'
+                  onSubmit={handleSubmit(submitForm)}
+                  layout>
+                  <Input
+                    name='username'
+                    type='text'
+                    labelName='Username'
+                    validationOptions={validationObj['username'](isLogin)}
+                    disabled={formState === 2}
+                  />
+                  {!shouldConfirmUser ? (
+                    <RegularForm isLogin={isLogin} />
+                  ) : (
+                    <ConfirmationForm />
+                  )}
+                  <SubmitButton
+                    variants={inputVariants}
+                    positionTransition={true}>
+                    {formStates[formState]}
+                  </SubmitButton>
+                </Form>
+              </FormProvider>
+            </AnimateSharedLayout>
 
-            {!isLogin && (
-              <Input
-                name='confirmPassword'
-                type='password'
-                labelName='Confirm Password'
-                validationOptions={validationObj['confirmPassword'](
-                  passwordValue
-                )}
-              />
+            {!!formState < 2 && (
+              <motion.p
+                variants={switchTextVariants}
+                initial='hidden'
+                animate='visible'
+                exit='hidden'
+                transition={{ delay: 0.4 }}
+                onClick={changeFormState}>
+                {isLogin ? 'Not a member? ' : 'Already a member? '}Click here
+              </motion.p>
             )}
-
-            <SubmitButton variants={inputVariants} positionTransition={true}>
-              {formStates[formState]}
-            </SubmitButton>
-          </Form>
-        </FormProvider>
-        <motion.p
-          variants={switchTextVariants}
-          initial='hidden'
-          animate='visible'
-          positionTransition={true}
-          transition={{ delay: 0.4 }}
-          onClick={changeFormState}>
-          {isLogin ? 'Not a member? ' : 'Already a member? '}Click here
-        </motion.p>
+          </>
+        )}
       </FormContainer>
     </SectionAuth>
   );

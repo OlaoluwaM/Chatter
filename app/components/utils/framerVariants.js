@@ -124,3 +124,38 @@ export const authPageVariants = {
     hidden: { opacity: 0, y: 40 },
   },
 };
+
+export const loadingCompVariants = {
+  overlayVariants: {
+    visible: { ...generalOrchestration.visible },
+    hidden: { ...generalOrchestration.hidden, opacity: 0 },
+  },
+  spinnerVariants: {
+    visible: { scale: 1, opacity: 1 },
+    hidden: { scale: 0, opacity: 0 },
+  },
+};
+
+export const notificationCompVariants = {
+  notificationStoreVariant: {
+    visible: {
+      ...generalOrchestration.visible,
+      transitionEnd: { zIndex: 999999 },
+    },
+    hidden: {
+      ...generalOrchestration.hidden,
+      opacity: 0,
+      transitionEnd: { zIndex: -11111 },
+    },
+  },
+  notificationItemVariant: {
+    visible: {
+      opacity: 1,
+      x: 0,
+    },
+    hidden: {
+      opacity: 0,
+      x: 150,
+    },
+  },
+};

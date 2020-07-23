@@ -8,8 +8,6 @@ import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 
 import '@testing-library/jest-dom/extend-expect';
 
-// TODO Refactor Authentication form tests with .each and other APIs
-
 afterEach(cleanup);
 
 const onSubmit = jest.fn();
@@ -67,7 +65,7 @@ const testData = {
 
 async function generalElements(sc) {
   const usernameInput = await sc.findByLabelText(/username/i);
-  const passwordInput = await sc.findByLabelText(/password/i);
+  const passwordInput = await sc.findByLabelText(/^password/i);
   const submitButton = await sc.findByRole('button');
   return { usernameInput, passwordInput, submitButton };
 }
@@ -80,9 +78,6 @@ describe('Login tests', () => {
       passwordInput,
       submitButton,
     } = await generalElements(screen);
-    // const usernameInput = await screen.findByLabelText(/username/i);
-    // const passwordInput = await screen.findByLabelText(/password/i);
-    // const submitButton = await screen.findByRole('button');
     const { validPassword, validUsername } = testData;
     // Act
     await act(async () => {
@@ -101,8 +96,7 @@ describe('Login tests', () => {
   describe('With invalid inputs', () => {
     test('Invalid username', async () => {
       // Arrange
-      const usernameInput = await screen.findByLabelText(/username/i);
-      const submitButton = await screen.findByRole('button');
+      const { usernameInput, submitButton } = await generalElements(screen);
       const { invalidUsername } = testData;
       // Act
       await act(async () => {
@@ -135,21 +129,22 @@ describe('Login tests', () => {
 });
 
 describe('Sign up tests', () => {
-  beforeEach(async () => {
-    const switchText = await screen.findByText(/not a member/i);
-    await act(async () => {
-      fireEvent.click(switchText);
-    });
+  beforeEach(() => {
+    const switchText = screen.getByText(/not a member/i);
+
+    fireEvent.click(switchText);
   });
 
   test('With valid inputs', async () => {
     // Arrange
-    const usernameInput = await screen.findByLabelText(/username/i);
-    const passwordInput = await screen.findByLabelText(/^password/i);
+    const {
+      usernameInput,
+      passwordInput,
+      submitButton,
+    } = await generalElements(screen);
     const confirmPasswordInput = await screen.findByLabelText(
       /confirm password/i
     );
-    const submitButton = await screen.findByRole('button');
     const { validPassword, validUsername } = testData;
     // Act
     await act(async () => {
@@ -177,8 +172,7 @@ describe('Sign up tests', () => {
   describe('With invalid inputs', () => {
     test('Invalid username', async () => {
       // Arrange
-      const usernameInput = await screen.findByLabelText(/username/i);
-      const submitButton = await screen.findByRole('button');
+      const { usernameInput, submitButton } = await generalElements(screen);
       const { invalidUsername } = testData;
       // Act
       await act(async () => {
@@ -195,8 +189,7 @@ describe('Sign up tests', () => {
 
     test('Invalid password', async () => {
       // Arrange
-      const passwordInput = await screen.findByLabelText(/^password/i);
-      const submitButton = await screen.findByRole('button');
+      const { passwordInput, submitButton } = await generalElements(screen);
       const { invalidPassword } = testData;
       // Act
       await act(async () => {
@@ -217,11 +210,10 @@ describe('Sign up tests', () => {
 
     test('Invalid confirm password input', async () => {
       // Arrange
-      const passwordInput = await screen.findByLabelText(/^password/i);
+      const { passwordInput, submitButton } = await generalElements(screen);
       const confirmPasswordInput = await screen.findByLabelText(
         /confirm password/i
       );
-      const submitButton = await screen.findByRole('button');
       const { invalidPassword, validPassword } = testData;
       // Act
       await act(async () => {

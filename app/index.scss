@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&family=Raleway:wght@100;700&display=swap');
+* {
+  box-sizing: border-box;
+  outline: rgba(0, 0, 0, 0.4);
+}
 
 $fontWeight: (
   'thin': 100,
@@ -9,17 +13,14 @@ $fontWeight: (
 
 $colorPalette: (
   black: #16161a,
+  blackLighter: #242629,
+  blackDarker: #010101,
+  baseColor: #7f5af0,
   white: #fffffe,
-  grayLight: #e9ecef,
-  grayDark: #94a1b2,
-  baseColorDarkest: #240046,
-  baseColorDark: #3c096c,
-  baseColor: #5a189a,
-  baseColorLight: #7319af,
-  baseColorLightest: #7f5af0,
+  gray: #94a1b2,
+  grayLight: #d4c7fa,
+  accentColor: #2cb67d,
 );
-// baseColorLighter: #9d4edd,
-// baseColorDarkest: #10002b,
 
 // Note accent font is Raleway thin (font-weight: 100)
 $primaryFont: 'Raleway' sans-serif;
@@ -57,10 +58,28 @@ body {
 }
 .nav-item {
   transition: color 0.3s ease;
-  color: change-color($color: map-get($colorPalette, grayDark), $alpha: 0.6);
+  color: change-color($color: map-get($colorPalette, white), $alpha: 0.3);
 }
 .nav-item:hover,
 .nav-item:active,
 .active-page {
   color: map-get($colorPalette, white);
+}
+
+// TODO try to use a for loop for this
+.top-right {
+  top: 12px;
+  right: 12px;
+}
+.bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+.top-left {
+  top: 12px;
+  left: 12px;
+}
+.bottom-left {
+  bottom: 12px;
+  left: 12px;
 }

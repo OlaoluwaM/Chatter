@@ -1,48 +1,56 @@
 'use strict';
 import { Auth } from 'aws-amplify';
-import { responseWrapper } from './helpers';
+import { generateErrorWrapper } from './helpers';
 
 const passwordPatterRegex = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}/
 );
 
-export async function signUp(formData) {
-  const { username, password, email } = formData;
+export async function signUp({ username, password, email }) {
   try {
-    const user = await Auth.signUp({
+    return await Auth.signUp({
       username,
       password,
       attributes: {
         email,
       },
     });
-    console.log({ user });
-    return responseWrapper('success', user);
   } catch (error) {
-    console.error(`An error occurred signing you up. ${error}`);
-    return responseWrapper('error', error);
+    throw generateErrorWrapper('An error occurred signing you up.', error);
   }
 }
 
-export async function signIn(formData) {
-  const { username, password } = formData;
+export async function confirmSignUp({ username, code }) {
   try {
-    const user = await Auth.signIn(username, password);
-    console.log(user);
-    return responseWrapper('success', user);
+    await Auth.confirmSignUp(username, code);
   } catch (error) {
-    console.error(`An error occurred logging you in. ${error}`);
-    return responseWrapper('error', error);
+    throw generateErrorWrapper('An error occurred confirming sign up', error);
+  }
+}
+
+export async function signIn({ username, password }) {
+  try {
+    return await Auth.signIn(username, password);
+  } catch (error) {
+    throw generateErrorWrapper('An error occurred logging you in', error);
   }
 }
 
 export async function signOut() {
   try {
     await Auth.signOut();
-    return responseWrapper('success', 'You have been logged Out');
+    return 'You have been logged out';
   } catch (error) {
-    console.error(`An error occurred signing you out. ${error}`);
-    return responseWrapper('error', error);
+    throw generateErrorWrapper('An error occurred signing you out.', error);
+  }
+}
+
+export async function resendConfirmationCode({ username }) {
+  try {
+    await Auth.resendSignUp(username);
+    return 'Code resent successfully';
+  } catch (error) {
+    throw generateErrorWrapper('error resending code', error);
   }
 }
 
@@ -72,6 +80,12 @@ export const validationObj = {
     };
   },
 
+  email() {
+    return {
+      required: 'Please provide your password.',
+    };
+  },
+
   username(isLogin) {
     if (isLogin) {
       return {
@@ -83,5 +97,9 @@ export const validationObj = {
       };
     }
     return { required: 'Please provide your username.' };
+  },
+
+  confirmCode() {
+    return { required: 'Please provide the code sent to your email' };
   },
 };

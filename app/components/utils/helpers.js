@@ -177,6 +177,22 @@ export function rawDataType(value) {
   return _toString.call(value).slice(8, -1).toLowerCase();
 }
 
-export function responseWrapper(type, data) {
-  return { type, data };
+export function generateErrorWrapper(message, error) {
+  return { message, errorData: error };
+}
+
+export function generateNotificationData(message, type, dismissTime) {
+  const notificationTypes = ['success', 'error', 'warning', 'info'];
+  const currentType = notificationTypes.includes(type)
+    ? type
+    : notificationTypes[0];
+
+  return {
+    id: generateRandomId(),
+    toast: {
+      message,
+      type: currentType,
+      dismissTime,
+    },
+  };
 }

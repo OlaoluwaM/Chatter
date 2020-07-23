@@ -4,7 +4,6 @@ import homeImage from '../assets/croods.png';
 
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { hexToRgb } from './utils/helpers';
 import { homePageVariants } from './utils/framerVariants';
 
 const {
@@ -37,7 +36,7 @@ const SectionHome = styled(motion.section).attrs({
     max-height: 9%;
     border: none;
     border-radius: 15px;
-    background: ${({ theme }) => theme.baseColorLightest};
+    background: ${({ theme }) => theme.baseColor};
     font-family: var(--secondaryFont);
     font-weight: var(--light);
     font-size: 1.1em;
