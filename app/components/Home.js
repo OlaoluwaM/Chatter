@@ -5,6 +5,7 @@ import homeImage from '../assets/croods.png';
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { homePageVariants } from './utils/framerVariants';
+import { CurrentUserContext } from './context/context';
 
 const {
   sectionVariants,
@@ -16,7 +17,7 @@ const {
 const SectionHome = styled(motion.section).attrs({
   className: 'container',
 })`
-  background: ${({ theme }) => theme.black};
+  background: ${({ theme }) => theme.background};
   display: flex;
   align-items: center;
   position: relative;
@@ -24,7 +25,7 @@ const SectionHome = styled(motion.section).attrs({
   & > button {
     position: absolute;
     bottom: 17%;
-    color: ${({ theme }) => theme.white};
+    color: #fffffe;
     left: 10%;
     display: block;
     text-align: center;
@@ -57,7 +58,7 @@ const SectionHome = styled(motion.section).attrs({
 const ForeFrontH1 = styled(motion.h1)`
   font-family: var(--primaryFont);
   font-weight: var(--bold);
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.whiteOrBlack};
   text-align: left;
   overflow-wrap: break-word;
   margin: 0;
@@ -76,6 +77,9 @@ const Image = styled(motion.img)`
 `;
 
 export default function Home() {
+  const { authenticated } = React.useContext(CurrentUserContext);
+  console.log(authenticated);
+
   return (
     <SectionHome
       variants={sectionVariants}
@@ -84,7 +88,11 @@ export default function Home() {
       exit='hidden'>
       <ForeFrontH1 variants={homeH1Variants}>Welcome To Chatter</ForeFrontH1>
       <motion.button type='button' variants={buttonVariants}>
-        <NavLink to='/authenticate'>Sign Up</NavLink>
+        {!authenticated ? (
+          <NavLink to='/authenticate'>Sign Up</NavLink>
+        ) : (
+          <NavLink to='/chatroom'>Talk to others</NavLink>
+        )}
       </motion.button>
       <Image
         variants={imageVariants}
