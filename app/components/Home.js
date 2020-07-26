@@ -78,7 +78,6 @@ const Image = styled(motion.img)`
 
 export default function Home() {
   const { authenticated } = React.useContext(CurrentUserContext);
-  console.log(authenticated);
 
   return (
     <SectionHome
