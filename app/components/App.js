@@ -4,10 +4,9 @@ import NavBar from './NavBar';
 import Loading from './Loading';
 import Notifications from './Notifications';
 
-import { Auth, Hub } from 'aws-amplify';
 import { Route, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { generateNotificationData, animateCSS } from './utils/helpers';
+import { generateNotificationData } from './utils/helpers';
 import {
   themeObj,
   CurrentUserContext,
@@ -16,9 +15,7 @@ import {
 
 const Authenticate = React.lazy(() => import('./Auth'));
 
-// FIX The light theme
 export default function App() {
-  const [theme, setTheme] = React.useState('dark');
   const [notifications, setNotifications] = React.useState([]);
 
   const [activeUser, setActiveUser] = React.useState({
@@ -26,53 +23,9 @@ export default function App() {
     authenticated: false,
   });
 
-  React.useEffect(() => {
-    const checkIfUserIsStillLoggedIn = async () => {
-      try {
-        const currentUser = await Auth.currentAuthenticatedUser();
-        setActiveUser({ activeUser: currentUser, authenticated: true });
-        createNotification(
-          `Welcome Back! ${currentUser.username}`,
-          'success',
-          4000
-        );
-      } catch (error) {
-        console.error('User is no longer logged in', error);
-      }
-    };
-
-    Hub.listen('auth', data => {
-      console.log(data);
-
-      switch (data.payload.event) {
-        case 'signIn':
-        case 'signUp':
-          setActiveUser({ activeUser: data.payload.data, authenticated: true });
-          break;
-
-        case 'signOut':
-          setActiveUser({ activeUser: null, authenticated: false });
-          createNotification(
-            'You have logged out successfully',
-            'success',
-            5000
-          );
-          break;
-
-        case 'signIn_failure':
-          createNotification(data.payload.message, 'warning', 5000);
-          break;
-      }
-    });
-
-    // checkIfUserIsStillLoggedIn();
-  }, []);
-
   const deleteNotification = id => {
     console.log('closing notification with id: ' + id);
-    animateCSS(id, 'backOutRight').then(() => {
-      setNotifications(prevArr => prevArr.filter(({ id: Id }) => Id !== id));
-    });
+    setNotifications(prevArr => prevArr.filter(({ id: Id }) => Id !== id));
   };
 
   const createNotification = (message, type, dismissTime) => {
@@ -86,12 +39,12 @@ export default function App() {
   };
 
   return (
-    <ThemeProvider theme={themeObj[theme]}>
+    <ThemeProvider theme={themeObj}>
       <NotificationContext.Provider
         value={{ createNotification, deleteNotification }}>
         <CurrentUserContext.Provider value={activeUser}>
-          <div className={`theme-${theme}`}>
-            <NavBar setTheme={setTheme} />
+          <div>
+            <NavBar />
             <Notifications notificationList={notifications} />
 
             <React.Suspense fallback={<Loading />}>

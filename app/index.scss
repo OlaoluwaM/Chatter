@@ -1,7 +1,4 @@
-@use "sass:string";
-@import '~animate.css/animate.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&family=Raleway:wght@100;700&display=swap');
-
 * {
   box-sizing: border-box;
   outline: rgba(0, 0, 0, 0.4);
@@ -14,30 +11,16 @@ $fontWeight: (
   'light': 300,
 );
 
-$colorPaletteDark: (
-  background: #16161a,
-  backgroundLighter: #242629,
-  backgroundDarker: #010101,
+$colorPalette: (
+  black: #16161a,
+  blackLighter: #242629,
+  blackDarker: #010101,
   baseColor: #7f5af0,
-  whiteOrBlack: #fffffe,
+  white: #fffffe,
   gray: #94a1b2,
   grayLight: #d4c7fa,
   accentColor: #2cb67d,
 );
-
-$colorPaletteLight: (
-  background: #ebebeb,
-  backgroundLighter: #fffffe,
-  backgroundDarker: #d6d6d6,
-  baseColor: #6246ea,
-  whiteOrBlack: #16161a,
-  gray: #d1d1e9,
-  grayLight: #d4c7fa,
-  accentColor: #e45858,
-);
-
-$NotificationStorePositions: 'top-left', 'top-right', 'bottom-left',
-  'bottom-right';
 
 // Note accent font is Raleway thin (font-weight: 100)
 $primaryFont: 'Raleway' sans-serif;
@@ -73,44 +56,30 @@ body {
   color: red;
   margin: 0;
 }
-
-div.theme-dark {
-  .nav-item {
-    transition: color 0.3s ease;
-    color: change-color(
-      $color: map-get($colorPaletteDark, whiteOrBlack),
-      $alpha: 0.3
-    );
-  }
-  .nav-item:hover,
-  .nav-item:active,
-  .active-page {
-    color: map-get($colorPaletteDark, whiteOrBlack);
-  }
+.nav-item {
+  transition: color 0.3s ease;
+  color: change-color($color: map-get($colorPalette, white), $alpha: 0.3);
+}
+.nav-item:hover,
+.nav-item:active,
+.active-page {
+  color: map-get($colorPalette, white);
 }
 
-div.theme-light {
-  .nav-item {
-    transition: color 0.3s ease;
-    color: change-color(
-      $color: map-get($colorPaletteLight, whiteOrBlack),
-      $alpha: 0.3
-    );
-  }
-  .nav-item:hover,
-  .nav-item:active,
-  .active-page {
-    color: map-get($colorPaletteLight, whiteOrBlack);
-  }
+// TODO try to use a for loop for this
+.top-right {
+  top: 12px;
+  right: 12px;
 }
-
-@each $position in $NotificationStorePositions {
-  $indexOfDash: string.index($position, '-');
-  $firstProperty: string.slice($position, 1, $indexOfDash - 1);
-  $lastProperty: string.slice($position, $indexOfDash + 1, -1);
-
-  .#{string.unquote($position)} {
-    #{string.unquote($firstProperty)}: 12px;
-    #{string.unquote($lastProperty)}: 12px;
-  }
+.bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+.top-left {
+  top: 12px;
+  left: 12px;
+}
+.bottom-left {
+  bottom: 12px;
+  left: 12px;
 }

@@ -10,28 +10,16 @@ const notificationColors = {
   warning: '#FFDB24',
 };
 
+// TODO refactor so it is easier to switch between light and dark modes
 export const themeObj = {
-  dark: {
-    background: '#16161a',
-    backgroundLighter: '#242629',
-    backgroundDarker: '#010101',
-    baseColor: '#7f5af0',
-    whiteOrBlack: '#fffffe',
-    gray: '#94a1b2',
-    grayLight: '#D4C7FA',
-    accentColor: '#2cb67d',
-    notificationColors,
-  },
-  light: {
-    background: '#EBEBEB',
-    backgroundLighter: '#fffffe',
-    backgroundDarker: '#D6D6D6',
-    baseColor: '#6246ea',
-    whiteOrBlack: '#16161a',
-    gray: '#d1d1e9',
-    grayLight: '#D4C7FA',
-    accentColor: '#e45858',
-    notificationColors,
-  },
+  black: '#16161a',
+  blackLighter: '#242629',
+  blackDarker: '#010101',
+  baseColor: '#7f5af0',
+  white: '#fffffe',
+  gray: '#94a1b2',
+  grayLight: '#D4C7FA',
+  accentColor: '#2cb67d',
+  notificationColors,
 };
 // export const themeObj

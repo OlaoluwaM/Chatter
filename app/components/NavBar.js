@@ -3,8 +3,8 @@ import { default as styled, keyframes } from 'styled-components';
 
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
+import { hexToRgb } from './utils/helpers';
 import { navBarVariants } from './utils/framerVariants';
-import { CurrentUserContext } from './context/context';
 
 const { navVariants, navItemVariants } = navBarVariants;
 
@@ -71,8 +71,6 @@ const NavItem = styled(motion.li)`
 `;
 
 export default function NavBar() {
-  const { authenticated } = React.useContext(CurrentUserContext);
-
   return (
     <Nav variants={navVariants} initial='hidden' animate='visible'>
       <ul>
@@ -83,21 +81,12 @@ export default function NavBar() {
           className='nav-item'>
           <NavItem variants={navItemVariants}>Home</NavItem>
         </NavLink>
-        {!authenticated ? (
-          <NavLink
-            to='/authenticate'
-            activeClassName='active-page'
-            className='nav-item'>
-            <NavItem variants={navItemVariants}>Join Us</NavItem>
-          </NavLink>
-        ) : (
-          <NavLink
-            to='/chatroom'
-            activeClassName='active-page'
-            className='nav-item'>
-            <NavItem variants={navItemVariants}>Chat</NavItem>
-          </NavLink>
-        )}
+        <NavLink
+          to='/authenticate'
+          activeClassName='active-page'
+          className='nav-item'>
+          <NavItem variants={navItemVariants}>Join Us</NavItem>
+        </NavLink>
       </ul>
     </Nav>
   );

@@ -148,7 +148,6 @@ export const notificationCompVariants = {
       transitionEnd: { zIndex: -11111 },
     },
   },
-
   notificationItemVariant: {
     visible: {
       opacity: 1,

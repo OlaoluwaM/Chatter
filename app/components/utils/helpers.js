@@ -196,32 +196,3 @@ export function generateNotificationData(message, type, dismissTime) {
     },
   };
 }
-
-export function makeHTMLId(id) {
-  return id.substr(0, 4);
-}
-
-export function animateCSS(node, animation) {
-  // We create a Promise and return it
-  return new Promise((resolve, reject) => {
-    let element = node;
-
-    if (!(node instanceof HTMLElement)) {
-      element = document.getElementById(`notification_${node}`);
-    }
-
-    const prefix = 'animate__';
-    const animationName = `${prefix}${animation}`;
-
-    element.classList.add(`${prefix}animated`, animationName);
-
-    // When the animation ends, we clean the classes and resolve the Promise
-    function handleAnimationEnd() {
-      element.classList.remove(`${prefix}animated`, animationName);
-      element.removeEventListener('animationend', handleAnimationEnd);
-      resolve('Animation ended');
-    }
-
-    element.addEventListener('animationend', handleAnimationEnd);
-  });
-}
