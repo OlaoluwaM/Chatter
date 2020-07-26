@@ -45,7 +45,7 @@ export async function signOut() {
   }
 }
 
-export async function resendConfirmationCode({ username }) {
+export async function resendConfirmationCode(username) {
   try {
     await Auth.resendSignUp(username);
     return 'Code resent successfully';
